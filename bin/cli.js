@@ -1,20 +1,56 @@
 #!/usr/bin/env node
-const npm = require('npm');
-const commander = require('commander');
+const fs = require('fs');
 const path = require('path');
+const helpers = require('../src/helpers');
+const commander = require('commander');
 const program = new commander.Command();
+const svgIcons = require('../src/svg-icons');
+const createFiles = require('../src/create-files');
 
-program.version('0.0.1');
+const packageJsonDir = path.join(process.cwd(), '/package.json');
+const packageJson = fs.existsSync(packageJsonDir) ? JSON.parse(fs.readFileSync(packageJsonDir, 'utf8')) : null;
 
-program
-  .command('fws-test <name>')
-  .action(function(name) {
-  	console.log(name)
+if (!packageJson || !packageJson.forwardslash) {
+    /*
+    * Check if CLI is running in a Forwardslash project.  */
+    helpers.consoleLogWarning('This directory does not support Forwardslash CLI', 'red', true);
+} else {
+    if (packageJson.forwardslash === 'starter_nuxt') {
+        const NuxtCLI = require('../src/nuxt-commands');
 
-	npm.load(() => {
-	  npm.run('test');
-	});
-  })
+        program.version('0.0.1');
+
+        /*
+        * Error on unknown commands.  */
+        program.on('command:*', function () {
+            console.error('Invalid command: %s', program.args.join(' '));
+            helpers.consoleLogWarning('Invalid command! Type \'fws -h\' for a list of available commands.', 'red', true);
+        });
+
+        NuxtCLI.mapCommand(program, 'dev');
+        NuxtCLI.mapCommand(program, 'build');
+        NuxtCLI.mapCommand(program, 'start');
+        NuxtCLI.mapCommand(program, 'generate');
+
+        program
+            .command('icons')
+            .description('optimizes and generates SVG icons')
+            .action(function () {
+                svgIcons.init(packageJson.forwardslash);
+            });
+
+        program
+            .command('create-file <name>')
+            .alias('cf')
+            .description('creates files')
+            .option('-b, --block', 'create block component')
+            .option('-p, --part', 'create part component')
+            .action(function (arg, cmd) {
+                createFiles.init(arg, cmd);
+            });
+
+        program.parse(process.argv);
+    }
+}
 
 
-program.parse(process.argv);

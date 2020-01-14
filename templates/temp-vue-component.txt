@@ -1,0 +1,23 @@
+<template>
+    <div class="<%= componentClass %>">
+        <h2>{{title}}</h2>
+    </div>
+</template>
+
+<script>
+    export default {
+        props: {
+        },
+        data() {
+            return {
+                title: 'This is title of "<%= componentName %>"!'
+            }
+        }
+    };
+</script>
+
+<style lang="scss" scoped>
+    .<%= componentClass %> {
+
+    }
+</style>
