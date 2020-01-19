@@ -19,7 +19,10 @@ module.exports = {
 
     init: function (starter) {
         this.handleSvgFiles();
-        this.generateVueFile(starter);
+
+        if (starter === 'fws_starter_nuxt') {
+            this.generateVueFile();
+        }
     },
 
     handleSvgFiles: function () {
@@ -52,10 +55,10 @@ module.exports = {
         });
     },
 
-    generateVueFile: function (starter) {
+    generateVueFile: function () {
         Promise.all(this.optimizeSVGs)
             .then(() => {
-                const svgIconGenTempFile = path.join(helpers.moduleDir, 'templates', `temp-svg-gen-${starter}.txt`);
+                const svgIconGenTempFile = path.join(helpers.moduleDir, 'templates', 'temp-svg-gen-starter_nuxt.txt');
                 const svgIconGenTemp = fs.readFileSync(svgIconGenTempFile, 'utf8');
                 let importStrings = '';
                 let componentsStrings = '';

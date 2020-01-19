@@ -5,6 +5,7 @@ const colors = require('ansi-colors');
 const notifier = require('node-notifier');
 const _template = require('lodash.template');
 const moduleDir = path.dirname(__dirname);
+const execSync = require('child_process').execSync;
 
 module.exports = {
     moduleDir: path.dirname(__dirname),
@@ -60,5 +61,18 @@ module.exports = {
 
             return agg;
         }, {});
+    },
+
+    mapCommand: function (program, script, desc) {
+        program
+            .command(script)
+            .description(desc)
+            .action(function () {
+                module.exports.runTask(script);
+            });
+    },
+
+    runTask: function (task) {
+        execSync('npm run ' + task, {stdio: [0, 1, 2]});
     }
 };

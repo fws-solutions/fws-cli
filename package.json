@@ -1,6 +1,6 @@
 {
     "name": "forwardslash-cli",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "description": "",
     "main": "index.js",
     "scripts": {
@@ -18,7 +18,6 @@
         "lodash.startcase": "^4.4.0",
         "lodash.template": "^4.5.0",
         "node-notifier": "^6.0.0",
-        "npm": "^6.13.6",
         "svgo": "^1.3.2"
     }
 }

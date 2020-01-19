@@ -1,0 +1,10 @@
+<?php
+/**
+ * @var string $title
+ */
+extract( (array) get_query_var( 'content-components' ) );
+?>
+
+<div class="<%= str %>">
+	<h2><?php echo $title; ?></h2>
+</div><!-- .<%= str %> -->

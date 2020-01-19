@@ -4,42 +4,33 @@
  * @description CLI script for creating Vue components.
  */
 
-const fs = require('fs');
-const path = require('path');
-const _startCase = require('lodash.startcase');
-const _template = require('lodash.template');
 const helpers = require('../helpers');
+const cfStarterS = require('./create-files-s');
+const cfStarterNuxt = require('./create-files-nuxt');
 
 module.exports = {
-    init: function (name, cmd) {
-        const options = helpers.cleanCmdArgs(cmd);
-
-        if (options.block) {
-            module.exports.createFiles(name, 'block');
-        } else if (options.part) {
-            module.exports.createFiles(name, 'part');
-        } else {
-            helpers.consoleLogWarning('WARNING: no parameters were passed');
+    init: function (name, cmd, starter) {
+        switch (starter) {
+            case 'fws_starter_nuxt':
+                module.exports.checkCommand(cfStarterNuxt.init, name, cmd);
+                break;
+            case 'fws_starter_s':
+                module.exports.checkCommand(cfStarterS.init, name, cmd);
+                break;
+            default:
+                helpers.consoleLogWarning('This is an unknown Starter!', 'red');
         }
     },
 
-    createFiles: function (name, type) {
-        const fileName = _startCase(type) + _startCase(name).replace(/ /g, '');
-        const directory = path.join(process.cwd(), 'components', `${type}s`, `${fileName}.vue`);
+    checkCommand: function(createFile, name, cmd) {
+        const options = helpers.cleanCmdArgs(cmd);
 
-        if (!fs.existsSync(directory)) {
-            const vueComponentTempFile = path.join(helpers.moduleDir, 'templates', 'temp-vue-component.txt');
-            const vueComponentTemp = fs.readFileSync(vueComponentTempFile, 'utf8');
-            const compiledVueComponentTemp = _template(vueComponentTemp);
-            const dataVueComponent = compiledVueComponentTemp({
-                componentName: fileName,
-                componentClass: name
-            });
-
-            fs.writeFileSync(directory, dataVueComponent, 'utf8');
-            helpers.consoleLogWarning(`New component ${type} "${fileName}.vue" is created!`, 'cyan');
+        if (options.block) {
+            createFile(name, 'block');
+        } else if (options.part) {
+            createFile(name, 'part');
         } else {
-            helpers.consoleLogWarning(`WARNING: Component ${type}: '${fileName}' already exists`);
+            helpers.consoleLogWarning('WARNING: no parameters were passed');
         }
     }
 };
