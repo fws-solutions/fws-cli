@@ -3,10 +3,10 @@ const fs = require('fs');
 const path = require('path');
 const helpers = require('../src/helpers');
 const commander = require('commander');
-const program = new commander.Command();
 const svgIcons = require('../src/svg-icons');
 const createFiles = require('../src/create-files');
 
+const program = new commander.Command();
 const packageJsonDir = path.join(process.cwd(), '/package.json');
 const packageJson = fs.existsSync(packageJsonDir) ? JSON.parse(fs.readFileSync(packageJsonDir, 'utf8')) : null;
 
