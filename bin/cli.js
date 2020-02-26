@@ -54,9 +54,11 @@ if (!packageJson || !packageJson.forwardslash) {
             helpers.mapCommand(program, 'build', 'runs production build');
             helpers.mapCommand(program, 'css', 'compiles CSS files');
             helpers.mapCommand(program, 'js', 'compiles JS files');
-            helpers.mapCommand(program, 'w3', 'runs w3 validator');
+            helpers.mapCommand(program, 'w3', 'runs W3 validator');
             helpers.mapCommand(program, 'lint-html', 'lint check of HTML files');
             helpers.mapCommand(program, 'lint-css', 'lint check of SCSS files');
+            helpers.mapCommand(program, 'lint-js', 'lint check of JS files');
+            helpers.mapCommand(program, 'remove-fe', 'removes all fe files from template-views directories');
             break;
         default:
             helpers.consoleLogWarning('This is an unknown Starter!', 'red');

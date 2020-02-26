@@ -14,26 +14,24 @@ const helpers = require('../helpers');
 const SHF = require('./svg-handle-files');
 
 module.exports = {
-    svgDirPath: path.join(process.cwd(), 'assets', 'svg'),
     optimizeSVGs: [],
 
     init: function (starter) {
-        this.handleSvgFiles();
+        const svgDirPath = path.join(process.cwd(), `${starter === 'fws_starter_s' ? 'src/' : ''}assets/svg`);
 
-        if (starter === 'fws_starter_nuxt') {
-            this.generateVueFile();
-        }
+        this.handleSvgFiles(svgDirPath);
+        this.generateVueFile(svgDirPath, starter);
     },
 
-    handleSvgFiles: function () {
-        fs.readdirSync(this.svgDirPath).forEach((file, i, allFiles) => {
-            const filePath = path.join(this.svgDirPath, file);
+    handleSvgFiles: function (svgDirPath) {
+        fs.readdirSync(svgDirPath).forEach((file, i, allFiles) => {
+            const filePath = path.join(svgDirPath, file);
 
             // remove non svg files from folder
             if (path.extname(file) !== '.svg') {
                 try {
                     fs.unlinkSync(filePath);
-                    helpers.consoleLogWarning(`deleted '${path.relative(this.svgDirPath, filePath)}' as it is not an SVG file`, 'red');
+                    helpers.consoleLogWarning(`deleted '${path.relative(svgDirPath, filePath)}' as it is not an SVG file`, 'red');
                 } catch (err) {
                     fancyLog(colors.red(err));
                 }
@@ -46,7 +44,7 @@ module.exports = {
                     })
                     .then(() => {
                         // clean file name and prefix it
-                        return SHF.renameSvgFiles(file, filePath, allFiles, this.svgDirPath);
+                        return SHF.renameSvgFiles(file, filePath, allFiles, svgDirPath);
                     });
 
                 // store all optimization Promise functions
@@ -55,19 +53,21 @@ module.exports = {
         });
     },
 
-    generateVueFile: function () {
+    generateVueFile: function (svgDirPath, starter) {
         Promise.all(this.optimizeSVGs)
             .then(() => {
-                const svgIconGenTempFile = path.join(helpers.moduleDir, 'templates', 'temp-svg-gen-starter_nuxt.txt');
+                const svgIconGenTempFile = path.join(helpers.moduleDir, 'templates', 'temp-svg-gen.txt');
                 const svgIconGenTemp = fs.readFileSync(svgIconGenTempFile, 'utf8');
                 let importStrings = '';
                 let componentsStrings = '';
 
-                const compiledImport = _template('    import <%= componentName %> from \'~/assets/svg/<%= fileName %>.svg?inline\';\n');
+                const compiledImportSrc = starter === 'fws_starter_s' ? '../../../../assets/svg/<%= fileName %>.svg' : '~/assets/svg/<%= fileName %>.svg?inline';
+
+                const compiledImport = _template(`    import <%= componentName %> from '${compiledImportSrc}';\n`);
                 const compiledComponent = _template('            <%= componentName %>,\n');
                 const compiledSvgIconGenFile = _template(svgIconGenTemp);
 
-                fs.readdirSync(this.svgDirPath).forEach(file => {
+                fs.readdirSync(svgDirPath).forEach(file => {
                     const fileName = path.basename(file, '.svg');
                     const componentName = _startCase(fileName.replace('ico-', '')).replace(' ', '');
 
@@ -86,7 +86,9 @@ module.exports = {
                     components: componentsStrings
                 });
 
-                fs.writeFileSync('components/plugins/SvgIcon/SvgIconGen.vue', dataSvgIconGen, 'utf8');
+                const writeDir = starter === 'fws_starter_s' ? 'src/vue/components/parts/SvgIcon/SvgIconGen.vue' : 'components/plugins/SvgIcon/SvgIconGen.vue';
+
+                fs.writeFileSync(writeDir, dataSvgIconGen, 'utf8');
                 helpers.consoleLogWarning('SVGs are optimized and SvgIconGen.vue file is generated!', 'cyan');
             })
             .catch(error => {
