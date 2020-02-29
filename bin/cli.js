@@ -10,13 +10,19 @@ const program = new commander.Command();
 const packageJsonDir = path.join(process.cwd(), '/package.json');
 const packageJson = fs.existsSync(packageJsonDir) ? JSON.parse(fs.readFileSync(packageJsonDir, 'utf8')) : null;
 
+const starter = {
+  nuxt: 'fws_starter_nuxt',
+  s: 'fws_starter_s'
+};
+
+program.version('0.3.1');
+
 if (!packageJson || !packageJson.forwardslash) {
+    program.parse(process.argv);
     /*
     * Check if CLI is running in a Forwardslash project.  */
     helpers.consoleLogWarning('This directory does not support Forwardslash CLI', 'red', true);
 } else {
-    program.version('0.0.1');
-
     /*
     * Error on unknown commands.  */
     program.on('command:*', function () {
@@ -31,24 +37,24 @@ if (!packageJson || !packageJson.forwardslash) {
             svgIcons.init(packageJson.forwardslash);
         });
 
-    program
-        .command('create-file <name>')
-        .alias('cf')
-        .description('creates files')
-        .option('-b, --block', 'create block component')
-        .option('-p, --part', 'create part component')
-        .action(function (arg, cmd) {
-            createFiles.init(arg, cmd, packageJson.forwardslash);
-        });
-
     switch (packageJson.forwardslash) {
-        case 'fws_starter_nuxt':
+        case helpers.starterNuxt:
             helpers.mapCommand(program, 'dev', 'runs nuxt dev script');
             helpers.mapCommand(program, 'build', 'runs nuxt dev script');
             helpers.mapCommand(program, 'start', 'runs nuxt dev script');
             helpers.mapCommand(program, 'generate', 'runs nuxt dev script');
+
+            program
+                .command('create-file <name>')
+                .alias('cf')
+                .description('creates files')
+                .option('-b, --block', 'create block component')
+                .option('-p, --part', 'create part component')
+                .action(function (arg, cmd) {
+                    createFiles.init(arg, cmd, helpers.starterNuxt);
+                });
             break;
-        case 'fws_starter_s':
+        case helpers.starterS:
             helpers.mapCommand(program, 'dev', 'runs watch task');
             helpers.mapCommand(program, 'build-dev', 'runs development build');
             helpers.mapCommand(program, 'build', 'runs production build');
@@ -59,6 +65,18 @@ if (!packageJson || !packageJson.forwardslash) {
             helpers.mapCommand(program, 'lint-css', 'lint check of SCSS files');
             helpers.mapCommand(program, 'lint-js', 'lint check of JS files');
             helpers.mapCommand(program, 'remove-fe', 'removes all fe files from template-views directories');
+
+            program
+                .command('create-file <name>')
+                .alias('cf')
+                .description('creates files')
+                .option('-b, --block', 'create template-view block')
+                .option('-p, --part', 'create template-view part')
+                .option('-B, --block-vue', 'create vue block')
+                .option('-P, --part-vue', 'create vue part')
+                .action(function (arg, cmd) {
+                    createFiles.init(arg, cmd, helpers.starterS);
+                });
             break;
         default:
             helpers.consoleLogWarning('This is an unknown Starter!', 'red');

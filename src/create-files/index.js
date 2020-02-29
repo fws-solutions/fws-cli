@@ -5,32 +5,35 @@
  */
 
 const helpers = require('../helpers');
-const cfStarterS = require('./create-files-s');
-const cfStarterNuxt = require('./create-files-nuxt');
+const cfTempView = require('./create-files-temp-view');
+const cfVue = require('./create-files-vue');
 
 module.exports = {
     init: function (name, cmd, starter) {
-        switch (starter) {
-            case 'fws_starter_nuxt':
-                module.exports.checkCommand(cfStarterNuxt.init, name, cmd);
-                break;
-            case 'fws_starter_s':
-                module.exports.checkCommand(cfStarterS.init, name, cmd);
-                break;
-            default:
-                helpers.consoleLogWarning('This is an unknown Starter!', 'red');
+        let option = helpers.cleanCmdArgs(cmd);
+        option = Object.keys(option)[0];
+
+        if (option) {
+            module.exports.checkStarter(name, option, starter);
+        } else {
+            helpers.consoleLogWarning('WARNING: no parameters were passed');
         }
     },
 
-    checkCommand: function(createFile, name, cmd) {
-        const options = helpers.cleanCmdArgs(cmd);
+    checkStarter(name, option, starter) {
+        switch (starter) {
+            case helpers.starterNuxt:
+                cfVue.init(name, option, helpers.starterNuxt);
+                break;
+            case helpers.starterS:
+                const isVue = option.includes('Vue');
+                const cf = isVue ? cfVue : cfTempView;
+                const opt = isVue ? option.replace('Vue', '') : option;
 
-        if (options.block) {
-            createFile(name, 'block');
-        } else if (options.part) {
-            createFile(name, 'part');
-        } else {
-            helpers.consoleLogWarning('WARNING: no parameters were passed');
+                cf.init(name, opt, helpers.starterS);
+                break;
+            default:
+                helpers.consoleLogWarning('This is an unknown Starter!', 'red');
         }
     }
 };

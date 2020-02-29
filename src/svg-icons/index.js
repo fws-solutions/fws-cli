@@ -86,7 +86,7 @@ module.exports = {
                     components: componentsStrings
                 });
 
-                const writeDir = starter === 'fws_starter_s' ? 'src/vue/components/parts/SvgIcon/SvgIconGen.vue' : 'components/plugins/SvgIcon/SvgIconGen.vue';
+                const writeDir = starter === 'fws_starter_s' ? 'src/vue/components/base/SvgIcon/SvgIconGen.vue' : 'components/plugins/SvgIcon/SvgIconGen.vue';
 
                 fs.writeFileSync(writeDir, dataSvgIconGen, 'utf8');
                 helpers.consoleLogWarning('SVGs are optimized and SvgIconGen.vue file is generated!', 'cyan');

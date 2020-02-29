@@ -12,7 +12,12 @@ const colors = require('ansi-colors');
 const helpers = require('../helpers');
 
 module.exports = {
-    init: function (name, type) {
+    init: function (name, type, starter) {
+        if (starter !== helpers.starterS) {
+            helpers.consoleLogWarning('Something went wrong... this is NOT starter_s', 'red');
+            return;
+        }
+
         const part = `${type}s`;
         const directory = path.join(process.cwd(), 'template-views', part, name);
 
