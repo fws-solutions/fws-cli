@@ -15,7 +15,7 @@ const starter = {
   s: 'fws_starter_s'
 };
 
-program.version('0.3.1');
+program.version('0.4.1');
 
 if (!packageJson || !packageJson.forwardslash) {
     program.parse(process.argv);
