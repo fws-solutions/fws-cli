@@ -1,7 +1,7 @@
 /**
- * Create Vue File
+ * Create File
  *
- * @description CLI script for creating Vue components.
+ * @description CLI script for creating components.
  */
 
 const helpers = require('../helpers');

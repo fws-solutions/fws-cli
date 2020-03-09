@@ -5,6 +5,7 @@ const helpers = require('../src/helpers');
 const commander = require('commander');
 const svgIcons = require('../src/svg-icons');
 const createFiles = require('../src/create-files');
+const deleteFiles = require('../src/delete-files');
 
 const program = new commander.Command();
 const packageJsonDir = path.join(process.cwd(), '/package.json');
@@ -15,7 +16,7 @@ const starter = {
   s: 'fws_starter_s'
 };
 
-program.version('0.4.1');
+program.version('0.4.2');
 
 if (!packageJson || !packageJson.forwardslash) {
     program.parse(process.argv);
@@ -64,7 +65,6 @@ if (!packageJson || !packageJson.forwardslash) {
             helpers.mapCommand(program, 'lint-html', 'lint check of HTML files');
             helpers.mapCommand(program, 'lint-css', 'lint check of SCSS files');
             helpers.mapCommand(program, 'lint-js', 'lint check of JS files');
-            helpers.mapCommand(program, 'remove-fe', 'removes all fe files from template-views directories');
 
             program
                 .command('create-file <name>')
@@ -76,6 +76,14 @@ if (!packageJson || !packageJson.forwardslash) {
                 .option('-P, --part-vue', 'create vue part')
                 .action(function (arg, cmd) {
                     createFiles.init(arg, cmd, helpers.starterS);
+                });
+
+            program
+                .command('remove-fe')
+                .alias('rfe')
+                .description('remove all _fe files in template-views dir')
+                .action(function () {
+                    deleteFiles.init();
                 });
             break;
         default:
