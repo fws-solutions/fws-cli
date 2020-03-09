@@ -51,18 +51,22 @@ module.exports = {
         /*
         * Package commander passes the cmd object itself as options,
         * extract only passed values into a fresh object. */
-        return cmd.options.reduce(function (agg, cur) {
-            const key = module.exports.camelize(cur.long.replace(/^--/, ''));
+        if (!cmd) {
+            return null;
+        } else {
+            return cmd.options.reduce(function (agg, cur) {
+                const key = module.exports.camelize(cur.long.replace(/^--/, ''));
 
-            /*
-            * In case an option is not present and a command has a method with the same name,
-            * it should not be copied */
-            if (typeof cmd[key] !== 'function' && typeof cmd[key] !== 'undefined') {
-                agg[key] = cmd[key];
-            }
+                /*
+                * In case an option is not present and a command has a method with the same name,
+                * it should not be copied */
+                if (typeof cmd[key] !== 'function' && typeof cmd[key] !== 'undefined') {
+                    agg[key] = cmd[key];
+                }
 
-            return agg;
-        }, {});
+                return agg;
+            }, {});
+        }
     },
 
     mapCommand: function (program, script, desc) {
