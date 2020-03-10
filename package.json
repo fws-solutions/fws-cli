@@ -19,6 +19,7 @@
         "glob": "^7.1.6",
         "html-validator": "^5.1.4",
         "is-url": "^1.2.4",
+        "lodash.forown": "^4.4.0",
         "lodash.startcase": "^4.4.0",
         "lodash.template": "^4.5.0",
         "node-notifier": "^6.0.0",

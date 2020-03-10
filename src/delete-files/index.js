@@ -1,5 +1,5 @@
 /**
- * Create File
+ * Delete File
  *
  * @description CLI script for deleting FE components.
  */
