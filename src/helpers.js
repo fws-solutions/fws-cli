@@ -33,14 +33,19 @@ module.exports = {
         fancyLog(colors[color](compiled({message: message})));
 
         if (error) {
-            notifier.notify({
-                title: 'ERROR',
-                icon: path.join(moduleDir, '/assets/error-icon.png'),
-                message: message
-            });
-
+            this.errorNotify(message);
             process.exit(1);
         }
+    },
+
+    errorNotify(message) {
+        notifier.notify({
+            title: 'ERROR',
+            icon: path.join(moduleDir, '/assets/error-icon.png'),
+            message: message,
+            time: 1000,
+            type: 'error'
+        });
     },
 
     camelize: function (str) {

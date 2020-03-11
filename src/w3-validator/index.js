@@ -3,7 +3,6 @@
  *
  * @description Validate domain via W3 API. Currently only supports WP projects that have REST API enabled.
  */
-
 const fancyLog = require('fancy-log');
 const colors = require('ansi-colors');
 const axios = require('axios');
@@ -11,30 +10,45 @@ const validator = require('html-validator');
 const helpers = require('../helpers');
 const isUrl = require('is-url');
 const forOwn = require('lodash.forown');
+const cliProgress = require('cli-progress');
+const spinner = require('cli-spinner').Spinner;
 
 // constructor for validator's config object
-function ValidatorConfig(url) {
+function ValidatorConfig(url, gulpDone) {
     this.url = url;
     this.format = 'text';
-    //this.isLocal = true;
     this.ignore = [
-        'Warning: The "type" attribute is unnecessary for JavaScript resources.'
+        'Warning: The "type" attribute is unnecessary for JavaScript resources.',
+        'Error: Attribute “item-id” not allowed on element “div” at this point.'
     ];
+
+    // set local validation if run from gulp
+    if (gulpDone) {
+        this.isLocal = true;
+    }
 }
 
 module.exports = {
     validateCount: 0,
     errorCount: 0,
     pageCount: 0,
+    bar: new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic),
+    barCount: 0,
+    spinner: new spinner(colors.yellow('Loading WP REST API... %s')),
+    gulpDone: null,
+    errorReport: '',
 
-    init: function(url) {
-        this.progressLabel(true);
+    init: function(url, gulpDone = null) {
+        this.processStatus(true);
+        this.gulpDone = gulpDone;
 
         // check if passed argument is an url
         if (isUrl(url)) {
+            this.spinner.setSpinnerString('|/-\\');
+
             this.getPostTypes(url);
         } else {
-            this.progressLabel();
+            this.processStatus();
             helpers.consoleLogWarning(`The passed argument '${url}' is not an URL.`, 'red', true);
         }
     },
@@ -42,6 +56,7 @@ module.exports = {
     getPostTypes: async function(url) {
         // get endpoints for all wp post types
         try {
+            this.spinner.start();
             const types = await axios.get(`${url}/wp-json/wp/v2/types`);
             let filteredTypes = [`${url}/wp-json/wp/v2/pages?per_page=100`];
 
@@ -55,11 +70,11 @@ module.exports = {
             this.getPages(filteredTypes);
         } catch (error) {
             if (error.code === 'ENOTFOUND') {
-                this.progressLabel();
+                this.processStatus();
                 helpers.consoleLogWarning(`The URL '${url}' that you are trying to reach is unavailable or wrong.`, 'red', true);
             } else {
                 console.error(error);
-                this.progressLabel();
+                this.processStatus();
                 process.exit(1);
             }
         }
@@ -79,7 +94,11 @@ module.exports = {
             const allURLs = values.reduce((agg, value) => {
                 if (value.data.length > 0) {
                     value.data.forEach(cur => {
-                        agg.push(cur.link);
+                        const isPdfUrl = cur.link.includes('spec-sheet-pdf');
+
+                        if (!isPdfUrl) {
+                            agg.push(cur.link);
+                        }
                     });
                 }
 
@@ -87,10 +106,12 @@ module.exports = {
             }, []);
 
             // send filtered urls for validation
+            _this.spinner.stop();
+            _this.bar.start(allURLs.length, 0);
             _this.checkURLs(allURLs);
         }).catch(error => {
             console.error(error);
-            this.progressLabel();
+            this.processStatus();
             helpers.consoleLogWarning(error.message, 'red', true);
         });
     },
@@ -104,18 +125,19 @@ module.exports = {
 
     validateHTML: async function(url, a) {
         // run w3 validator on passed url
-        const config = new ValidatorConfig(url);
+        const config = new ValidatorConfig(url, this.gulpDone);
 
         try {
             let counter = 0;
             let result = await validator(config);
             const hasErrorsString = 'There were errors.';
+            this.bar.update(++this.barCount);
 
             // check if results have errors
             if (result.includes(hasErrorsString)) {
                 result = result.replace('\n' + hasErrorsString, '').split('\n');
 
-                helpers.consoleLogWarning(`W3 Validator Error on Page: ${url}`, 'cyan');
+                this.errorReport += colors.cyan(`\n\n### W3 Validator Error on Page: ${url}\n\n`);
 
                 // count pages that have errors
                 ++this.pageCount;
@@ -125,42 +147,67 @@ module.exports = {
                     ++this.errorCount;
 
                     if (i % 2 !== 0) {
-                        fancyLog(colors.yellow(`Location: ${cur}`));
-                        fancyLog(colors.cyan('-----------------------------------------------------'));
-                        console.log('\n');
+                        this.errorReport += colors.yellow(`\n    Location: ${cur}\n\n`);
                     } else {
                         counter++;
-                        fancyLog(colors.cyan(`No.#${counter} -----------------------------------------------`));
-                        fancyLog(colors.red(cur));
+                        this.errorReport += `${colors.cyan(`--- No.#${counter} --------------------------------------------------------------`)}\n    ${colors.red(cur)}`;
                     }
                 });
             }
 
             // count when last Validator promise is done and stop the script
-            this.cancelProcess(++this.validateCount, a.length);
+            ++this.validateCount;
+            this.detectProcessEnd(a.length);
         } catch (error) {
             console.error(error);
-            this.progressLabel();
+            this.processStatus();
             helpers.consoleLogWarning(error.message, 'red', true);
         }
     },
 
-    cancelProcess: function(validateCount, totalCount) {
-        if (validateCount === totalCount) {
+    detectProcessEnd: function(totalCount) {
+        if (this.validateCount === totalCount) {
+            this.validateCount = 0;
             if (this.pageCount > 0) {
-                this.progressLabel();
-                helpers.consoleLogWarning(`Found ${this.errorCount} errors, on ${this.pageCount} pages!`, 'red', true);
+                this.processStatus();
+                // log error report
+                console.log(this.errorReport);
+                const errorMsg = `Found ${this.errorCount} errors, on ${this.pageCount} pages!`;
+                this.errorCount = 0;
+                this.pageCount = 0;
+                // disable process.exit if run from gulp
+                helpers.consoleLogWarning(errorMsg, 'red', !this.gulpDone);
+                // show notification if run from gulp
+                if (this.gulpDone) {
+                    helpers.errorNotify(errorMsg);
+                }
             } else {
-                helpers.consoleLogWarning('All Good! No Errors Found! :)', 'cyan');
-                this.progressLabel();
-                process.exit(1);
+                helpers.consoleLogWarning('All Good! W3 Validator Passed! :)', 'cyan');
+                this.processStatus();
+                // disable process.exit if run from gulp
+                if (!this.gulpDone) {
+                    process.exit(1);
+                }
             }
         }
     },
 
-    progressLabel: function(start = false) {
+    processStatus: function(start = false) {
         // label message to know when whole task started and ended
-        const msg = start ? 'W3 Start' : 'W3 End';
-        fancyLog(colors.cyan(msg));
+        const taskName = 'w3-validator';
+        const msg = start ? `Starting '${colors.cyan(taskName)}'...` : `Finished '${colors.cyan(taskName)}'`;
+
+        if (!start) {
+            this.spinner.stop();
+            this.bar.stop();
+            this.barCount = 0;
+
+            // run gulp done()
+            if (this.gulpDone) {
+                this.gulpDone();
+            }
+        }
+
+        fancyLog(msg);
     }
 };

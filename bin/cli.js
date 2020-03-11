@@ -18,7 +18,7 @@ const starter = {
     s: 'fws_starter_s'
 };
 
-program.version('0.5.0');
+program.version('0.5.1');
 
 program
     .command('w3-validator <url>')
@@ -79,6 +79,7 @@ if (!packageJson || !packageJson.forwardslash) {
             helpers.mapCommand(program, 'lint-html', 'lint check of HTML files');
             helpers.mapCommand(program, 'lint-css', 'lint check of SCSS files');
             helpers.mapCommand(program, 'lint-js', 'lint check of JS files');
+            helpers.mapCommand(program, 'w3-local', 'validate via w3 api');
 
             program
                 .command('create-file <name>')
