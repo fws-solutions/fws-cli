@@ -18,7 +18,7 @@ const starter = {
     s: 'fws_starter_s'
 };
 
-program.version('0.5.1');
+program.version('0.5.2');
 
 program
     .command('w3-validator <url>')

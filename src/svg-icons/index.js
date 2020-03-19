@@ -69,7 +69,7 @@ module.exports = {
 
                 fs.readdirSync(svgDirPath).forEach(file => {
                     const fileName = path.basename(file, '.svg');
-                    const componentName = _startCase(fileName.replace('ico-', '')).replace(' ', '');
+                    const componentName = _startCase(fileName.replace('ico-', '')).replace(/ /g, '');
 
                     importStrings += compiledImport({
                         fileName,
