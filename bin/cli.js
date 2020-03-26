@@ -13,12 +13,7 @@ const packageJsonDir = path.join(process.cwd(), '/package.json');
 const packageJson = fs.existsSync(packageJsonDir) ? JSON.parse(fs.readFileSync(packageJsonDir, 'utf8')) : null;
 let w3Command = false;
 
-const starter = {
-    nuxt: 'fws_starter_nuxt',
-    s: 'fws_starter_s'
-};
-
-program.version('0.5.2');
+program.version('0.5.3');
 
 program
     .command('w3-validator <url>')
@@ -56,9 +51,11 @@ if (!packageJson || !packageJson.forwardslash) {
     switch (packageJson.forwardslash) {
         case helpers.starterNuxt:
             helpers.mapCommand(program, 'dev', 'runs nuxt dev script');
-            helpers.mapCommand(program, 'build', 'runs nuxt dev script');
-            helpers.mapCommand(program, 'start', 'runs nuxt dev script');
-            helpers.mapCommand(program, 'generate', 'runs nuxt dev script');
+            helpers.mapCommand(program, 'build', 'runs nuxt build script');
+            helpers.mapCommand(program, 'start', 'runs nuxt start script');
+            helpers.mapCommand(program, 'generate', 'runs nuxt generate script');
+            helpers.mapCommand(program, 'storybook', 'runs storybook script');
+            helpers.mapCommand(program, 'storybook-build', 'runs build-storybook script');
 
             program
                 .command('create-file <name>')

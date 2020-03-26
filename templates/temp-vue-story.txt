@@ -1,0 +1,30 @@
+import <%= componentName %> from '<%= componentSrc %>';
+import StoryWrapper from './base/StoryWrapper';
+
+export default {
+    title: '<%= componentPrettyNamePrefix %><%= componentPrettyName %>'
+};
+
+// Default State
+export const Story<%= componentName %> = () => ({
+    components: {
+        StoryWrapper,
+        <%= componentName %>
+    },
+
+    data: function() {
+        return {
+            title: '<%= componentPrettyName %>'
+        }
+    },
+
+    template: `
+        <StoryWrapper :title="title" :fluid="<%= componentWrapFluid %>">
+            <<%= componentName %>/>
+        </StoryWrapper>
+    `
+});
+
+Story<%= componentName %>.story = {
+    name: 'Default State'
+};
