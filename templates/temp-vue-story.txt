@@ -15,7 +15,7 @@ export const Story<%= componentName %> = () => ({
     data: function() {
         return {
             title: '<%= componentPrettyName %>'
-        }
+        };
     },
 
     template: `

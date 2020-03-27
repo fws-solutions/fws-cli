@@ -11,37 +11,55 @@ const _template = require('lodash.template');
 const helpers = require('../helpers');
 
 module.exports = {
+    isPart: null,
+    isStarterNuxt: null,
+    directoryFile: '',
+    directoryStory: '',
+    fileName: '',
+    prettyName: '',
+    prettyNamePrefix: '',
+    compImportSrc: '',
+    msg: '',
+    msgPrefix: '',
+
     init: function(name, type, starter) {
-        const isStarterNuxt = starter === helpers.starterNuxt;
-        const isPart = type === 'part';
-        const vueCompDir = isStarterNuxt ? 'components' : 'src/vue/components';
+        this.setFileDetails(name, type, starter);
+        this.checkIfComponentExists(name, type);
+    },
+
+    setFileDetails: function(name, type, starter) {
+        this.isStarterNuxt = starter === helpers.starterNuxt;
+        this.isPart = type === 'part';
 
         // names and strings
-        const fileName = _startCase(type) + _startCase(name).replace(/ /g, '');
-        const prettyName = _startCase(name);
-        const prettyNamePrefix = isPart ? 'Part: ' : 'Block: ';
-        const compImportSrc = `../components/${type}s/${fileName}`;
+        this.fileName = _startCase(type) + _startCase(name).replace(/ /g, '');
+        this.prettyName = _startCase(name);
+        this.prettyNamePrefix = this.isPart ? 'Part: ' : 'Block: ';
+        this.compImportSrc = `../components/${type}s/${this.fileName}`;
 
         // directories
-        const directory = path.join(process.cwd(), vueCompDir, `${type}s`, `${fileName}.vue`);
-        const directoryStory = path.join(process.cwd(), 'stories', `${isPart ? '2-' : '3-'}${fileName}.stories.js`);
+        const vueCompDir = this.isStarterNuxt ? 'components' : 'src/vue/components';
+        this.directoryFile = path.join(process.cwd(), vueCompDir, `${type}s`, `${this.fileName}.vue`);
+        this.directoryStory = path.join(process.cwd(), 'stories', `${this.isPart ? '2-' : '3-'}${this.fileName}.stories.js`);
 
         // success message
-        const msgPrefix = isStarterNuxt ? '' : 'Vue ';
-        let msg = `New ${msgPrefix}component ${type} "${fileName}.vue" is created!`;
+        this.msgPrefix = this.isStarterNuxt ? '' : 'Vue ';
+        this.msg = `New ${this.msgPrefix}component ${type} "${this.fileName}.vue" is created!`;
+    },
 
+    checkIfComponentExists: function(name, type) {
         // check if component already exists
-        if (!fs.existsSync(directory)) {
-            this.generateVueFile(name, fileName, directory);
+        if (!fs.existsSync(this.directoryFile)) {
+            this.generateVueFile(name);
 
-            if (isStarterNuxt) {
-                this.generateVueStory(isPart, prettyNamePrefix, prettyName, compImportSrc, fileName, directoryStory);
-                msg += `\n    New story     ${type} "${isPart ? '2-' : '3-'}${fileName}.stories.js" is created!`;
+            if (this.isStarterNuxt) {
+                this.generateVueStory();
+                this.msg += `\n    New story     ${type} "${this.isPart ? '2-' : '3-'}${this.fileName}.stories.js" is created!`;
             }
 
-            helpers.consoleLogWarning(msg, 'cyan');
+            helpers.consoleLogWarning(this.msg, 'cyan');
         } else {
-            helpers.consoleLogWarning(`WARNING: ${msgPrefix}Component ${type}: '${fileName}' already exists`);
+            helpers.consoleLogWarning(`WARNING: ${this.msgPrefix}Component ${type}: '${this.fileName}' already exists`);
         }
     },
 
@@ -56,28 +74,28 @@ module.exports = {
         return templateCompiler(data);
     },
 
-    generateVueFile: function(name, fileName, directory) {
+    generateVueFile: function(name) {
         const data = {
-            componentName: fileName,
+            componentName: this.fileName,
             componentClass: name
         };
         const compiledTemplate = this.compileTemplate('temp-vue-component.txt', data);
 
         // generate new Vue file
-        fs.writeFileSync(directory, compiledTemplate, 'utf8');
+        fs.writeFileSync(this.directoryFile, compiledTemplate, 'utf8');
     },
 
-    generateVueStory: function(wrapFluid, prettyNamePrefix, prettyName, compImportSrc, fileName, directory) {
+    generateVueStory: function() {
         const data = {
-            componentSrc: compImportSrc,
-            componentName: fileName,
-            componentPrettyName: prettyName,
-            componentPrettyNamePrefix: prettyNamePrefix,
-            componentWrapFluid: wrapFluid
+            componentSrc: this.compImportSrc,
+            componentName: this.fileName,
+            componentPrettyName: this.prettyName,
+            componentPrettyNamePrefix: this.prettyNamePrefix,
+            componentWrapFluid: this.isPart
         };
         const compiledTemplate = this.compileTemplate('temp-vue-story.txt', data);
 
         // generate new Vue file
-        fs.writeFileSync(directory, compiledTemplate, 'utf8');
+        fs.writeFileSync(this.directoryStory, compiledTemplate, 'utf8');
     }
 };
