@@ -14,13 +14,15 @@ export const Story<%= componentName %> = () => ({
 
     data: function() {
         return {
-            title: '<%= componentPrettyName %>'
+            title: '<%= componentPrettyName %>',
+            data: {
+            }
         };
     },
 
     template: `
         <StoryWrapper :title="title" :fluid="<%= componentWrapFluid %>">
-            <<%= componentName %>/>
+            <<%= componentName %> :data="data"/>
         </StoryWrapper>
     `
 });
