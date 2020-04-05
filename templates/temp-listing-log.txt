@@ -1,0 +1,15 @@
+
+------------------------------------------------------------------------
+
+    CREATED BLOCK -------------------------------------- <%= str %>
+
+
+    - created PHP file:  '<%= str %>.php' in dir 'template-views/listings/<%= str %>'
+
+    - created PHP file:  '_fe-<%= str %>.php' in dir 'template-views/listings/<%= str %>'
+
+    - created SCSS file: '_<%= str %>.scss' in dir 'template-views/listings/<%= str %>'
+
+    - updated SCSS file: '_listings.scss' in dir 'src/scss/layout'
+
+------------------------------------------------------------------------

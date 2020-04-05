@@ -13,7 +13,7 @@ const packageJsonDir = path.join(process.cwd(), '/package.json');
 const packageJson = fs.existsSync(packageJsonDir) ? JSON.parse(fs.readFileSync(packageJsonDir, 'utf8')) : null;
 let w3Command = false;
 
-program.version('0.5.3');
+program.version('0.5.5');
 
 program
     .command('w3-validator <url>')
@@ -84,6 +84,7 @@ if (!packageJson || !packageJson.forwardslash) {
                 .description('creates files')
                 .option('-b, --block', 'create template-view block')
                 .option('-p, --part', 'create template-view part')
+                .option('-l, --listing', 'create template-view listing')
                 .option('-B, --block-vue', 'create vue block')
                 .option('-P, --part-vue', 'create vue part')
                 .action(function(arg, cmd) {
