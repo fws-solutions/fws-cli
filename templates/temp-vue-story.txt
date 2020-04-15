@@ -21,7 +21,7 @@ export const Story<%= componentName %> = () => ({
     },
 
     template: `
-        <StoryWrapper :title="title" :fluid="<%= componentWrapFluid %>">
+        <StoryWrapper :title="title" :container="<%= componentWrapFluid %>">
             <<%= componentName %> :data="data"/>
         </StoryWrapper>
     `

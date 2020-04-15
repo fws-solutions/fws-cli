@@ -13,7 +13,7 @@ const packageJsonDir = path.join(process.cwd(), '/package.json');
 const packageJson = fs.existsSync(packageJsonDir) ? JSON.parse(fs.readFileSync(packageJsonDir, 'utf8')) : null;
 let w3Command = false;
 
-program.version('0.5.6');
+program.version('0.5.7');
 
 program
     .command('w3-validator <url>')
