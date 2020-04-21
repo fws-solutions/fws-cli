@@ -95,7 +95,7 @@ module.exports = {
         });
 
         // generate new JSON file
-        fs.writeFileSync('stories/elements/svgIconList.json', JSON.stringify(icons, null, '\t'), 'utf8');
+        fs.writeFileSync('stories/base/svgIconList.json', JSON.stringify(icons, null, '\t'), 'utf8');
     },
 
     generateSvgIcon: function(svgDirPath, starter) {
