@@ -7,7 +7,6 @@
 const fs = require('fs');
 const path = require('path');
 const _startCase = require('lodash.startcase');
-const _template = require('lodash.template');
 const helpers = require('../helpers');
 
 module.exports = {
@@ -63,23 +62,12 @@ module.exports = {
         }
     },
 
-    compileTemplate: function(templateFile, data) {
-        // get template file
-        const tempSrc = path.join(helpers.moduleDir, 'templates', templateFile);
-        const tempFile = fs.readFileSync(tempSrc, 'utf8');
-        // set compiler
-        const templateCompiler = _template(tempFile);
-
-        // return compiled data
-        return templateCompiler(data);
-    },
-
     generateVueFile: function(name) {
         const data = {
             componentName: this.fileName,
             componentClass: name
         };
-        const compiledTemplate = this.compileTemplate('temp-vue-component.txt', data);
+        const compiledTemplate = helpers.compileTemplate('temp-vue-component.txt', data);
 
         // generate new Vue file
         fs.writeFileSync(this.directoryFile, compiledTemplate, 'utf8');
@@ -93,7 +81,7 @@ module.exports = {
             componentPrettyNamePrefix: this.prettyNamePrefix,
             componentWrapFluid: this.isPart
         };
-        const compiledTemplate = this.compileTemplate('temp-vue-story.txt', data);
+        const compiledTemplate = helpers.compileTemplate('temp-vue-story.txt', data);
 
         // generate new Vue file
         fs.writeFileSync(this.directoryStory, compiledTemplate, 'utf8');

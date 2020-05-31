@@ -74,9 +74,10 @@ module.exports = {
         }
     },
 
-    mapCommand: function (program, script, desc) {
+    mapCommand: function (program, alias, script, desc) {
         program
             .command(script)
+            .alias(alias)
             .description(desc)
             .action(function () {
                 module.exports.runTask(script);
@@ -85,5 +86,16 @@ module.exports = {
 
     runTask: function (task) {
         execSync('npm run ' + task, {stdio: [0, 1, 2]});
-    }
+    },
+
+    compileTemplate: function(templateFile, data) {
+        // get template file
+        const tempSrc = path.join(module.exports.moduleDir, 'templates', templateFile);
+        const tempFile = fs.readFileSync(tempSrc, 'utf8');
+        // set compiler
+        const templateCompiler = _template(tempFile);
+
+        // return compiled data
+        return templateCompiler(data);
+    },
 };

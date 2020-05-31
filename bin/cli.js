@@ -7,13 +7,14 @@ const svgIcons = require('../src/svg-icons');
 const createFiles = require('../src/create-files');
 const deleteFiles = require('../src/delete-files');
 const w3Validator = require('../src/w3-validator');
+const postInstall = require('../src/postinstall');
 
 const program = new commander.Command();
 const packageJsonDir = path.join(process.cwd(), '/package.json');
 const packageJson = fs.existsSync(packageJsonDir) ? JSON.parse(fs.readFileSync(packageJsonDir, 'utf8')) : null;
 let w3Command = false;
 
-program.version('0.5.8');
+program.version('0.5.9');
 
 program
     .command('w3-validator <url>')
@@ -50,12 +51,19 @@ if (!packageJson || !packageJson.forwardslash) {
 
     switch (packageJson.forwardslash) {
         case helpers.starterNuxt:
-            helpers.mapCommand(program, 'dev', 'runs nuxt dev script');
-            helpers.mapCommand(program, 'build', 'runs nuxt build script');
-            helpers.mapCommand(program, 'start', 'runs nuxt start script');
-            helpers.mapCommand(program, 'generate', 'runs nuxt generate script');
-            helpers.mapCommand(program, 'storybook', 'runs storybook script');
-            helpers.mapCommand(program, 'storybook-build', 'runs build-storybook script');
+            helpers.mapCommand(program, null, 'dev', 'runs nuxt dev script');
+            helpers.mapCommand(program, null, 'build', 'runs nuxt build script');
+            helpers.mapCommand(program, 'gen', 'generate', 'runs nuxt generate script');
+            helpers.mapCommand(program, null, 'start', 'runs nuxt start script');
+            helpers.mapCommand(program, 'story', 'storybook', 'runs storybook script');
+            helpers.mapCommand(program, 'story-b', 'storybook-build', 'runs build-storybook script');
+
+            program
+                .command('postinstall')
+                .description('runs postinstall script')
+                .action(function() {
+                    postInstall.init();
+                });
 
             program
                 .command('create-file <name>')
@@ -68,15 +76,15 @@ if (!packageJson || !packageJson.forwardslash) {
                 });
             break;
         case helpers.starterS:
-            helpers.mapCommand(program, 'dev', 'runs watch task');
-            helpers.mapCommand(program, 'build-dev', 'runs development build');
-            helpers.mapCommand(program, 'build', 'runs production build');
-            helpers.mapCommand(program, 'css', 'compiles CSS files');
-            helpers.mapCommand(program, 'js', 'compiles JS files');
-            helpers.mapCommand(program, 'lint-html', 'lint check of HTML files');
-            helpers.mapCommand(program, 'lint-css', 'lint check of SCSS files');
-            helpers.mapCommand(program, 'lint-js', 'lint check of JS files');
-            helpers.mapCommand(program, 'w3-local', 'validate via w3 api');
+            helpers.mapCommand(program, null, 'dev', 'runs watch task');
+            helpers.mapCommand(program, null, 'build-dev', 'runs development build');
+            helpers.mapCommand(program, null, 'build', 'runs production build');
+            helpers.mapCommand(program, null, 'css', 'compiles CSS files');
+            helpers.mapCommand(program, null, 'js', 'compiles JS files');
+            helpers.mapCommand(program, null, 'lint-html', 'lint check of HTML files');
+            helpers.mapCommand(program, null, 'lint-css', 'lint check of SCSS files');
+            helpers.mapCommand(program, null, 'lint-js', 'lint check of JS files');
+            helpers.mapCommand(program, null, 'w3-local', 'validate via w3 api');
 
             program
                 .command('create-file <name>')
