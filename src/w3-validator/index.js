@@ -12,8 +12,6 @@ const isUrl = require('is-url');
 const forOwn = require('lodash.forown');
 const cliProgress = require('cli-progress');
 const spinner = require('cli-spinner').Spinner;
-const fs = require('fs');
-const path = require('path');
 require('dotenv').config();
 
 // constructor for validator's config object
@@ -42,11 +40,11 @@ module.exports = {
     errorReport: '',
     isLocal: false,
 
-    init: function(url, isLocal = false) {
+    init: function(url) {
         this.processStatus(true);
-        this.isLocal = isLocal;
+        this.isLocal = url === 'local';
 
-        const wpURL = isLocal ? process.env.VIRTUAL_HOST_URL : url;
+        const wpURL = this.isLocal ? process.env.VIRTUAL_HOST_URL : url;
 
         // check if passed argument is an url
         if (isUrl(wpURL)) {

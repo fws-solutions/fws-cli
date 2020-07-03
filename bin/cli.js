@@ -14,20 +14,19 @@ const packageJsonDir = path.join(process.cwd(), '/package.json');
 const packageJson = fs.existsSync(packageJsonDir) ? JSON.parse(fs.readFileSync(packageJsonDir, 'utf8')) : null;
 let w3Command = false;
 
-program.version('0.5.10');
+program.version('0.5.11');
 
 program
     .command('w3-validator <url>')
     .alias('w3')
     .description('validate via w3 api')
-    .option('-l, --local', 'run w3 on localhost')
     .option('--force-build', 'run w3 without build fail')
     .action(function(arg, cmd) {
         w3Command = true;
         let options = helpers.cleanCmdArgs(cmd);
         options = Object.keys(options);
 
-        w3Validator.init(arg, options.includes('local'));
+        w3Validator.init(arg);
     });
 
 if (!packageJson || !packageJson.forwardslash) {
