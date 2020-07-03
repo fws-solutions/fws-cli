@@ -12,19 +12,23 @@ const isUrl = require('is-url');
 const forOwn = require('lodash.forown');
 const cliProgress = require('cli-progress');
 const spinner = require('cli-spinner').Spinner;
+const fs = require('fs');
+const path = require('path');
+require('dotenv').config();
 
 // constructor for validator's config object
-function ValidatorConfig(url, gulpDone) {
+function ValidatorConfig(url, isLocal) {
     this.url = url;
     this.format = 'text';
     this.ignore = [
         'Warning: The "type" attribute is unnecessary for JavaScript resources.',
-        'Error: Attribute “item-id” not allowed on element “div” at this point.'
+        'Error: Attribute “item-id” not allowed on element “div” at this point.',
+        'Error: End tag “br”.'
     ];
 
-    // set local validation if run from gulp
-    if (gulpDone) {
-        this.isLocal = true;
+    // set local validation if run from local env
+    if (isLocal) {
+        this.isLocal = isLocal;
     }
 }
 
@@ -35,21 +39,23 @@ module.exports = {
     bar: new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic),
     barCount: 0,
     spinner: new spinner(colors.yellow('Loading WP REST API... %s')),
-    gulpDone: null,
     errorReport: '',
+    isLocal: false,
 
-    init: function(url, gulpDone = null) {
+    init: function(url, isLocal = false) {
         this.processStatus(true);
-        this.gulpDone = gulpDone;
+        this.isLocal = isLocal;
+
+        const wpURL = isLocal ? process.env.VIRTUAL_HOST_URL : url;
 
         // check if passed argument is an url
-        if (isUrl(url)) {
+        if (isUrl(wpURL)) {
             this.spinner.setSpinnerString('|/-\\');
 
-            this.getPostTypes(url);
+            this.getPostTypes(wpURL);
         } else {
             this.processStatus();
-            helpers.consoleLogWarning(`The passed argument '${url}' is not an URL.`, 'red', true);
+            helpers.consoleLogWarning(`The passed argument '${wpURL}' is not an URL.`, 'red', true);
         }
     },
 
@@ -73,9 +79,13 @@ module.exports = {
                 this.processStatus();
                 helpers.consoleLogWarning(`The URL '${url}' that you are trying to reach is unavailable or wrong.`, 'red', true);
             } else {
-                console.error(error);
-                this.processStatus();
-                process.exit(1);
+                if (error.response && error.response.status && error.response.statusText) {
+                    helpers.consoleLogWarning(`Error ${error.response.status}: ${error.response.statusText}! \n    W3 Validator couldn't scan URL '${url}'. \n    Please check if this URL is a WP site and if 'wp-json' routes are avalible.`, 'red', true);
+                } else {
+                    console.error(error);
+                    this.processStatus();
+                    process.exit(1);
+                }
             }
         }
     },
@@ -125,7 +135,7 @@ module.exports = {
 
     validateHTML: async function(url, a) {
         // run w3 validator on passed url
-        const config = new ValidatorConfig(url, this.gulpDone);
+        const config = new ValidatorConfig(url, this.isLocal);
 
         try {
             let counter = 0;
@@ -175,17 +185,17 @@ module.exports = {
                 const errorMsg = `Found ${this.errorCount} errors, on ${this.pageCount} pages!`;
                 this.errorCount = 0;
                 this.pageCount = 0;
-                // disable process.exit if run from gulp
-                helpers.consoleLogWarning(errorMsg, 'red', !this.gulpDone);
-                // show notification if run from gulp
-                if (this.gulpDone) {
+                // disable process.exit if run from local
+                helpers.consoleLogWarning(errorMsg, 'red', !this.isLocal);
+                // show notification if run from local
+                if (this.isLocal) {
                     helpers.errorNotify(errorMsg);
                 }
             } else {
                 helpers.consoleLogWarning('All Good! W3 Validator Passed! :)', 'cyan');
                 this.processStatus();
-                // disable process.exit if run from gulp
-                if (!this.gulpDone) {
+                // disable process.exit if run from local
+                if (!this.isLocal) {
                     process.exit(1);
                 }
             }
@@ -201,11 +211,6 @@ module.exports = {
             this.spinner.stop();
             this.bar.stop();
             this.barCount = 0;
-
-            // run gulp done()
-            if (this.gulpDone) {
-                this.gulpDone();
-            }
         }
 
         fancyLog(msg);

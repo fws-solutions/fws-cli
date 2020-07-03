@@ -14,19 +14,25 @@ const packageJsonDir = path.join(process.cwd(), '/package.json');
 const packageJson = fs.existsSync(packageJsonDir) ? JSON.parse(fs.readFileSync(packageJsonDir, 'utf8')) : null;
 let w3Command = false;
 
-program.version('0.5.9');
+program.version('0.5.10');
 
 program
     .command('w3-validator <url>')
     .alias('w3')
     .description('validate via w3 api')
-    .action(function(arg) {
+    .option('-l, --local', 'run w3 on localhost')
+    .option('--force-build', 'run w3 without build fail')
+    .action(function(arg, cmd) {
         w3Command = true;
-        w3Validator.init(arg);
+        let options = helpers.cleanCmdArgs(cmd);
+        options = Object.keys(options);
+
+        w3Validator.init(arg, options.includes('local'));
     });
 
 if (!packageJson || !packageJson.forwardslash) {
     program.parse(process.argv);
+
     /*
     * Check if CLI is running in a Forwardslash project.  */
     if (!w3Command) {
@@ -49,6 +55,13 @@ if (!packageJson || !packageJson.forwardslash) {
             svgIcons.init(packageJson.forwardslash);
         });
 
+    program
+        .command('postinstall')
+        .description('runs postinstall script')
+        .action(function() {
+            postInstall.init(packageJson.forwardslash);
+        });
+
     switch (packageJson.forwardslash) {
         case helpers.starterNuxt:
             helpers.mapCommand(program, null, 'dev', 'runs nuxt dev script');
@@ -57,13 +70,6 @@ if (!packageJson || !packageJson.forwardslash) {
             helpers.mapCommand(program, null, 'start', 'runs nuxt start script');
             helpers.mapCommand(program, 'story', 'storybook', 'runs storybook script');
             helpers.mapCommand(program, 'story-b', 'storybook-build', 'runs build-storybook script');
-
-            program
-                .command('postinstall')
-                .description('runs postinstall script')
-                .action(function() {
-                    postInstall.init();
-                });
 
             program
                 .command('create-file <name>')
