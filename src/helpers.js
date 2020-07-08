@@ -8,6 +8,7 @@ const moduleDir = path.dirname(__dirname);
 const execSync = require('child_process').execSync;
 
 module.exports = {
+    starterVue: 'fws_starter_vue',
     starterNuxt: 'fws_starter_nuxt',
     starterS: 'fws_starter_s',
     moduleDir: path.dirname(__dirname),

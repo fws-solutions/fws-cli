@@ -15,12 +15,14 @@ const SHF = require('./svg-handle-files');
 
 module.exports = {
     optimizeSVGs: [],
+    starter: '',
 
     init: function(starter) {
-        const svgDirPath = path.join(process.cwd(), `${starter === 'fws_starter_s' ? 'src/' : ''}assets/svg`);
+        this.starter = starter;
+        const svgDirPath = path.join(process.cwd(), `${this.starter !== helpers.starterNuxt ? 'src/' : ''}assets/svg`);
 
         this.handleSvgFiles(svgDirPath);
-        this.generateFiles(svgDirPath, starter);
+        this.generateFiles(svgDirPath);
     },
 
     handleSvgFiles: function(svgDirPath) {
@@ -53,15 +55,15 @@ module.exports = {
         });
     },
 
-    generateFiles: function(svgDirPath, starter) {
+    generateFiles: function(svgDirPath) {
         const _this = this;
 
         Promise.all(this.optimizeSVGs)
             .then(() => {
                 let msg = 'SVGs are optimized and SvgIconGen.vue file is generated!';
-                _this.generateSvgIcon(svgDirPath, starter);
+                _this.generateSvgIcon(svgDirPath);
 
-                if (starter === 'fws_starter_nuxt') {
+                if (this.starter !== helpers.starterS) {
                     _this.generateSvgJson(svgDirPath);
                     msg += '\n    And svgIconList.json for stories is generated!';
                 }
@@ -95,20 +97,41 @@ module.exports = {
         });
 
         // generate new JSON file
-        fs.writeFileSync('stories/base/svgIconList.json', JSON.stringify(icons, null, '\t'), 'utf8');
+        fs.writeFileSync(`${this.starter !== helpers.starterNuxt ? 'src/' : ''}stories/base/svgIconList.json`, JSON.stringify(icons, null, '\t'), 'utf8');
     },
 
-    generateSvgIcon: function(svgDirPath, starter) {
-        // set write dir
-        const writeDir = starter === 'fws_starter_s' ? 'src/vue/components/base/SvgIcon/SvgIconGen.vue' : 'components/plugins/SvgIcon/SvgIconGen.vue';
+    generateSvgIcon: function(svgDirPath) {
+        // set write/temp dir and src string
+        let writeDir;
+        let compiledImportSrc;
+        let tempFile;
+
+        switch (this.starter) {
+            case helpers.starterS:
+                writeDir = 'src/vue/components/base/SvgIcon/SvgIconGen.vue';
+                compiledImportSrc = '../../../../assets/svg/<%= fileName %>.svg';
+                tempFile = 'temp-svg-gen.txt';
+                break;
+            case helpers.starterNuxt:
+                writeDir = 'components/plugins/SvgIcon/SvgIconGen.vue';
+                compiledImportSrc = '~/assets/svg/<%= fileName %>.svg?inline';
+                tempFile = 'temp-svg-gen.txt';
+                break;
+            case helpers.starterVue:
+                writeDir = 'src/components/base/SvgIcon/SvgIconGen.vue';
+                compiledImportSrc = '@/assets/svg/<%= fileName %>.svg';
+                tempFile = 'temp-svg-gen-ts.txt';
+                break;
+        }
+
         // get template file
-        const svgIconGenTempFile = path.join(helpers.moduleDir, 'templates', 'temp-svg-gen.txt');
+        const svgIconGenTempFile = path.join(helpers.moduleDir, 'templates', tempFile);
         const svgIconGenTemp = fs.readFileSync(svgIconGenTempFile, 'utf8');
-        // set import src string
-        const compiledImportSrc = starter === 'fws_starter_s' ? '../../../../assets/svg/<%= fileName %>.svg' : '~/assets/svg/<%= fileName %>.svg?inline';
+
         // set parts of lodash template
         const compiledImport = _template(`    import <%= componentName %> from '${compiledImportSrc}';\n`);
         const compiledComponent = _template('            <%= componentName %>,\n');
+
         // set full lodash template
         const compiledSvgIconGenFile = _template(svgIconGenTemp);
 

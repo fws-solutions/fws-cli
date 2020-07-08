@@ -15,17 +15,17 @@ module.exports = {
     moduleExampleEnvFileS: path.join(__dirname, '/example-s.env'),
 
     init: function(starter) {
-        const isNuxtStarter = starter === 'fws_starter_nuxt';
-        this.createEnv(isNuxtStarter);
+        const isStarterNuxt = starter === helpers.starterNuxt;
+        this.createEnv(isStarterNuxt);
     },
 
-    createEnv: function(isNuxtStarter) {
-        const exampleEnvFile = isNuxtStarter ? this.moduleExampleEnvFileNuxt : this.moduleExampleEnvFileS;
+    createEnv: function(isStarterNuxt) {
+        const exampleEnvFile = isStarterNuxt ? this.moduleExampleEnvFileNuxt : this.moduleExampleEnvFileS;
 
         // Create example.env file in project root if it doesn't exist
         if (!fs.existsSync(this.directoryExampleEnvFile)) {
             fs.copyFileSync(exampleEnvFile, this.directoryExampleEnvFile);
-            helpers.consoleLogWarning(`Generated .env.example file in the root of the ${isNuxtStarter ? 'Nuxt project' : 'theme directory'}!`, 'cyan');
+            helpers.consoleLogWarning(`Generated .env.example file in the root of the ${isStarterNuxt ? 'Nuxt project' : 'theme directory'}!`, 'cyan');
         } else {
             helpers.consoleLogWarning('WARNING: .env.example already exists');
         }
@@ -33,7 +33,7 @@ module.exports = {
         // Create .env file in project root if it doesn't exist
         if (!fs.existsSync(this.directoryEnvFile)) {
             fs.copyFileSync(this.directoryExampleEnvFile, this.directoryEnvFile);
-            helpers.consoleLogWarning(`Generated .env file in the root of the ${isNuxtStarter ? 'Nuxt project' : 'theme directory'}! \n    Please configure your local environment.`, 'cyan');
+            helpers.consoleLogWarning(`Generated .env file in the root of the ${isStarterNuxt ? 'Nuxt project' : 'theme directory'}! \n    Please configure your local environment.`, 'cyan');
         } else {
             helpers.consoleLogWarning('WARNING: .env already exists');
         }

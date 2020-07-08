@@ -11,7 +11,7 @@ const helpers = require('../helpers');
 
 module.exports = {
     isPart: null,
-    isStarterNuxt: null,
+    starter: '',
     directoryFile: '',
     directoryStory: '',
     fileName: '',
@@ -22,12 +22,12 @@ module.exports = {
     msgPrefix: '',
 
     init: function(name, type, starter) {
-        this.setFileDetails(name, type, starter);
+        this.starter = starter;
+        this.setFileDetails(name, type);
         this.checkIfComponentExists(name, type);
     },
 
-    setFileDetails: function(name, type, starter) {
-        this.isStarterNuxt = starter === helpers.starterNuxt;
+    setFileDetails: function(name, type) {
         this.isPart = type === 'part';
 
         // names and strings
@@ -37,12 +37,28 @@ module.exports = {
         this.compImportSrc = `../components/${type}s/${this.fileName}`;
 
         // directories
-        const vueCompDir = this.isStarterNuxt ? 'components' : 'src/vue/components';
+        let vueCompDir;
+        let vueStoryDir;
+        switch (this.starter) {
+            case helpers.starterS:
+                vueCompDir = 'src/vue/components';
+                vueStoryDir = '';
+                break;
+            case helpers.starterNuxt:
+                vueCompDir = 'components';
+                vueStoryDir = 'stories';
+                break;
+            case helpers.starterVue:
+                vueCompDir = 'src/components';
+                vueStoryDir = 'src/stories';
+                break;
+        }
+
         this.directoryFile = path.join(process.cwd(), vueCompDir, `${type}s`, `${this.fileName}.vue`);
-        this.directoryStory = path.join(process.cwd(), 'stories', `${this.isPart ? '2-' : '3-'}${this.fileName}.stories.js`);
+        this.directoryStory = path.join(process.cwd(), vueStoryDir, `${this.isPart ? '2-' : '3-'}${this.fileName}.stories.js`);
 
         // success message
-        this.msgPrefix = this.isStarterNuxt ? '' : 'Vue ';
+        this.msgPrefix = this.starter !== helpers.starterS ? 'Vue ' : '';
         this.msg = `New ${this.msgPrefix}component ${type} "${this.fileName}.vue" is created!`;
     },
 
@@ -51,7 +67,7 @@ module.exports = {
         if (!fs.existsSync(this.directoryFile)) {
             this.generateVueFile(name);
 
-            if (this.isStarterNuxt) {
+            if (this.starter !== helpers.starterS) {
                 this.generateVueStory();
                 this.msg += `\n    New story     ${type} "${this.isPart ? '2-' : '3-'}${this.fileName}.stories.js" is created!`;
             }
@@ -67,7 +83,8 @@ module.exports = {
             componentName: this.fileName,
             componentClass: name
         };
-        const compiledTemplate = helpers.compileTemplate('temp-vue-component.txt', data);
+        const tempFile = this.starter !== helpers.starterVue ? 'temp-vue-component.txt' : 'temp-vuets-component.txt';
+        const compiledTemplate = helpers.compileTemplate(tempFile, data);
 
         // generate new Vue file
         fs.writeFileSync(this.directoryFile, compiledTemplate, 'utf8');
@@ -81,7 +98,8 @@ module.exports = {
             componentPrettyNamePrefix: this.prettyNamePrefix,
             componentWrapFluid: this.isPart
         };
-        const compiledTemplate = helpers.compileTemplate('temp-vue-story.txt', data);
+        const tempFile = this.starter !== helpers.starterVue ? 'temp-vue-story.txt' : 'temp-vuets-story.txt';
+        const compiledTemplate = helpers.compileTemplate(tempFile, data);
 
         // generate new Vue file
         fs.writeFileSync(this.directoryStory, compiledTemplate, 'utf8');

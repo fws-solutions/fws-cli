@@ -4,17 +4,23 @@
     </div>
 </template>
 
-<script>
-    export default {
+<script lang="ts">
+    import Vue from 'vue';
+
+    interface Data {
+        title: string
+    }
+
+    export default Vue.extend({
         props: {
         },
 
-        data() {
+        data(): Data {
             return {
                 title: 'This is title of "<%= componentName %>"!'
             };
         }
-    };
+    });
 </script>
 
 <style lang="scss" scoped>
