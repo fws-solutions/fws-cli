@@ -68,7 +68,7 @@ module.exports = {
                     msg += '\n    And svgIconList.json for stories is generated!';
                 } else {
                     _this.generateSvgScssVars(svgDirPath);
-                    msg += '\n    And SCSS _icons.scss for SVG backgrounds is generated!';
+                    msg += '\n    And SCSS _icons.scss is generated!';
                 }
 
                 helpers.consoleLogWarning(msg, 'cyan');
