@@ -66,6 +66,9 @@ module.exports = {
                 if (this.starter !== helpers.starterS) {
                     _this.generateSvgJson(svgDirPath);
                     msg += '\n    And svgIconList.json for stories is generated!';
+                } else {
+                    _this.generateSvgScssVars(svgDirPath);
+                    msg += '\n    And SCSS _icons.scss for SVG backgrounds is generated!';
                 }
 
                 helpers.consoleLogWarning(msg, 'cyan');
@@ -75,29 +78,65 @@ module.exports = {
             });
     },
 
-    loopFileNames: function(svgDirPath, callback) {
+    loopFiles: function(svgDirPath, callback) {
         fs.readdirSync(svgDirPath).forEach(file => {
-            const fileName = path.basename(file, '.svg');
+            const name = path.basename(file, '.svg');
+            const relPath = path.relative('src/scss', path.join(svgDirPath, file));
 
-            callback(fileName);
+            const svg = {
+                name,
+                relPath
+            };
+
+            callback(svg);
         });
     },
 
     generateSvgJson: function(svgDirPath) {
-        const icons = [];
+        let icons = [];
 
         // set new array of icons
-        this.loopFileNames(svgDirPath, function(fileName) {
-            const componentName = _startCase(fileName.replace('ico-', '')).replace(/ /g, '');
+        this.loopFiles(svgDirPath, function(svg) {
+            const componentName = _startCase(svg.name.replace('ico-', '')).replace(/ /g, '');
 
             icons.push({
-                fileName,
+                fileName: svg.name,
                 componentName
             });
         });
 
+        // convert to JSON format
+        icons = JSON.stringify(icons, null, '\t');
+
         // generate new JSON file
-        fs.writeFileSync(`${this.starter !== helpers.starterNuxt ? 'src/' : ''}stories/base/svgIconList.json`, JSON.stringify(icons, null, '\t'), 'utf8');
+        fs.writeFileSync(`${this.starter !== helpers.starterNuxt ? 'src/' : ''}stories/base/svgIconList.json`, icons, 'utf8');
+    },
+
+    generateSvgScssVars: function(svgDirPath) {
+        // get template file
+        const svgScssGenTempFile = path.join(helpers.moduleDir, 'templates', 'temp-svg-gen-scss.txt');
+        const svgScssGenTemp = fs.readFileSync(svgScssGenTempFile, 'utf8');
+
+        // set full lodash template
+        const compiledSvgScssGenFile = _template(svgScssGenTemp);
+
+        // compile parts of lodash template
+        let scssImports = '';
+
+        // set scss imports
+        this.loopFiles(svgDirPath, function(svg) {
+            scssImports += `\t@if $icon == ${svg.name} {\n`;
+            scssImports += `\t\t$path: '${svg.relPath}'\n`;
+            scssImports += '\t}\n';
+        });
+
+        // compile full lodash template
+        const dataSvgScssGen = compiledSvgScssGenFile({
+            imports: scssImports
+        });
+
+        // generate new Vue file
+        fs.writeFileSync('src/scss/config/_icons.scss', dataSvgScssGen, 'utf8');
     },
 
     generateSvgIcon: function(svgDirPath) {
@@ -110,17 +149,17 @@ module.exports = {
             case helpers.starterS:
                 writeDir = 'src/vue/components/base/SvgIcon/SvgIconGen.vue';
                 compiledImportSrc = '../../../../assets/svg/<%= fileName %>.svg';
-                tempFile = 'temp-svg-gen.txt';
+                tempFile = 'temp-svg-gen-vue-js.txt';
                 break;
             case helpers.starterNuxt:
                 writeDir = 'components/plugins/SvgIcon/SvgIconGen.vue';
                 compiledImportSrc = '~/assets/svg/<%= fileName %>.svg?inline';
-                tempFile = 'temp-svg-gen.txt';
+                tempFile = 'temp-svg-gen-vue-js.txt';
                 break;
             case helpers.starterVue:
                 writeDir = 'src/components/base/SvgIcon/SvgIconGen.vue';
                 compiledImportSrc = '@/assets/svg/<%= fileName %>.svg';
-                tempFile = 'temp-svg-gen-ts.txt';
+                tempFile = 'temp-svg-gen-vue-ts.txt';
                 break;
         }
 
@@ -139,11 +178,11 @@ module.exports = {
         let componentsStrings = '';
 
         // compile parts of lodash template
-        this.loopFileNames(svgDirPath, function(fileName) {
-            const componentName = _startCase(fileName.replace('ico-', '')).replace(/ /g, '');
+        this.loopFiles(svgDirPath, function(svg) {
+            const componentName = _startCase(svg.name.replace('ico-', '')).replace(/ /g, '');
 
             importStrings += compiledImport({
-                fileName,
+                fileName: svg.name,
                 componentName
             });
 
