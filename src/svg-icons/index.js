@@ -82,7 +82,7 @@ module.exports = {
         fs.readdirSync(svgDirPath).forEach(file => {
             const name = path.basename(file, '.svg');
             const relPath = path.relative('src/scss', path.join(svgDirPath, file)).replace(/\\/g, '/');
-            
+
             const svg = {
                 name,
                 relPath

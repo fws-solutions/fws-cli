@@ -4,12 +4,12 @@
     CREATED BLOCK -------------------------------------- <%= str %>
 
 
-    - created PHP file:  '<%= str %>.php' in dir '<%= src %>/<%= str %>'
+    - created TWIG file:  '<%= str %>.twig' in dir '<%= src %>/<%= str %>'
 
-    - created PHP file:  '_fe-<%= str %>.php' in dir '<%= src %>/<%= str %>'
+    - created JSON file:  '<%= str %>.json' in dir '<%= src %>/<%= str %>'
 
     - created SCSS file: '_<%= str %>.scss' in dir '<%= src %>/<%= str %>'
 
-    - updated SCSS file: '_blocks.scss' in dir 'src/scss/layout'
+    - updated SCSS file: '_blocks.scss' in dir 'src/assets/scss/layout'
 
 ------------------------------------------------------------------------

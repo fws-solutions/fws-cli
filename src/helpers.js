@@ -11,6 +11,7 @@ module.exports = {
     starterVue: 'fws_starter_vue',
     starterNuxt: 'fws_starter_nuxt',
     starterS: 'fws_starter_s',
+    starterTwig: 'fws_starter_twig',
     moduleDir: path.dirname(__dirname),
     warningTemp: path.join(moduleDir, '/templates/temp-warning-log.txt'),
 

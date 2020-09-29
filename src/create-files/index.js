@@ -25,12 +25,12 @@ module.exports = {
     },
 
     checkStarter(name, option) {
-        if (this.starter === helpers.starterS) {
+        if (this.starter === helpers.starterS || this.starter === helpers.starterTwig) {
             const isVue = option.includes('Vue');
             const cf = isVue ? cfVue : cfTempView;
             const opt = isVue ? option.replace('Vue', '') : option;
 
-            cf.init(name, opt, helpers.starterS);
+            cf.init(name, opt, this.starter);
         } else if (this.starter === helpers.starterVue || this.starter === helpers.starterNuxt) {
             cfVue.init(name, option, this.starter);
         } else {
