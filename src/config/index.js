@@ -98,6 +98,7 @@ module.exports = {
                 helpers.mapCommand(program, null, 'dev', 'runs watch task');
                 helpers.mapCommand(program, null, 'build-dev', 'runs development build');
                 helpers.mapCommand(program, null, 'build', 'runs production build');
+                helpers.mapCommand(program, null, 'vue', 'runs development vue build');
                 helpers.mapCommand(program, null, 'css', 'compiles CSS files');
                 helpers.mapCommand(program, null, 'js', 'compiles JS files');
                 helpers.mapCommand(program, null, 'lint-html', 'lint check of HTML files');
