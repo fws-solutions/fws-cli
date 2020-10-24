@@ -14,6 +14,8 @@ module.exports = {
     starterTwig: 'fws_starter_twig',
     moduleDir: path.dirname(__dirname),
     warningTemp: path.join(moduleDir, '/templates/temp-warning-log.txt'),
+    wpConfigSampleDir: path.join(process.cwd(), '/wp-config-sample.php'),
+    packageJsonDir: path.join(process.cwd(), '/package.json'),
 
     rf(src, callback) {
         /*
@@ -100,4 +102,20 @@ module.exports = {
         // return compiled data
         return templateCompiler(data);
     },
+
+    getWPConfigSample:function() {
+        if (!fs.existsSync(this.wpConfigSampleDir)) {
+            return null;
+        }
+
+        return this.wpConfigSampleDir;
+    },
+
+    getPackageJson:function() {
+        if (!fs.existsSync(this.packageJsonDir)) {
+            return null;
+        }
+
+        return JSON.parse(fs.readFileSync(this.packageJsonDir, 'utf8'));
+    }
 };

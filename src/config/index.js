@@ -8,30 +8,60 @@ const svgIcons = require('../svg-icons');
 const createFiles = require('../create-files');
 const deleteFiles = require('../delete-files');
 const postInstall = require('../postinstall');
+const landoSetup = require('../lando-setup');
+const w3Validator = require('../w3-validator');
 
 module.exports = {
-    init: function(starter, program) {
-        this.mappingCommands(starter, program);
-        this.crudFiles(starter, program);
-        this.universalCommands(starter, program);
+    program: null,
+    packageJson: null,
+    wpConfigSample: null,
+    starter: '',
+
+    init: function(program) {
+        this.program = program;
+        this.packageJson = helpers.getPackageJson();
+        this.wpConfigSample = helpers.getWPConfigSample();
+
+        // w3 validator available from anywhere
+        this.w3Validator();
+
+        // limit commands to wp's root directory
+        if (this.wpConfigSample) {
+            this.landoSetup();
+        }
+
+        // limit commands to theme's root directory
+        if (this.packageJson) {
+            if (!this.packageJson.forwardslash) {
+                helpers.consoleLogWarning('This directory does not support Forwardslash CLI', 'red', true);
+            }
+
+            this.starter = this.packageJson.forwardslash;
+
+            this.mappingCommands();
+            this.crudFiles();
+            this.universalCommands();
+        }
     },
 
-    crudFiles: function(starter, program) {
-        switch (starter) {
+    crudFiles: function() {
+        const _this = this;
+
+        switch (this.starter) {
             case helpers.starterVue:
             case helpers.starterNuxt:
-                program
+                this.program
                     .command('create-file <name>')
                     .alias('cf')
                     .description('creates files')
                     .option('-b, --block', 'create block component')
                     .option('-p, --part', 'create part component')
                     .action(function(arg, cmd) {
-                        createFiles.init(arg, cmd, starter);
+                        createFiles.init(arg, cmd, _this.starter);
                     });
                 break;
             case helpers.starterTwig:
-                program
+                this.program
                     .command('create-file <name>')
                     .alias('cf')
                     .description('creates files')
@@ -39,11 +69,11 @@ module.exports = {
                     .option('-p, --part', 'create part component')
                     .option('-pg, --page', 'create page')
                     .action(function(arg, cmd) {
-                        createFiles.init(arg, cmd, starter);
+                        createFiles.init(arg, cmd, _this.starter);
                     });
                 break;
             case helpers.starterS:
-                program
+                this.program
                     .command('create-file <name>')
                     .alias('cf')
                     .description('creates files')
@@ -53,10 +83,10 @@ module.exports = {
                     .option('-B, --block-vue', 'create vue block')
                     .option('-P, --part-vue', 'create vue part')
                     .action(function(arg, cmd) {
-                        createFiles.init(arg, cmd, starter);
+                        createFiles.init(arg, cmd, _this.starter);
                     });
 
-                program
+                this.program
                     .command('remove-fe')
                     .alias('rfe')
                     .description('remove all _fe files in template-views dir')
@@ -67,63 +97,89 @@ module.exports = {
         }
     },
 
-    mappingCommands: function(starter, program) {
-        switch (starter) {
+    mappingCommands: function() {
+        switch (this.starter) {
             case helpers.starterVue:
-                helpers.mapCommand(program, null, 'dev', 'runs vue-cli-service serve script');
-                helpers.mapCommand(program, null, 'build', 'runs vue-cli-service build script');
-                helpers.mapCommand(program, null, 'lint', 'runs vue-cli-service lint script');
-                helpers.mapCommand(program, 'story', 'storybook', 'runs storybook script');
-                helpers.mapCommand(program, 'story-b', 'storybook-build', 'runs build-storybook script');
+                helpers.mapCommand(this.program, null, 'dev', 'runs vue-cli-service serve script');
+                helpers.mapCommand(this.program, null, 'build', 'runs vue-cli-service build script');
+                helpers.mapCommand(this.program, null, 'lint', 'runs vue-cli-service lint script');
+                helpers.mapCommand(this.program, 'story', 'storybook', 'runs storybook script');
+                helpers.mapCommand(this.program, 'story-b', 'storybook-build', 'runs build-storybook script');
                 break;
             case helpers.starterNuxt:
-                helpers.mapCommand(program, null, 'dev', 'runs nuxt dev script');
-                helpers.mapCommand(program, null, 'build', 'runs nuxt build script');
-                helpers.mapCommand(program, 'gen', 'generate', 'runs nuxt generate script');
-                helpers.mapCommand(program, null, 'start', 'runs nuxt start script');
-                helpers.mapCommand(program, 'story', 'storybook', 'runs storybook script');
-                helpers.mapCommand(program, 'story-b', 'storybook-build', 'runs build-storybook script');
+                helpers.mapCommand(this.program, null, 'dev', 'runs nuxt dev script');
+                helpers.mapCommand(this.program, null, 'build', 'runs nuxt build script');
+                helpers.mapCommand(this.program, 'gen', 'generate', 'runs nuxt generate script');
+                helpers.mapCommand(this.program, null, 'start', 'runs nuxt start script');
+                helpers.mapCommand(this.program, 'story', 'storybook', 'runs storybook script');
+                helpers.mapCommand(this.program, 'story-b', 'storybook-build', 'runs build-storybook script');
                 break;
             case helpers.starterTwig:
-                helpers.mapCommand(program, null, 'dev', 'runs watch task');
-                helpers.mapCommand(program, null, 'build-dev', 'runs development build');
-                helpers.mapCommand(program, null, 'build', 'runs production build');
-                helpers.mapCommand(program, null, 'twig', 'compiles Twig files');
-                helpers.mapCommand(program, null, 'css', 'compiles CSS files');
-                helpers.mapCommand(program, null, 'js', 'compiles JS files');
-                helpers.mapCommand(program, null, 'lint-css', 'lint check of SCSS files');
-                helpers.mapCommand(program, null, 'lint-js', 'lint check of JS files');
+                helpers.mapCommand(this.program, null, 'dev', 'runs watch task');
+                helpers.mapCommand(this.program, null, 'build-dev', 'runs development build');
+                helpers.mapCommand(this.program, null, 'build', 'runs production build');
+                helpers.mapCommand(this.program, null, 'twig', 'compiles Twig files');
+                helpers.mapCommand(this.program, null, 'css', 'compiles CSS files');
+                helpers.mapCommand(this.program, null, 'js', 'compiles JS files');
+                helpers.mapCommand(this.program, null, 'lint-css', 'lint check of SCSS files');
+                helpers.mapCommand(this.program, null, 'lint-js', 'lint check of JS files');
                 break;
             case helpers.starterS:
-                helpers.mapCommand(program, null, 'dev', 'runs watch task');
-                helpers.mapCommand(program, null, 'build-dev', 'runs development build');
-                helpers.mapCommand(program, null, 'build', 'runs production build');
-                helpers.mapCommand(program, null, 'vue', 'runs development vue build');
-                helpers.mapCommand(program, null, 'css', 'compiles CSS files');
-                helpers.mapCommand(program, null, 'js', 'compiles JS files');
-                helpers.mapCommand(program, null, 'lint-html', 'lint check of HTML files');
-                helpers.mapCommand(program, null, 'lint-css', 'lint check of SCSS files');
-                helpers.mapCommand(program, null, 'lint-js', 'lint check of JS files');
-                helpers.mapCommand(program, null, 'w3-local', 'validate via w3 api');
+                helpers.mapCommand(this.program, null, 'dev', 'runs watch task');
+                helpers.mapCommand(this.program, null, 'build-dev', 'runs development build');
+                helpers.mapCommand(this.program, null, 'build', 'runs production build');
+                helpers.mapCommand(this.program, null, 'vue', 'runs development vue build');
+                helpers.mapCommand(this.program, null, 'css', 'compiles CSS files');
+                helpers.mapCommand(this.program, null, 'js', 'compiles JS files');
+                helpers.mapCommand(this.program, null, 'lint-html', 'lint check of HTML files');
+                helpers.mapCommand(this.program, null, 'lint-css', 'lint check of SCSS files');
+                helpers.mapCommand(this.program, null, 'lint-js', 'lint check of JS files');
+                helpers.mapCommand(this.program, null, 'w3-local', 'validate via w3 api');
                 break;
             default:
                 helpers.consoleLogWarning('This is NOT a FWS Starter!!!', 'red');
         }
     },
 
-    universalCommands: function(starter, program) {
-        program
+    landoSetup: function() {
+        this.program
+            .command('lando-setup')
+            .alias('lndo')
+            .description('setup project using lando')
+            .action(function() {
+                landoSetup.init();
+            });
+    },
+
+    w3Validator: function() {
+        this.program
+            .command('w3-validator <url>')
+            .alias('w3')
+            .description('validate via w3 api')
+            .option('--force-build', 'run w3 without build fail')
+            .action(function(arg, cmd) {
+                let options = helpers.cleanCmdArgs(cmd);
+                options = Object.keys(options);
+
+                w3Validator.init(arg);
+            });
+    },
+
+    universalCommands: function() {
+        const _this = this;
+
+        this.program
             .command('icons')
             .description('optimizes and generates SVG icons')
             .action(function() {
-                svgIcons.init(starter);
+                svgIcons.init(_this.starter);
             });
 
-        program
+        this.program
             .command('postinstall')
             .description('runs postinstall script')
             .action(function() {
-                postInstall.init(starter);
+                postInstall.init(_this.starter);
             });
     }
 };
