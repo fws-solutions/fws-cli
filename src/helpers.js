@@ -20,7 +20,7 @@ module.exports = {
     rf(src, callback) {
         /*
         * Helper for FS readFile function.  */
-        fs.readFile(src, 'utf8', function (err, data) {
+        fs.readFile(src, 'utf8', function(err, data) {
             if (!err) {
                 callback(data);
             } else {
@@ -52,18 +52,18 @@ module.exports = {
         });
     },
 
-    camelize: function (str) {
+    camelize: function(str) {
         return str.replace(/-(\w)/g, (_, c) => c ? c.toUpperCase() : '');
     },
 
-    cleanCmdArgs: function (cmd) {
+    cleanCmdArgs: function(cmd) {
         /*
         * Package commander passes the cmd object itself as options,
         * extract only passed values into a fresh object. */
         if (!cmd) {
             return null;
         } else {
-            return cmd.options.reduce(function (agg, cur) {
+            return cmd.options.reduce(function(agg, cur) {
                 const key = module.exports.camelize(cur.long.replace(/^--/, ''));
 
                 /*
@@ -78,17 +78,17 @@ module.exports = {
         }
     },
 
-    mapCommand: function (program, alias, script, desc) {
+    mapCommand: function(program, alias, script, desc) {
         program
             .command(script)
             .alias(alias)
             .description(desc)
-            .action(function () {
+            .action(function() {
                 module.exports.runTask(script);
             });
     },
 
-    runTask: function (task) {
+    runTask: function(task) {
         execSync('npm run ' + task, {stdio: [0, 1, 2]});
     },
 
@@ -103,7 +103,7 @@ module.exports = {
         return templateCompiler(data);
     },
 
-    getWPConfigSample:function() {
+    getWPConfigSample: function() {
         if (!fs.existsSync(this.wpConfigSampleDir)) {
             return null;
         }
@@ -111,7 +111,7 @@ module.exports = {
         return this.wpConfigSampleDir;
     },
 
-    getPackageJson:function() {
+    getPackageJson: function() {
         if (!fs.existsSync(this.packageJsonDir)) {
             return null;
         }

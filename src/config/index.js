@@ -142,12 +142,14 @@ module.exports = {
     },
 
     landoSetup: function() {
+        const _this = this;
+
         this.program
             .command('lando-setup')
             .alias('lndo')
             .description('setup project using lando')
             .action(function() {
-                landoSetup.init();
+                landoSetup.init(_this.wpConfigSample);
             });
     },
 

@@ -74,7 +74,7 @@ module.exports = {
         }
 
         // create file
-        fs.writeFileSync(writeDir, output);
+        fs.writeFileSync(writeDir, output, 'utf8');
     },
 
     logCreatedFiles: function() {
