@@ -12,41 +12,51 @@ const colors = require('ansi-colors');
 const helpers = require('../helpers');
 
 module.exports = {
+    name: '',
+    type: '',
+    starter: '',
+
     init: function(name, type, starter) {
-        if (starter !== helpers.starterS && starter !== helpers.starterTwig) {
+        // set global values
+        this.name = name;
+        this.type = type;
+        this.starter = starter;
+
+        // exit if unknown starter
+        if (this.starter !== helpers.starterS && this.starter !== helpers.starterTwig) {
             helpers.consoleLogWarning('Something went wrong... this is NOT fws_starter_s or fws_starter_twig', 'red');
             return;
         }
 
-        const part = `${type}s`;
-        const directory = module.exports.createDirectoryPath(starter, part, name);
+        const part = `${this.type}s`;
+        const directory = module.exports.createDirectoryPath(part);
 
         // create if template or module doesn't exists
-        module.exports.createDirectory(directory, type, name, module.exports.createFiles.bind(null, starter, directory, name, type));
+        module.exports.createDirectory(directory, module.exports.createFiles.bind(null, directory));
     },
 
-    createFiles: function(starter, directory, name, type) {
-        if (starter === helpers.starterS) {
-            module.exports.createFile('php', starter, name, type, directory);
-            module.exports.createFile('php', starter, name, type, directory, true);
+    createFiles: function(directory) {
+        if (this.starter === helpers.starterS) {
+            module.exports.createFile('php', directory);
+            module.exports.createFile('php', directory, true);
         } else {
-            module.exports.createFile('twig', starter, name, type, directory);
-            module.exports.createFile('json', starter, name, type, directory);
+            module.exports.createFile('twig', directory);
+            module.exports.createFile('json', directory);
         }
 
-        module.exports.createFile('scss', starter, name, type, directory);
-        module.exports.createFile('style', starter, name, type, directory);
+        module.exports.createFile('scss', directory);
+        module.exports.createFile('style', directory);
 
-        module.exports.logCreatedFiles(starter, name, type);
+        module.exports.logCreatedFiles();
     },
 
-    createFile: function(file, starter, name, type, directory, isFE = false) {
+    createFile: function(file, directory, isFE = false) {
         // set which files to create
-        const part = `${type}s`;
-        const config = module.exports.filesToCreate(file, name, type, isFE);
+        const part = `${this.type}s`;
+        const config = module.exports.filesToCreate(file, isFE);
 
         // set read/write directories
-        const styleSRC = module.exports.createStylePath(starter, part);
+        const styleSRC = module.exports.createStylePath(part);
         const readDir = file === 'style' ? styleSRC : path.join(helpers.moduleDir, 'templates', config.temp);
         const writeDir = file === 'style' ? styleSRC : path.join(directory, config.filename);
 
@@ -54,12 +64,12 @@ module.exports = {
         let output = fs.readFileSync(readDir, 'utf8');
 
         if (file === 'style') {
-            const src = starter === helpers.starterS ? 'template-views' : 'components';
-            output = output + `\n@import '../../../${src}/${part}/${name}/${name}';`;
+            const src = this.starter === helpers.starterS ? 'template-views' : 'components';
+            output = output + `\n@import '../../../${src}/${part}/${this.name}/${this.name}';`;
         } else {
             const compiledFileContentTemp = _template(output);
             output = compiledFileContentTemp({
-                str: name
+                str: module.exports.name
             });
         }
 
@@ -67,28 +77,28 @@ module.exports = {
         fs.writeFileSync(writeDir, output);
     },
 
-    logCreatedFiles: function(starter, name, type) {
-        const temp = starter === helpers.starterS ? `temp-${type}-log.txt` : `temp-${type}-twig-log.txt`;
-        const src = starter === helpers.starterS ? `template-views/${type}s` : `src/components/${type}s`;
+    logCreatedFiles: function() {
+        const temp = this.starter === helpers.starterS ? `temp-${this.type}-log.txt` : `temp-${this.type}-twig-log.txt`;
+        const src = this.starter === helpers.starterS ? `template-views/${this.type}s` : `src/components/${this.type}s`;
 
         const tempLogFile = path.join(helpers.moduleDir, 'templates', temp);
         const tempLog = fs.readFileSync(tempLogFile, 'utf8');
         const compiled = _template(tempLog);
         fancyLog(colors.green(compiled({
-            str: name,
+            str: module.exports.name,
             src: src
         })));
     },
 
-    filesToCreate: function(file, name, type, isFE) {
+    filesToCreate: function(file, isFE) {
         // file prefix and suffix for scss and fe files
         let prefix = file === 'scss' ? '_' : '';
         prefix = file === 'php' && isFE ? '_fe-' : prefix;
         const suffix = file === 'php' && isFE ? '-fe' : '';
 
         // create file name
-        const temp = `temp-${type}-${file + suffix}.txt`;
-        const filename = `${prefix + name}.${file}`;
+        const temp = `temp-${this.type}-${file + suffix}.txt`;
+        const filename = `${prefix + this.name}.${file}`;
 
         return {
             temp,
@@ -96,22 +106,22 @@ module.exports = {
         };
     },
 
-    createStylePath: function(starter, part) {
-        const src = starter === helpers.starterS ? 'src/scss/layout' : 'src/assets/scss/layout';
+    createStylePath: function(part) {
+        const src = this.starter === helpers.starterS ? 'src/scss/layout' : 'src/assets/scss/layout';
         return path.join(process.cwd(), src, `_${part}.scss`);
     },
 
-    createDirectoryPath: function(starter, part, name) {
-        const src = starter === helpers.starterS ? 'template-views' : 'src/components';
-        return path.join(process.cwd(), src, part, name);
+    createDirectoryPath: function(part) {
+        const src = this.starter === helpers.starterS ? 'template-views' : 'src/components';
+        return path.join(process.cwd(), src, part, this.name);
     },
 
-    createDirectory: function(directory, type, name, callback) {
+    createDirectory: function(directory, callback) {
         if (!fs.existsSync(directory)) {
             fs.mkdirSync(directory);
             callback();
         } else {
-            helpers.consoleLogWarning(`ERROR: ${type} '${name}' already exists`);
+            helpers.consoleLogWarning(`ERROR: ${this.type} '${this.name}' already exists`);
         }
     }
 };

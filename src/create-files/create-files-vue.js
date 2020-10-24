@@ -10,8 +10,10 @@ const _startCase = require('lodash.startcase');
 const helpers = require('../helpers');
 
 module.exports = {
-    isPart: null,
+    name: '',
+    type: '',
     starter: '',
+    isPart: null,
     directoryFile: '',
     directoryStory: '',
     fileName: '',
@@ -22,19 +24,23 @@ module.exports = {
     msgPrefix: '',
 
     init: function(name, type, starter) {
+        // set global values
+        this.name = name;
+        this.type = type;
         this.starter = starter;
-        this.setFileDetails(name, type);
-        this.checkIfComponentExists(name, type);
+
+        this.setFileDetails();
+        this.checkIfComponentExists();
     },
 
-    setFileDetails: function(name, type) {
-        this.isPart = type === 'part';
+    setFileDetails: function() {
+        this.isPart = this.type === 'part';
 
         // names and strings
-        this.fileName = _startCase(type) + _startCase(name).replace(/ /g, '');
-        this.prettyName = _startCase(name);
+        this.fileName = _startCase(this.type) + _startCase(this.name).replace(/ /g, '');
+        this.prettyName = _startCase(this.name);
         this.prettyNamePrefix = this.isPart ? 'Part: ' : 'Block: ';
-        this.compImportSrc = `../components/${type}s/${this.fileName}`;
+        this.compImportSrc = `../components/${this.type}s/${this.fileName}`;
 
         // directories
         let vueCompDir;
@@ -54,34 +60,34 @@ module.exports = {
                 break;
         }
 
-        this.directoryFile = path.join(process.cwd(), vueCompDir, `${type}s`, `${this.fileName}.vue`);
+        this.directoryFile = path.join(process.cwd(), vueCompDir, `${this.type}s`, `${this.fileName}.vue`);
         this.directoryStory = path.join(process.cwd(), vueStoryDir, `${this.isPart ? '2-' : '3-'}${this.fileName}.stories.js`);
 
         // success message
         this.msgPrefix = this.starter !== helpers.starterS ? 'Vue ' : '';
-        this.msg = `New ${this.msgPrefix}component ${type} "${this.fileName}.vue" is created!`;
+        this.msg = `New ${this.msgPrefix}component ${this.type} "${this.fileName}.vue" is created!`;
     },
 
-    checkIfComponentExists: function(name, type) {
+    checkIfComponentExists: function() {
         // check if component already exists
         if (!fs.existsSync(this.directoryFile)) {
-            this.generateVueFile(name);
+            this.generateVueFile();
 
             if (this.starter !== helpers.starterS) {
                 this.generateVueStory();
-                this.msg += `\n    New story     ${type} "${this.isPart ? '2-' : '3-'}${this.fileName}.stories.js" is created!`;
+                this.msg += `\n    New story     ${this.type} "${this.isPart ? '2-' : '3-'}${this.fileName}.stories.js" is created!`;
             }
 
             helpers.consoleLogWarning(this.msg, 'cyan');
         } else {
-            helpers.consoleLogWarning(`WARNING: ${this.msgPrefix}Component ${type}: '${this.fileName}' already exists`);
+            helpers.consoleLogWarning(`WARNING: ${this.msgPrefix}Component ${this.type}: '${this.fileName}' already exists`);
         }
     },
 
-    generateVueFile: function(name) {
+    generateVueFile: function() {
         const data = {
             componentName: this.fileName,
-            componentClass: name
+            componentClass: this.name
         };
         const tempFile = this.starter !== helpers.starterVue ? 'temp-vue-component.txt' : 'temp-vuets-component.txt';
         const compiledTemplate = helpers.compileTemplate(tempFile, data);
