@@ -5,6 +5,7 @@
  */
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios');
 const colors = require('ansi-colors');
 const readline = require('readline');
 const helpers = require('../helpers');
@@ -21,11 +22,13 @@ module.exports = {
     init: function(wpConfigSample) {
         this.wpConfigSample = wpConfigSample;
 
+        // init inputs
         this.rl = readline.createInterface({
             input: process.stdin,
             output: process.stdout
         });
 
+        // set and create files
         this.setProjectName();
         this.createFiles();
     },
@@ -53,43 +56,55 @@ module.exports = {
     createFiles: function() {
         const _this = this;
 
+        // submit entered values
         this.rl.on('close', function() {
             if (_this.invalidInputs()) {
                 const msg = 'This command does not except naming with spaces.\n    Please do not use space characters.';
                 helpers.consoleLogWarning(msg, 'red', true);
             }
 
-            _this.createWPConfigFile();
             _this.createLandoConfigFile();
-            process.exit(0);
+            _this.createWPConfigFile();
         });
     },
 
-    createWPConfigFile: function() {
+    createWPConfigFile: async function() {
+        // exit if wp-config already exists
         if (fs.existsSync(this.wpConfigDir)) {
             helpers.consoleLogWarning('WARNING: wp-config.php file already exists!');
             return null;
         }
 
+        // get salts with api.wordpress.org
+        const salts = await this.getSalts();
+
+        // read wp-config-sample.php file
         this.wpConfig = fs.readFileSync(this.wpConfigSample, 'utf8');
 
+        // prepare values for lando config
         this.wpConfig = this.findReplaceWPConfigFile('DB_NAME', 'database_name_here', 'wordpress');
         this.wpConfig = this.findReplaceWPConfigFile('DB_USER', 'username_here', 'wordpress');
         this.wpConfig = this.findReplaceWPConfigFile('DB_PASSWORD', 'password_here', 'wordpress');
         this.wpConfig = this.findReplaceWPConfigFile('DB_HOST', 'localhost', 'database');
         this.wpConfig = this.findReplaceWPConfigFile('WP_DEBUG', 'false', 'true', true);
 
-        fs.writeFileSync(this.wpConfigDir, this.wpConfig, 'utf8');
+        // replace salts with api.wordpress.org
+        salts ? this.replaceSalts(salts) : null;
 
+        // create file
+        fs.writeFileSync(this.wpConfigDir, this.wpConfig, 'utf8');
         helpers.consoleLogWarning('wp-config.php file is created!', 'green');
+        process.exit(0);
     },
 
     createLandoConfigFile: function() {
+        // exit if .lando.yml already exists
         if (fs.existsSync(this.landoConfigDir)) {
             helpers.consoleLogWarning('WARNING: .lando.yml file already exists!');
             return null;
         }
 
+        // compile template
         const data = {
             projectName: this.projectName,
             themeName: this.themeName
@@ -97,8 +112,8 @@ module.exports = {
         const tempFile = 'temp-lando.txt';
         const compiledTemplate = helpers.compileTemplate(tempFile, data);
 
+        // create file
         fs.writeFileSync(this.landoConfigDir, compiledTemplate, 'utf8');
-
         helpers.consoleLogWarning('.lando.yml file is created!', 'green');
     },
 
@@ -115,5 +130,24 @@ module.exports = {
 
     invalidInputs() {
         return this.projectName.indexOf(' ') > -1 || this.themeName.indexOf(' ') > -1;
+    },
+
+    getSalts: async function() {
+        try {
+            return await axios.get(`https://api.wordpress.org/secret-key/1.1/salt/`);
+        } catch (error) {
+            console.log(error);
+            return '';
+        }
+    },
+
+    // TODO - refactor find/replace and regex
+    replaceSalts: function(salts) {
+        const currentSalts = this.wpConfig.match(/(define)(.*)(here' \);)/g);
+        const newSalts = salts.data.split('\n');
+
+        newSalts.forEach((salt, i) => {
+            this.wpConfig = this.wpConfig.replace(currentSalts[i], salt);
+        });
     }
 };
