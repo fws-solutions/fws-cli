@@ -8,7 +8,7 @@ const svgIcons = require('../svg-icons');
 const createFiles = require('../create-files');
 const deleteFiles = require('../delete-files');
 const postInstall = require('../postinstall');
-const landoSetup = require('../lando-setup');
+const setupProject = require('../setup-project');
 const w3Validator = require('../w3-validator');
 
 module.exports = {
@@ -27,7 +27,7 @@ module.exports = {
 
         // limit commands to wp's root directory
         if (this.wpConfigSample) {
-            this.landoSetup();
+            this.setupProject();
         }
 
         // limit commands to theme's root directory
@@ -141,7 +141,7 @@ module.exports = {
         }
     },
 
-    landoSetup: function() {
+    setupProject: function() {
         const _this = this;
 
         this.program
@@ -149,7 +149,7 @@ module.exports = {
             .alias('lndo')
             .description('setup project using lando')
             .action(function() {
-                landoSetup.init(_this.wpConfigSample);
+                setupProject.init(_this.wpConfigSample);
             });
     },
 

@@ -42,6 +42,13 @@ module.exports = {
         }
     },
 
+    consoleLogReport(title, message) {
+        console.log(colors.magenta('\n------------------------------------------------------------------------'));
+        console.log(colors.magenta(`\t${title}\n`));
+        console.log(`\t${message}`);
+        console.log(colors.magenta('------------------------------------------------------------------------\n'));
+    },
+
     errorNotify(message) {
         notifier.notify({
             title: 'ERROR',

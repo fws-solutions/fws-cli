@@ -18,7 +18,4 @@ program.on('command:*', function() {
 /*
 * Run CLI configuration. */
 config.init(program);
-
 program.parse(process.argv);
-
-
