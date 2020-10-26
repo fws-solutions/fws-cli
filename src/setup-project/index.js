@@ -12,6 +12,7 @@ const helpers = require('../helpers');
 const spWPConfig = require('./setup-project-wp-config');
 const spLando = require('./setup-project-lando');
 const spNpm = require('./setup-project-npm');
+const terminalImage = require('terminal-image');
 
 module.exports = {
     rl: null,
@@ -38,6 +39,14 @@ module.exports = {
         // set and create files
         this.isLandoEnv();
         this.createFiles();
+
+
+
+
+        // (async () => {
+        //     console.log(await terminalImage.file(path.join(helpers.moduleDir, 'fws.jpeg'), {width: 70}));
+        //     process.exit();
+        // })();
     },
 
     isLandoEnv: function() {

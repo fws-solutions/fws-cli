@@ -145,8 +145,8 @@ module.exports = {
         const _this = this;
 
         this.program
-            .command('lando-setup')
-            .alias('lndo')
+            .command('setup-wordpress')
+            .alias('set-wp')
             .description('setup project using lando')
             .action(function() {
                 setupProject.init(_this.wpConfigSample);

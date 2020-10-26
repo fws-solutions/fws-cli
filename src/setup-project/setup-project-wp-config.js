@@ -71,10 +71,13 @@ module.exports = {
     // TODO - refactor find/replace and regex
     replaceSalts: function(salts) {
         const currentSalts = this.wpConfig.match(/(define)(.*)(here' \);)/g);
-        const newSalts = salts.data.split('\n');
 
-        newSalts.forEach((salt, i) => {
-            this.wpConfig = this.wpConfig.replace(currentSalts[i], salt);
-        });
+        if (currentSalts) {
+            const newSalts = salts.data.split('\n');
+
+            newSalts.forEach((salt, i) => {
+                this.wpConfig = this.wpConfig.replace(currentSalts[i], salt);
+            });
+        }
     }
 };
