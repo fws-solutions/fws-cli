@@ -85,7 +85,7 @@ module.exports = {
     setThemeName: function() {
         // skip if theme name is set
         if (this.themeName) {
-            this.enterDevServer();
+            this.enterHostName();
             return null;
         }
 
@@ -95,6 +95,23 @@ module.exports = {
 
         this.rl.question(question, name => {
             _this.themeName = name.trim();
+            _this.enterHostName();
+        });
+    },
+
+    enterHostName: function() {
+        // skip if is lando
+        if (this.isLando) {
+            this.enterDevServer();
+            return null;
+        }
+
+        // set local host
+        const _this = this;
+        const question = colors['magenta']('Local Host (URL): ');
+
+        this.rl.question(question, url => {
+            _this.hostName = _this.cleanUrl(url)
             _this.enterDevServer();
         });
     },
@@ -104,13 +121,13 @@ module.exports = {
         const _this = this;
         const question = colors['magenta']('Dev Server (URL): ');
 
-        this.rl.question(question, name => {
-            _this.devServer = _this.cleanDevServerName(name)
+        this.rl.question(question, url => {
+            _this.devServer = _this.cleanUrl(url)
             _this.enterWPMigrateDBProLicence();
         });
     },
 
-    cleanDevServerName: function(name) {
+    cleanUrl: function(name) {
         let cleanName = name.trim();
         cleanName = cleanName.replace('https://', '');
         cleanName = cleanName.replace('http://', '');
@@ -146,11 +163,7 @@ module.exports = {
             if (_this.isLando) {
                 _this.hostName = spLando.init(_this.projectName, _this.themeName, _this.landoConfigDir);
                 _this.landoFileCreated = true;
-            }
-
-            if (!_this.hostName) {
-                const hostName = fs.readFileSync(_this.landoConfigDir, 'utf8');
-                _this.hostName = yaml.parse(hostName)['proxy']['appserver'][0];
+                _this.checkHostName();
             }
 
             // create wp-config.php file
@@ -165,6 +178,13 @@ module.exports = {
             // run npm install and build in theme's root directory
             spNpm.init(_this.themeName, _this.wpThemeDir);
         });
+    },
+
+    checkHostName: function() {
+        if (!this.hostName) {
+            const hostName = fs.readFileSync(this.landoConfigDir, 'utf8');
+            this.hostName = yaml.parse(hostName)['proxy']['appserver'][0];
+        }
     },
 
     getRepositoryName: function() {
