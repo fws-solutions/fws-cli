@@ -1,0 +1,20 @@
+# 1. Change name to 'dev-deployment', 'stage-deployment' or 'prod-deployment'
+name: dev-deployment
+
+# 2. Adjust these variables if needed
+env:
+    # WP Engine environment slug: https://i.imgur.com/jVccu8Z.png
+    wpengineEnvironment: <%= devSlug %>
+
+    # Theme directory name
+    themeDir: <%= themeName %>
+
+    # Node version. Use 10 or 12
+    nodeVersion: 12
+
+on:
+    push:
+        # 3. Set the git branch for which to trigger this workflow
+        branches: [ develop ]
+
+<%= jobs %>

@@ -14,6 +14,7 @@ const spWPConfig = require('./setup-project-wp-config');
 const spLando = require('./setup-project-lando');
 const spNpm = require('./setup-project-npm');
 const spHtaccess = require('./setup-project-wp-htaccess');
+const spGithub = require('./setup-project-github-wpengine');
 
 module.exports = {
     rl: null,
@@ -25,6 +26,7 @@ module.exports = {
     landoFileCreated: false,
     wpConfigFileCreated: false,
     htaccessFileCreated: false,
+    githubFileCreated: false,
     wpMigrateDbKey: '',
     wpThemePrefix: 'fws-',
     wpThemeDir: path.join(process.cwd(), '/wp-content/themes/'),
@@ -33,7 +35,7 @@ module.exports = {
     init: function(wpConfigSample) {
         this.wpConfigSample = wpConfigSample;
         this.projectName = this.getRepositoryName();
-        this.themeName = this.getWPThemeName();
+        this.themeName = this.getThemeName();
 
         // init inputs
         this.rl = readline.createInterface({
@@ -42,11 +44,11 @@ module.exports = {
         });
 
         // set and create files
-        this.isLandoEnv();
+        this.inputIsLando();
         this.createFiles();
     },
 
-    isLandoEnv: function() {
+    inputIsLando: function() {
         // set project name
         const _this = this;
         const question = colors['magenta']('Use Lando Env? (Y/N): ');
@@ -57,18 +59,18 @@ module.exports = {
 
             if (!confirmed.includes(a)) {
                 _this.isLando = false;
-                _this.setThemeName();
+                _this.inputThemeName();
                 return null;
             }
 
-            _this.setProjectName();
+            _this.inputProjectName();
         });
     },
 
-    setProjectName: function() {
+    inputProjectName: function() {
         // skip if project name is set
         if (this.projectName) {
-            this.setThemeName();
+            this.inputThemeName();
             return null;
         }
 
@@ -78,14 +80,14 @@ module.exports = {
 
         this.rl.question(question, name => {
             _this.projectName = name.trim();
-            _this.setThemeName();
+            _this.inputThemeName();
         });
     },
 
-    setThemeName: function() {
+    inputThemeName: function() {
         // skip if theme name is set
         if (this.themeName) {
-            this.enterHostName();
+            this.inputLocalHost();
             return null;
         }
 
@@ -95,14 +97,14 @@ module.exports = {
 
         this.rl.question(question, name => {
             _this.themeName = name.trim();
-            _this.enterHostName();
+            _this.inputLocalHost();
         });
     },
 
-    enterHostName: function() {
+    inputLocalHost: function() {
         // skip if is lando
         if (this.isLando) {
-            this.enterDevServer();
+            this.inputDevServer();
             return null;
         }
 
@@ -111,35 +113,23 @@ module.exports = {
         const question = colors['magenta']('Local Host (URL): ');
 
         this.rl.question(question, url => {
-            _this.hostName = _this.cleanUrl(url)
-            _this.enterDevServer();
+            _this.hostName = _this.cleanUrl(url);
+            _this.inputDevServer();
         });
     },
 
-    enterDevServer: function() {
+    inputDevServer: function() {
         // set dev server
         const _this = this;
         const question = colors['magenta']('Dev Server (URL): ');
 
         this.rl.question(question, url => {
-            _this.devServer = _this.cleanUrl(url)
-            _this.enterWPMigrateDBProLicence();
+            _this.devServer = _this.cleanUrl(url);
+            _this.inputMigrateLicence();
         });
     },
 
-    cleanUrl: function(name) {
-        let cleanName = name.trim();
-        cleanName = cleanName.replace('https://', '');
-        cleanName = cleanName.replace('http://', '');
-
-        if (cleanName.substr(-1, 1) === '/') {
-            cleanName = cleanName.slice(0, -1);
-        }
-
-        return cleanName;
-    },
-
-    enterWPMigrateDBProLicence: function() {
+    inputMigrateLicence: function() {
         const _this = this;
         const question = colors['magenta']('WP Migrate DB Pro Key: ');
 
@@ -162,8 +152,8 @@ module.exports = {
             // create .lando.yml file
             if (_this.isLando) {
                 _this.hostName = spLando.init(_this.projectName, _this.themeName, _this.landoConfigDir);
-                _this.landoFileCreated = true;
-                _this.checkHostName();
+                _this.landoFileCreated = !!_this.hostName;
+                _this.getLocalHostName();
             }
 
             // create wp-config.php file
@@ -171,6 +161,9 @@ module.exports = {
 
             // create wp-content/uploads/.htaccess file
             _this.htaccessFileCreated = spHtaccess.init(_this.hostName, _this.devServer);
+
+            // create .github config pipeline
+            _this.githubFileCreated = spGithub.init(_this.themeName, _this.devServer);
 
             // log created files
             _this.logReport();
@@ -180,7 +173,23 @@ module.exports = {
         });
     },
 
-    checkHostName: function() {
+    invalidInputs: function() {
+        return this.projectName.indexOf(' ') > -1 || this.themeName.indexOf(' ') > -1;
+    },
+
+    cleanUrl: function(name) {
+        let cleanName = name.trim();
+        cleanName = cleanName.replace('https://', '');
+        cleanName = cleanName.replace('http://', '');
+
+        if (cleanName.substr(-1, 1) === '/') {
+            cleanName = cleanName.slice(0, -1);
+        }
+
+        return cleanName;
+    },
+
+    getLocalHostName: function() {
         if (!this.hostName) {
             const hostName = fs.readFileSync(this.landoConfigDir, 'utf8');
             this.hostName = yaml.parse(hostName)['proxy']['appserver'][0];
@@ -201,7 +210,7 @@ module.exports = {
         return repoName.replace('.git', '');
     },
 
-    getWPThemeName: function() {
+    getThemeName: function() {
         const themes = fs.readdirSync(this.wpThemeDir);
         let themeName = '';
 
@@ -214,10 +223,6 @@ module.exports = {
         return themeName;
     },
 
-    invalidInputs: function() {
-        return this.projectName.indexOf(' ') > -1 || this.themeName.indexOf(' ') > -1;
-    },
-
     logReport: function() {
         let report = '';
         const landoCreated = colors.green('- File .lando.yml is created!');
@@ -227,6 +232,8 @@ module.exports = {
         const wpConfigExists = colors.yellow('- File wp-config.php already exists!');
         const htAccessCreated = colors.green('- File .htaccess is created!');
         const htAccessExists = colors.yellow('- File .htaccess already exists!');
+        const githubCreated = colors.green('- Directory .github is created!');
+        const githubExists = colors.yellow('- Directory .github already exists!');
 
         // lando report
         if (!this.isLando) {
@@ -244,6 +251,11 @@ module.exports = {
         // htaccess report
         report += '\t';
         report += this.htaccessFileCreated ? htAccessCreated : htAccessExists;
+        report += '\n';
+
+        // github report
+        report += '\t';
+        report += this.githubFileCreated ? githubCreated : githubExists;
 
         // log full report
         helpers.consoleLogReport('REPORT:', report);

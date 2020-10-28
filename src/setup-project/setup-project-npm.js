@@ -31,6 +31,14 @@ module.exports = {
 
     npmInstall: function() {
         const _this = this;
+
+        // exit if node_modules already exists
+        if (fs.existsSync(path.join(this.wpThemeDir, 'node_modules'))) {
+            helpers.consoleLogWarning('node_modules already installed...');
+            this.buildFiles();
+            return null;
+        }
+
         this.spinner.setSpinnerTitle(colors.cyan('%s ...getting ready for \'npm install\'...'));
         console.log('\n');
         this.spinner.start();

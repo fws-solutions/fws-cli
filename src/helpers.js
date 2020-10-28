@@ -124,5 +124,19 @@ module.exports = {
         }
 
         return JSON.parse(fs.readFileSync(this.packageJsonDir, 'utf8'));
+    },
+
+    createNestedDirectories(dirs, root = process.cwd()) {
+        let curPath = root;
+
+        if (dirs.length > 0) {
+            dirs.forEach(cur => {
+                curPath = path.join(curPath, cur);
+
+                if (!fs.existsSync(curPath)) {
+                    fs.mkdirSync(curPath);
+                }
+            });
+        }
     }
 };

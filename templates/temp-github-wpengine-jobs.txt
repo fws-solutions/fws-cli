@@ -1,0 +1,44 @@
+jobs:
+    build-and-deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Set additional env variables
+                run: |
+                    echo ::set-env name=branch::$(echo ${GITHUB_REF#refs/heads/})
+                    echo ::set-env name=workspace::$GITHUB_WORKSPACE
+                    echo ::set-env name=fullThemeDir::$GITHUB_WORKSPACE/wp-content/themes/${{ env.themeDir }}
+
+            -   name: Git checkout
+                uses: actions/checkout@v2
+                with:
+                    fetch-depth: 0
+
+            -   name: Prepare for Deployment
+                working-directory: ${{ env.workspace }}
+                run: rm .gitignore && mv deploy.gitignore .gitignore
+
+            -   name: Install Composer Dependencies
+                uses: php-actions/composer@v3
+                env:
+                    FULL_THEME_DIR: ${{ env.fullThemeDir }}
+                with:
+                    args: --working-dir $FULL_THEME_DIR
+                    dev: no
+
+            -   name: Setup Node.js environment
+                uses: actions/setup-node@v2.1.2
+                with:
+                    node-version: ${{ env.nodeVersion }}
+
+            -   name: Build FE assets
+                working-directory: ${{ env.fullThemeDir }}
+                run: npm install && npm run build
+
+            -   name: WP Engine deployment
+                uses: fws-solutions/wpengine-deploy-action@master
+                env:
+                    WPENGINE_ENVIRONMENT_NAME: ${{ env.wpengineEnvironment }}
+                    LOCAL_BRANCH: ${{ env.branch }}
+                    WPENGINE_SSH_KEY_PRIVATE: ${{ secrets.WPENGINE_SSH_KEY_PRIVATE }}
+                    WPENGINE_SSH_KEY_PUBLIC: ${{ secrets.WPENGINE_SSH_KEY_PUBLIC }}
