@@ -35,6 +35,6 @@
         "node-notifier": "^7.0.1",
         "parse-git-config": "^3.0.0",
         "svgo": "^1.3.2",
-        "terminal-image": "^1.2.1"
+        "yaml": "^1.10.0"
     }
 }

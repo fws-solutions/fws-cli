@@ -2,7 +2,7 @@ name: <%= projectName %>
 recipe: wordpress
 proxy:
     appserver:
-        - <%= projectName %>.lndo.site
+        - <%= hostName %>
 
 config:
     xdebug: true

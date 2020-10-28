@@ -8,22 +8,27 @@ const path = require('path');
 const colors = require('ansi-colors');
 const readline = require('readline');
 const parse = require('parse-git-config');
+const yaml = require('yaml');
 const helpers = require('../helpers');
 const spWPConfig = require('./setup-project-wp-config');
 const spLando = require('./setup-project-lando');
 const spNpm = require('./setup-project-npm');
-const terminalImage = require('terminal-image');
+const spHtaccess = require('./setup-project-wp-htaccess');
 
 module.exports = {
     rl: null,
     projectName: '',
     themeName: '',
+    devServer: '',
+    hostName: '',
     isLando: true,
     landoFileCreated: false,
     wpConfigFileCreated: false,
+    htaccessFileCreated: false,
     wpMigrateDbKey: '',
     wpThemePrefix: 'fws-',
     wpThemeDir: path.join(process.cwd(), '/wp-content/themes/'),
+    landoConfigDir: path.join(process.cwd(), '/.lando.yml'),
 
     init: function(wpConfigSample) {
         this.wpConfigSample = wpConfigSample;
@@ -39,14 +44,6 @@ module.exports = {
         // set and create files
         this.isLandoEnv();
         this.createFiles();
-
-
-
-
-        // (async () => {
-        //     console.log(await terminalImage.file(path.join(helpers.moduleDir, 'fws.jpeg'), {width: 70}));
-        //     process.exit();
-        // })();
     },
 
     isLandoEnv: function() {
@@ -88,7 +85,7 @@ module.exports = {
     setThemeName: function() {
         // skip if theme name is set
         if (this.themeName) {
-            this.enterWPMigrateDBProLicence();
+            this.enterDevServer();
             return null;
         }
 
@@ -98,8 +95,31 @@ module.exports = {
 
         this.rl.question(question, name => {
             _this.themeName = name.trim();
+            _this.enterDevServer();
+        });
+    },
+
+    enterDevServer: function() {
+        // set dev server
+        const _this = this;
+        const question = colors['magenta']('Dev Server (URL): ');
+
+        this.rl.question(question, name => {
+            _this.devServer = _this.cleanDevServerName(name)
             _this.enterWPMigrateDBProLicence();
         });
+    },
+
+    cleanDevServerName: function(name) {
+        let cleanName = name.trim();
+        cleanName = cleanName.replace('https://', '');
+        cleanName = cleanName.replace('http://', '');
+
+        if (cleanName.substr(-1, 1) === '/') {
+            cleanName = cleanName.slice(0, -1);
+        }
+
+        return cleanName;
     },
 
     enterWPMigrateDBProLicence: function() {
@@ -122,14 +142,27 @@ module.exports = {
                 helpers.consoleLogWarning(msg, 'red', true);
             }
 
+            // create .lando.yml file
             if (_this.isLando) {
-                _this.landoFileCreated = spLando.init(_this.projectName, _this.themeName);
+                _this.hostName = spLando.init(_this.projectName, _this.themeName, _this.landoConfigDir);
+                _this.landoFileCreated = true;
             }
 
+            if (!_this.hostName) {
+                const hostName = fs.readFileSync(_this.landoConfigDir, 'utf8');
+                _this.hostName = yaml.parse(hostName)['proxy']['appserver'][0];
+            }
+
+            // create wp-config.php file
             _this.wpConfigFileCreated = await spWPConfig.init(_this.wpConfigSample);
 
+            // create wp-content/uploads/.htaccess file
+            _this.htaccessFileCreated = spHtaccess.init(_this.hostName, _this.devServer);
+
+            // log created files
             _this.logReport();
 
+            // run npm install and build in theme's root directory
             spNpm.init(_this.themeName, _this.wpThemeDir);
         });
     },
@@ -172,8 +205,10 @@ module.exports = {
         const landoSkipped = colors.cyan('- Skipped Lando setup.');
         const wpConfigCreated = colors.green('- File wp-config.php is created!');
         const wpConfigExists = colors.yellow('- File wp-config.php already exists!');
+        const htAccessCreated = colors.green('- File .htaccess is created!');
+        const htAccessExists = colors.yellow('- File .htaccess already exists!');
 
-        // format report
+        // lando report
         if (!this.isLando) {
             report += landoSkipped + '\n';
         } else {
@@ -181,10 +216,16 @@ module.exports = {
             report += '\n';
         }
 
+        // wp-config report
         report += '\t';
         report += this.wpConfigFileCreated ? wpConfigCreated : wpConfigExists;
+        report += '\n';
 
-        // log report
+        // htaccess report
+        report += '\t';
+        report += this.htaccessFileCreated ? htAccessCreated : htAccessExists;
+
+        // log full report
         helpers.consoleLogReport('REPORT:', report);
     }
 };

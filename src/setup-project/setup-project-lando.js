@@ -10,11 +10,15 @@ const helpers = require('../helpers');
 module.exports = {
     projectName: '',
     themeName: '',
+    hostName: '',
     landoConfigDir: path.join(process.cwd(), '/.lando.yml'),
 
-    init: function(projectName, themeName) {
+    init: function(projectName, themeName, landoConfigDir) {
+        this.landoConfigDir = landoConfigDir;
         this.projectName = projectName;
         this.themeName = themeName;
+        this.hostName = `${projectName}.lndo.site`;
+
         return this.createLandoConfigFile();
     },
 
@@ -27,7 +31,8 @@ module.exports = {
         // compile template
         const data = {
             projectName: this.projectName,
-            themeName: this.themeName
+            themeName: this.themeName,
+            hostName: this.hostName
         };
         const tempFile = 'temp-lando.txt';
         const compiledTemplate = helpers.compileTemplate(tempFile, data);
@@ -35,6 +40,6 @@ module.exports = {
         // create file
         fs.writeFileSync(this.landoConfigDir, compiledTemplate, 'utf8');
 
-        return true;
+        return this.hostName;
     }
 };

@@ -3,5 +3,5 @@ RewriteEngine On
 RewriteCond %{HTTP_HOST} <%= hostName %>
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.+) <%= devName %>/wp-content/uploads/$1 [L,R=301,NE]
+RewriteRule ^(.+) http://<%= devName %>/wp-content/uploads/$1 [L,R=301,NE]
 </IfModule>

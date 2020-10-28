@@ -8,15 +8,15 @@ const path = require('path');
 const helpers = require('../helpers');
 
 module.exports = {
-    projectName: '',
     hostName: '',
     devName: '',
     htaccessDir: path.join(process.cwd(), '/wp-content/uploads/.htaccess'),
 
-    init: function(projectName, hostName, devName) {
-        this.projectName = projectName;
+    init: function(hostName, devName) {
         this.hostName = hostName;
         this.devName = devName;
+
+        return this.createHtaccessFile();
     },
 
     createHtaccessFile: function() {
@@ -27,7 +27,6 @@ module.exports = {
 
         // compile template
         const data = {
-            projectName: this.projectName,
             hostName: this.hostName,
             devName: this.devName
         };
