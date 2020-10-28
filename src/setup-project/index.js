@@ -23,14 +23,16 @@ module.exports = {
     devServer: '',
     hostName: '',
     isLando: true,
-    landoFileCreated: false,
-    wpConfigFileCreated: false,
-    htaccessFileCreated: false,
-    githubFileCreated: false,
     wpMigrateDbKey: '',
     wpThemePrefix: 'fws-',
     wpThemeDir: path.join(process.cwd(), '/wp-content/themes/'),
     landoConfigDir: path.join(process.cwd(), '/.lando.yml'),
+    createdFiles: {
+        lando: false,
+        wpconfig: false,
+        htaccess: false,
+        github: false
+    },
 
     init: function(wpConfigSample) {
         this.wpConfigSample = wpConfigSample;
@@ -152,18 +154,18 @@ module.exports = {
             // create .lando.yml file
             if (_this.isLando) {
                 _this.hostName = spLando.init(_this.projectName, _this.themeName, _this.landoConfigDir);
-                _this.landoFileCreated = !!_this.hostName;
+                _this.createdFiles.lando = !!_this.hostName;
                 _this.getLocalHostName();
             }
 
             // create wp-config.php file
-            _this.wpConfigFileCreated = await spWPConfig.init(_this.wpConfigSample);
+            _this.createdFiles.wpconfig = await spWPConfig.init(_this.wpConfigSample);
 
             // create wp-content/uploads/.htaccess file
-            _this.htaccessFileCreated = spHtaccess.init(_this.hostName, _this.devServer);
+            _this.createdFiles.htaccess = spHtaccess.init(_this.hostName, _this.devServer);
 
             // create .github config pipeline
-            _this.githubFileCreated = spGithub.init(_this.themeName, _this.devServer);
+            _this.createdFiles.github = spGithub.init(_this.themeName, _this.devServer);
 
             // log created files
             _this.logReport();
@@ -225,39 +227,35 @@ module.exports = {
 
     logReport: function() {
         let report = '';
-        const landoCreated = colors.green('- File .lando.yml is created!');
-        const landoExists = colors.yellow('- File .lando.yml already exists!');
         const landoSkipped = colors.cyan('- Skipped Lando setup.');
-        const wpConfigCreated = colors.green('- File wp-config.php is created!');
-        const wpConfigExists = colors.yellow('- File wp-config.php already exists!');
-        const htAccessCreated = colors.green('- File .htaccess is created!');
-        const htAccessExists = colors.yellow('- File .htaccess already exists!');
-        const githubCreated = colors.green('- Directory .github is created!');
-        const githubExists = colors.yellow('- Directory .github already exists!');
 
         // lando report
         if (!this.isLando) {
             report += landoSkipped + '\n';
         } else {
-            report += this.landoFileCreated ? landoCreated : landoExists;
-            report += '\n';
+            report += this.reportMessage('lando', '.lando.yml', true, false);
         }
 
-        // wp-config report
-        report += '\t';
-        report += this.wpConfigFileCreated ? wpConfigCreated : wpConfigExists;
-        report += '\n';
-
-        // htaccess report
-        report += '\t';
-        report += this.htaccessFileCreated ? htAccessCreated : htAccessExists;
-        report += '\n';
-
-        // github report
-        report += '\t';
-        report += this.githubFileCreated ? githubCreated : githubExists;
+        // create report messages
+        report += this.reportMessage('wpconfig', 'wp-config.php');
+        report += this.reportMessage('htaccess', '.htaccess');
+        report += this.reportMessage('github', '.github', false);
 
         // log full report
         helpers.consoleLogReport('REPORT:', report);
+    },
+
+    reportMessage: function(file, name, n = true, t = true) {
+        const isCreated = this.createdFiles[file];
+        const created = 'is created!';
+        const exist = 'already exists!';
+        const msg = `- File ${name} ${isCreated ? created : exist}`;
+        let report = '';
+
+        report += t ? '\t' : '';
+        report += colors[isCreated ? 'green' : 'yellow'](msg);
+        report += n ? '\n' : '';
+
+        return report;
     }
 };

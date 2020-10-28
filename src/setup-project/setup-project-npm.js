@@ -12,6 +12,7 @@ const helpers = require('../helpers');
 
 module.exports = {
     wpThemeDir: '',
+    themeName: '',
     spawnConfig: {},
     spinner: null,
     timeout: 1500,
@@ -20,6 +21,7 @@ module.exports = {
         this.spinner = new spinner();
         this.spinner.setSpinnerString('|/-\\');
 
+        this.themeName = themeName;
         this.wpThemeDir = path.join(wpThemeDir, themeName);
         this.spawnConfig = {
             stdio: 'inherit',
@@ -34,7 +36,7 @@ module.exports = {
 
         // exit if node_modules already exists
         if (fs.existsSync(path.join(this.wpThemeDir, 'node_modules'))) {
-            helpers.consoleLogWarning('node_modules already installed...');
+            helpers.consoleLogWarning(`node_modules already installed in the root of '${this.themeName}' theme.`);
             this.buildFiles();
             return null;
         }
