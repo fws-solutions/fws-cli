@@ -12,7 +12,8 @@ const yaml = require('yaml');
 const figlet = require('figlet');
 const helpers = require('../helpers');
 const spWPConfig = require('./setup-project-wp-config');
-const spLando = require('./setup-project-lando');
+const spLandoConfig = require('./setup-project-lando-config');
+const spLandoStart = require('./setup-project-lando-start');
 const spNpm = require('./setup-project-npm');
 const spHtaccess = require('./setup-project-wp-htaccess');
 const spGithub = require('./setup-project-github-wpengine');
@@ -170,7 +171,7 @@ module.exports = {
 
             // create .lando.yml file
             if (_this.isLando) {
-                _this.hostName = spLando.init(_this.projectName, _this.themeName, _this.landoConfigDir);
+                _this.hostName = spLandoConfig.init(_this.projectName, _this.themeName, _this.landoConfigDir);
                 _this.createdFiles.lando = !!_this.hostName;
                 _this.getLocalHostName();
             }
@@ -187,8 +188,8 @@ module.exports = {
             // log created files
             _this.logReport();
 
-            // run npm install and build in theme's root directory
-            spNpm.init(_this.themeName, _this.wpThemeDir);
+            // run 'npm install', build in theme's root directory and start lando
+            spNpm.init(_this.themeName, _this.wpThemeDir, spLandoStart);
         });
     },
 
