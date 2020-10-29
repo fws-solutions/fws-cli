@@ -17,7 +17,7 @@ module.exports = {
         this.landoConfigDir = landoConfigDir;
         this.projectName = projectName;
         this.themeName = themeName;
-        this.hostName = `${projectName}.lndo.site`;
+        this.hostName = helpers.createLandoHostName(projectName);
 
         return this.createLandoConfigFile();
     },

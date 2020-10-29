@@ -192,7 +192,11 @@ module.exports = {
             _this.logReport();
 
             // run 'npm install', build in theme's root directory and start lando
-            spNpm.init(_this.themeName, _this.wpThemeDir, spLandoStart);
+            spNpm.init(
+                _this.themeName,
+                _this.wpThemeDir,
+                spLandoStart.init.bind(spLandoStart, _this.projectName)
+            );
         });
     },
 
