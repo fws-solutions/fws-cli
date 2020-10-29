@@ -15,8 +15,10 @@ module.exports = {
     wpConfig: null,
     saltApi: 'https://api.wordpress.org/secret-key/1.1/salt/',
 
-    init: function(wpConfigSample) {
+    init: function(wpConfigSample, wpMigrateDbKey) {
         this.wpConfigSample = wpConfigSample;
+        this.wpMigrateDbKey = wpMigrateDbKey;
+
         return this.createWPConfigFile();
     },
 
@@ -26,11 +28,14 @@ module.exports = {
             return null;
         }
 
-        // get salts with api.wordpress.org
-        const salts = await this.getSalts();
-
         // read wp-config-sample.php file
         this.wpConfig = fs.readFileSync(this.wpConfigSample, 'utf8');
+
+        // salts and licence
+        const newSalts = await this.getSalts();
+        const defaultSalts = fs.readFileSync(path.join(helpers.moduleDir, 'templates', 'temp-wp-salts-default.txt'), 'utf8');
+        const migrateKey = `define( 'WPMDB_LICENCE', '${this.wpMigrateDbKey}' );`;
+        const saltsRegEx = this.wpConfig.match(/^\/\*\*#@\+.*\/\*\*#@-\*\//sm);
 
         // prepare values for lando config
         this.wpConfig = this.findReplaceWPConfigFile('DB_NAME', 'database_name_here', 'wordpress');
@@ -39,8 +44,13 @@ module.exports = {
         this.wpConfig = this.findReplaceWPConfigFile('DB_HOST', 'localhost', 'database');
         this.wpConfig = this.findReplaceWPConfigFile('WP_DEBUG', 'false', 'true', true);
 
-        // replace salts with api.wordpress.org
-        salts ? this.replaceSalts(salts) : null;
+        // replace salts and add migrate db pro licence
+        const data = {
+            salts: newSalts ? newSalts.data : defaultSalts,
+            migrate: migrateKey
+        };
+        const compiledTemplateSalts = helpers.compileTemplate('temp-wp-salts-licence.txt', data);
+        this.wpConfig = this.wpConfig.replace(saltsRegEx, compiledTemplateSalts);
 
         // create file
         fs.writeFileSync(this.wpConfigDir, this.wpConfig, 'utf8');
@@ -65,19 +75,6 @@ module.exports = {
         } catch (error) {
             console.log(error);
             return '';
-        }
-    },
-
-    // TODO - refactor find/replace and regex
-    replaceSalts: function(salts) {
-        const currentSalts = this.wpConfig.match(/(define)(.*)(here' \);)/g);
-
-        if (currentSalts) {
-            const newSalts = salts.data.split('\n');
-
-            newSalts.forEach((salt, i) => {
-                this.wpConfig = this.wpConfig.replace(currentSalts[i], salt);
-            });
         }
     }
 };

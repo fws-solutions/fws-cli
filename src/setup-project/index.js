@@ -9,6 +9,7 @@ const colors = require('ansi-colors');
 const readline = require('readline');
 const parse = require('parse-git-config');
 const yaml = require('yaml');
+const figlet = require('figlet');
 const helpers = require('../helpers');
 const spWPConfig = require('./setup-project-wp-config');
 const spLando = require('./setup-project-lando');
@@ -45,9 +46,25 @@ module.exports = {
             output: process.stdout
         });
 
-        // set and create files
-        this.inputIsLando();
-        this.createFiles();
+        // run setup
+        this.setupWelcome();
+    },
+
+    setupWelcome: function() {
+        const _this = this;
+
+        figlet('FWS', {font: 'Slant'}, function(err, data) {
+            if (err) {
+                console.log('Something went wrong...');
+                console.dir(err);
+                return;
+            }
+            console.log(colors['red'](data));
+
+            // set and create files
+            _this.inputIsLando();
+            _this.createFiles();
+        });
     },
 
     inputIsLando: function() {
@@ -159,7 +176,7 @@ module.exports = {
             }
 
             // create wp-config.php file
-            _this.createdFiles.wpconfig = await spWPConfig.init(_this.wpConfigSample);
+            _this.createdFiles.wpconfig = await spWPConfig.init(_this.wpConfigSample, _this.wpMigrateDbKey);
 
             // create wp-content/uploads/.htaccess file
             _this.createdFiles.htaccess = spHtaccess.init(_this.hostName, _this.devServer);
