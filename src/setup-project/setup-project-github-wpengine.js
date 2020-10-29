@@ -11,12 +11,16 @@ module.exports = {
     themeName: '',
     devSlug: '',
     githubDir: path.join(process.cwd(), '/.github/workflows/dev-deployment.yml'),
+    deployGitIgnore: path.join(process.cwd(), 'deploy.gitignore'),
 
     init: function(themeName, devName) {
         this.themeName = themeName;
         this.devSlug = devName.replace('.wpengine.com', '');
 
-        return this.createGithubConfig();
+        return {
+            githubConfig: this.createGithubConfig(),
+            deployGitIgnore: this.createDeployGitIgnore()
+        }
     },
 
     createGithubConfig: function() {
@@ -40,6 +44,18 @@ module.exports = {
 
         // create file
         fs.writeFileSync(this.githubDir, compiledTemplate, 'utf8');
+
+        return true;
+    },
+
+    createDeployGitIgnore: function() {
+        // exit if deploy.gitignore already exists
+        if (fs.existsSync(this.deployGitIgnore)) {
+            return null;
+        }
+
+        const gitIgnore = fs.readFileSync(path.join(helpers.moduleDir, 'templates', 'temp-github-gitignore.txt'), 'utf8');
+        fs.writeFileSync(this.deployGitIgnore, gitIgnore, 'utf8');
 
         return true;
     }

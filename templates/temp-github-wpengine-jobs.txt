@@ -5,10 +5,11 @@ jobs:
         steps:
             -   name: Set additional env variables
                 run: |
-                    echo ::set-env name=branch::$(echo ${GITHUB_REF#refs/heads/})
-                    echo ::set-env name=workspace::$GITHUB_WORKSPACE
-                    echo ::set-env name=fullThemeDir::$GITHUB_WORKSPACE/wp-content/themes/${{ env.themeDir }}
-
+                    echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+                    echo "workspace=$GITHUB_WORKSPACE" >> $GITHUB_ENV
+                    echo "fullThemeDir=$GITHUB_WORKSPACE/wp-content/themes/${{ env.themeDir }}" >> $GITHUB_ENV
+                    echo "nodeModulesDir=$GITHUB_WORKSPACE/wp-content/themes/${{ env.themeDir }}/node_modules" >> $GITHUB_ENV
+                    echo "packageLockJson=$GITHUB_WORKSPACE/wp-content/themes/${{ env.themeDir }}/package-lock.json" >> $GITHUB_ENV
             -   name: Git checkout
                 uses: actions/checkout@v2
                 with:
@@ -31,12 +32,24 @@ jobs:
                 with:
                     node-version: ${{ env.nodeVersion }}
 
+            -   name: Cache node_modules
+                id: cache-node-modules
+                uses: actions/cache@v2
+                with:
+                    path: ${{ env.nodeModulesDir }}
+                    key: node-modules-${{ hashFiles( env.packageLockJson) }}
+
+            -   name: Install NPM
+                working-directory: ${{ env.fullThemeDir }}
+                if: steps.cache-node-modules.outputs.cache-hit != 'true'
+                run: npm install
+
             -   name: Build FE assets
                 working-directory: ${{ env.fullThemeDir }}
-                run: npm install && npm run build
+                run: npm run build
 
             -   name: WP Engine deployment
-                uses: fws-solutions/wpengine-deploy-action@master
+                uses: fws-solutions/wpengine-deploy-action@1.1.1
                 env:
                     WPENGINE_ENVIRONMENT_NAME: ${{ env.wpengineEnvironment }}
                     LOCAL_BRANCH: ${{ env.branch }}

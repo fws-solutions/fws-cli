@@ -33,7 +33,8 @@ module.exports = {
         lando: false,
         wpconfig: false,
         htaccess: false,
-        github: false
+        github: false,
+        deployIgnore: false
     },
 
     init: function(wpConfigSample) {
@@ -183,7 +184,9 @@ module.exports = {
             _this.createdFiles.htaccess = spHtaccess.init(_this.hostName, _this.devServer);
 
             // create .github config pipeline
-            _this.createdFiles.github = spGithub.init(_this.themeName, _this.devServer);
+            const githubFiles = spGithub.init(_this.themeName, _this.devServer);
+            _this.createdFiles.github = githubFiles.githubConfig;
+            _this.createdFiles.deployIgnore = githubFiles.deployGitIgnore;
 
             // log created files
             _this.logReport();
@@ -257,7 +260,8 @@ module.exports = {
         // create report messages
         report += this.reportMessage('wpconfig', 'wp-config.php');
         report += this.reportMessage('htaccess', '.htaccess');
-        report += this.reportMessage('github', '.github', false);
+        report += this.reportMessage('github', '.github');
+        report += this.reportMessage('deployIgnore', 'deploy.gitignore', false);
 
         // log full report
         helpers.consoleLogReport('REPORT:', report);
