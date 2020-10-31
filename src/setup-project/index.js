@@ -25,6 +25,7 @@ module.exports = {
     devServer: '',
     hostName: '',
     isLando: true,
+    devSecretKey: '',
     wpMigrateDbKey: '',
     wpThemePrefix: 'fws-',
     wpThemeDir: path.join(process.cwd(), '/wp-content/themes/'),
@@ -156,6 +157,16 @@ module.exports = {
 
         this.rl.question(question, key => {
             _this.wpMigrateDbKey = key.trim();
+            _this.inputMigrateSecretKey();
+        });
+    },
+
+    inputMigrateSecretKey: function() {
+        const _this = this;
+        const question = colors['magenta']('Dev Secret Key: ');
+
+        this.rl.question(question, key => {
+            _this.devSecretKey = _this.cleanSecretKey(key);
             _this.rl.close();
         });
     },
@@ -195,7 +206,12 @@ module.exports = {
             spNpm.init(
                 _this.themeName,
                 _this.wpThemeDir,
-                spLandoStart.init.bind(spLandoStart, _this.projectName)
+                spLandoStart.init.bind(
+                    spLandoStart,
+                    _this.projectName,
+                    _this.devServer,
+                    _this.devSecretKey
+                )
             );
         });
     },
@@ -214,6 +230,11 @@ module.exports = {
         }
 
         return cleanName;
+    },
+
+    cleanSecretKey: function(key) {
+        const secretKey = key.split(' ');
+        return secretKey[secretKey.length - 1];
     },
 
     getLocalHostName: function() {
