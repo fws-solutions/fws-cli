@@ -11,14 +11,15 @@ const colors = require('ansi-colors');
 const _template = require('lodash.template');
 const _startCase = require('lodash.startcase');
 const helpers = require('../helpers');
+const store = require('../store');
 const SHF = require('./svg-handle-files');
 
 module.exports = {
     optimizeSVGs: [],
     starter: '',
 
-    init: function(starter) {
-        this.starter = starter;
+    init: function() {
+        this.starter = store.getters.getStarter();
         const svgDirPath = path.join(process.cwd(), `${this.starter !== helpers.starterNuxt ? 'src/' : ''}assets/svg`);
 
         this.handleSvgFiles(svgDirPath);

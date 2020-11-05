@@ -6,16 +6,18 @@
 const fs = require('fs');
 const path = require('path');
 const helpers = require('../helpers');
+const store = require('../store');
 
 module.exports = {
-
+    starter: '',
     directoryEnvFile: path.join(process.cwd(), '/.env'),
     directoryExampleEnvFile: path.join(process.cwd(), '/.env.example'),
     moduleExampleEnvFileNuxt: path.join(__dirname, '/example-nuxt.env'),
     moduleExampleEnvFileS: path.join(__dirname, '/example-s.env'),
 
-    init: function(starter) {
-        const isStarterNuxt = starter === helpers.starterNuxt;
+    init: function() {
+        this.starter = store.getters.getStarter();
+        const isStarterNuxt = this.starter === helpers.starterNuxt;
         this.createEnv(isStarterNuxt);
     },
 

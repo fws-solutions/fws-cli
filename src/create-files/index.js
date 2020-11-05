@@ -5,14 +5,15 @@
  */
 
 const helpers = require('../helpers');
+const store = require('../store');
 const cfTempView = require('./create-files-temp-view');
 const cfVue = require('./create-files-vue');
 
 module.exports = {
     starter: '',
 
-    init: function(name, cmd, starter) {
-        this.starter = starter;
+    init: function(name, cmd) {
+        this.starter = store.getters.getStarter();
 
         let option = helpers.cleanCmdArgs(cmd);
         option = Object.keys(option)[0];

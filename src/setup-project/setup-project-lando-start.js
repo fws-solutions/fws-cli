@@ -14,6 +14,7 @@ module.exports = {
     wpAdminUser: 'admin',
     wpAdminPass: 'admin',
     wpAdminEmail: 'hello@forwardslashny.com',
+    protocol: 'https',
     spawnConfig: {},
 
     init: function(projectName, devServer, devSecretKey) {
@@ -79,7 +80,7 @@ module.exports = {
     },
 
     wpActivatePlugins: function() {
-        // run bash script with spawn - 'lando wp core install'
+        // run bash script with spawn - 'lando wp plugin activate'
         const scriptParams = [
             'wp',
             'plugin',
@@ -99,12 +100,12 @@ module.exports = {
     },
 
     wpMigrateDbPull: function() {
-        // run bash script with spawn - 'lando wp core install'
+        // run bash script with spawn - 'lando wp migratedb pull'
         const scriptParams = [
             'wp',
             'migratedb',
             'pull',
-            `https://${this.devServer}`,
+            `${protocol}://${this.devServer}`,
             this.devSecretKey,
             `--find=//${this.devServer}`,
             `--replace=//${this.hostName}`

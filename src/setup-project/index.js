@@ -11,6 +11,7 @@ const parse = require('parse-git-config');
 const yaml = require('yaml');
 const figlet = require('figlet');
 const helpers = require('../helpers');
+const store = require('../store');
 const spWPConfig = require('./setup-project-wp-config');
 const spLandoConfig = require('./setup-project-lando-config');
 const spLandoStart = require('./setup-project-lando-start');
@@ -38,10 +39,9 @@ module.exports = {
         deployIgnore: false
     },
 
-    init: function(wpConfigSample) {
-        this.wpConfigSample = wpConfigSample;
+    init: function() {
         this.projectName = this.getRepositoryName();
-        this.themeName = this.getThemeName();
+        this.themeName = store.getters.getWpThemeName();
 
         // init inputs
         this.rl = readline.createInterface({
@@ -189,7 +189,7 @@ module.exports = {
             }
 
             // create wp-config.php file
-            _this.createdFiles.wpconfig = await spWPConfig.init(_this.wpConfigSample, _this.wpMigrateDbKey);
+            _this.createdFiles.wpconfig = await spWPConfig.init(_this.wpMigrateDbKey);
 
             // create wp-content/uploads/.htaccess file
             _this.createdFiles.htaccess = spHtaccess.init(_this.hostName, _this.devServer);

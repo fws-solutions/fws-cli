@@ -4,6 +4,7 @@
  * @description Configuration of FWS CLI commands.
  */
 const helpers = require('../helpers');
+const store = require('../store');
 const svgIcons = require('../svg-icons');
 const createFiles = require('../create-files');
 const deleteFiles = require('../delete-files');
@@ -14,19 +15,28 @@ const w3Validator = require('../w3-validator');
 module.exports = {
     program: null,
     packageJson: null,
-    wpConfigSample: null,
+    wpConfigSamplePath: null,
     starter: '',
 
     init: function(program) {
+        // set store
+        store.actions.setProjectRoot();
+        store.actions.setWpConfigSamplePath();
+        store.actions.setWpThemePath();
+        store.actions.setThemeName();
+        store.actions.setWpPackageJsonPath();
+        store.actions.setPackageJson();
+
+        // init
         this.program = program;
-        this.packageJson = helpers.getPackageJson();
-        this.wpConfigSample = helpers.getWPConfigSample();
+        this.packageJson = store.getters.getWpPackageJson();
+        this.wpConfigSamplePath = store.getters.getWpConfigSamplePath();
 
         // w3 validator available from anywhere
         this.w3Validator();
 
         // limit commands to wp's root directory
-        if (this.wpConfigSample) {
+        if (this.wpConfigSamplePath) {
             this.setupProject();
         }
 
@@ -36,7 +46,8 @@ module.exports = {
                 helpers.consoleLogWarning('This directory does not support Forwardslash CLI', 'red', true);
             }
 
-            this.starter = this.packageJson.forwardslash;
+            store.mutations.setStarter(this.packageJson.forwardslash);
+            this.starter = store.getters.getStarter();
 
             this.mappingCommands();
             this.crudFiles();
@@ -45,8 +56,6 @@ module.exports = {
     },
 
     crudFiles: function() {
-        const _this = this;
-
         switch (this.starter) {
             case helpers.starterVue:
             case helpers.starterNuxt:
@@ -57,7 +66,7 @@ module.exports = {
                     .option('-b, --block', 'create block component')
                     .option('-p, --part', 'create part component')
                     .action(function(arg, cmd) {
-                        createFiles.init(arg, cmd, _this.starter);
+                        createFiles.init(arg, cmd);
                     });
                 break;
             case helpers.starterTwig:
@@ -69,7 +78,7 @@ module.exports = {
                     .option('-p, --part', 'create part component')
                     .option('-pg, --page', 'create page')
                     .action(function(arg, cmd) {
-                        createFiles.init(arg, cmd, _this.starter);
+                        createFiles.init(arg, cmd);
                     });
                 break;
             case helpers.starterS:
@@ -83,7 +92,7 @@ module.exports = {
                     .option('-B, --block-vue', 'create vue block')
                     .option('-P, --part-vue', 'create vue part')
                     .action(function(arg, cmd) {
-                        createFiles.init(arg, cmd, _this.starter);
+                        createFiles.init(arg, cmd);
                     });
 
                 this.program
@@ -142,14 +151,12 @@ module.exports = {
     },
 
     setupProject: function() {
-        const _this = this;
-
         this.program
             .command('setup-wordpress')
             .alias('set-wp')
             .description('setup project using lando')
             .action(function() {
-                setupProject.init(_this.wpConfigSample);
+                setupProject.init();
             });
     },
 
@@ -168,20 +175,18 @@ module.exports = {
     },
 
     universalCommands: function() {
-        const _this = this;
-
         this.program
             .command('icons')
             .description('optimizes and generates SVG icons')
             .action(function() {
-                svgIcons.init(_this.starter);
+                svgIcons.init();
             });
 
         this.program
             .command('postinstall')
             .description('runs postinstall script')
             .action(function() {
-                postInstall.init(_this.starter);
+                postInstall.init();
             });
     }
 };

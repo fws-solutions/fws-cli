@@ -7,7 +7,6 @@ const spinner = require('cli-spinner').Spinner;
 const notifier = require('node-notifier');
 const _template = require('lodash.template');
 const moduleDir = path.dirname(__dirname);
-const execSync = require('child_process').execSync;
 
 module.exports = {
     starterVue: 'fws_starter_vue',
@@ -16,8 +15,6 @@ module.exports = {
     starterTwig: 'fws_starter_twig',
     moduleDir: path.dirname(__dirname),
     warningTemp: path.join(moduleDir, '/templates/temp-warning-log.txt'),
-    wpConfigSampleDir: path.join(process.cwd(), '/wp-config-sample.php'),
-    packageJsonDir: path.join(process.cwd(), '/package.json'),
 
     rf(src, callback) {
         /*
@@ -98,7 +95,16 @@ module.exports = {
     },
 
     runTask: function(task) {
-        execSync('npm run ' + task, {stdio: [0, 1, 2]});
+        const spawnConfig = {
+            stdio: 'inherit',
+            cwd: process.cwd()
+        };
+
+        const script = spawn('npm', ['run', task], spawnConfig);
+
+        script.on('close', (code) => {
+            process.exit(code);
+        });
     },
 
     compileTemplate: function(templateFile, data) {
@@ -110,22 +116,6 @@ module.exports = {
 
         // return compiled data
         return templateCompiler(data);
-    },
-
-    getWPConfigSample: function() {
-        if (!fs.existsSync(this.wpConfigSampleDir)) {
-            return null;
-        }
-
-        return this.wpConfigSampleDir;
-    },
-
-    getPackageJson: function() {
-        if (!fs.existsSync(this.packageJsonDir)) {
-            return null;
-        }
-
-        return JSON.parse(fs.readFileSync(this.packageJsonDir, 'utf8'));
     },
 
     createLandoHostName: function(projectName) {

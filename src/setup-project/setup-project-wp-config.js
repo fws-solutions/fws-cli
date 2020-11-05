@@ -7,16 +7,17 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const helpers = require('../helpers');
+const store = require('../store');
 
 module.exports = {
     wpMigrateDbKey: '',
-    wpConfigSample: null,
+    wpConfigSamplePath: null,
     wpConfigDir: path.join(process.cwd(), '/wp-config.php'),
     wpConfig: null,
     saltApi: 'https://api.wordpress.org/secret-key/1.1/salt/',
 
-    init: function(wpConfigSample, wpMigrateDbKey) {
-        this.wpConfigSample = wpConfigSample;
+    init: function(wpMigrateDbKey) {
+        this.wpConfigSamplePath = store.getters.getWpConfigSamplePath();
         this.wpMigrateDbKey = wpMigrateDbKey;
 
         return this.createWPConfigFile();
@@ -29,7 +30,7 @@ module.exports = {
         }
 
         // read wp-config-sample.php file
-        this.wpConfig = fs.readFileSync(this.wpConfigSample, 'utf8');
+        this.wpConfig = fs.readFileSync(this.wpConfigSamplePath, 'utf8');
 
         // salts and licence
         const newSalts = await this.getSalts();
