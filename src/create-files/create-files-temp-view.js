@@ -10,17 +10,18 @@ const _template = require('lodash.template');
 const fancyLog = require('fancy-log');
 const colors = require('ansi-colors');
 const helpers = require('../helpers');
+const store = require('../store');
 
 module.exports = {
     name: '',
     type: '',
     starter: '',
 
-    init: function(name, type, starter) {
+    init: function(name, type) {
         // set global values
         this.name = name;
         this.type = type;
-        this.starter = starter;
+        this.starter = store.getters.getStarter();
 
         // exit if unknown starter
         if (this.starter !== helpers.starterS && this.starter !== helpers.starterTwig) {
@@ -29,34 +30,34 @@ module.exports = {
         }
 
         const part = `${this.type}s`;
-        const directory = module.exports.createDirectoryPath(part);
+        const directory = this.createDirectoryPath(part);
 
         // create if template or module doesn't exists
-        module.exports.createDirectory(directory, module.exports.createFiles.bind(null, directory));
+        this.createDirectory(directory, this.createFiles.bind(this, directory));
     },
 
     createFiles: function(directory) {
         if (this.starter === helpers.starterS) {
-            module.exports.createFile('php', directory);
-            module.exports.createFile('php', directory, true);
+            this.createFile('php', directory);
+            this.createFile('php', directory, true);
         } else {
-            module.exports.createFile('twig', directory);
-            module.exports.createFile('json', directory);
+            this.createFile('twig', directory);
+            this.createFile('json', directory);
         }
 
-        module.exports.createFile('scss', directory);
-        module.exports.createFile('style', directory);
+        this.createFile('scss', directory);
+        this.createFile('style', directory);
 
-        module.exports.logCreatedFiles();
+        this.logCreatedFiles();
     },
 
     createFile: function(file, directory, isFE = false) {
         // set which files to create
         const part = `${this.type}s`;
-        const config = module.exports.filesToCreate(file, isFE);
+        const config = this.filesToCreate(file, isFE);
 
         // set read/write directories
-        const styleSRC = module.exports.createStylePath(part);
+        const styleSRC = this.createStylePath(part);
         const readDir = file === 'style' ? styleSRC : path.join(helpers.moduleDir, 'templates', config.temp);
         const writeDir = file === 'style' ? styleSRC : path.join(directory, config.filename);
 
@@ -69,7 +70,7 @@ module.exports = {
         } else {
             const compiledFileContentTemp = _template(output);
             output = compiledFileContentTemp({
-                str: module.exports.name
+                str: this.name
             });
         }
 
@@ -85,7 +86,7 @@ module.exports = {
         const tempLog = fs.readFileSync(tempLogFile, 'utf8');
         const compiled = _template(tempLog);
         fancyLog(colors.green(compiled({
-            str: module.exports.name,
+            str: this.name,
             src: src
         })));
     },

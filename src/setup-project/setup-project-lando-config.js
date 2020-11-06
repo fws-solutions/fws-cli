@@ -6,6 +6,7 @@
 const fs = require('fs');
 const path = require('path');
 const helpers = require('../helpers');
+const store = require('../store');
 
 module.exports = {
     projectName: '',
@@ -13,11 +14,11 @@ module.exports = {
     hostName: '',
     landoConfigDir: path.join(process.cwd(), '/.lando.yml'),
 
-    init: function(projectName, themeName, landoConfigDir) {
+    init: function(landoConfigDir) {
         this.landoConfigDir = landoConfigDir;
-        this.projectName = projectName;
-        this.themeName = themeName;
-        this.hostName = helpers.createLandoHostName(projectName);
+        this.projectName = store.getters.getProjectName();
+        this.themeName = store.getters.getWpThemeName();
+        this.hostName = helpers.createLandoHostName(this.projectName);
 
         return this.createLandoConfigFile();
     },

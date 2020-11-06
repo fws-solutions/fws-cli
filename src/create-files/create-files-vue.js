@@ -8,6 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const _startCase = require('lodash.startcase');
 const helpers = require('../helpers');
+const store = require('../store');
 
 module.exports = {
     name: '',
@@ -23,11 +24,11 @@ module.exports = {
     msg: '',
     msgPrefix: '',
 
-    init: function(name, type, starter) {
+    init: function(name, type) {
         // set global values
         this.name = name;
         this.type = type;
-        this.starter = starter;
+        this.starter = store.getters.getStarter();
 
         this.setFileDetails();
         this.checkIfComponentExists();

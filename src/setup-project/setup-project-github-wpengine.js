@@ -6,6 +6,7 @@
 const fs = require('fs');
 const path = require('path');
 const helpers = require('../helpers');
+const store = require('../store');
 
 module.exports = {
     themeName: '',
@@ -13,8 +14,8 @@ module.exports = {
     githubDir: path.join(process.cwd(), '/.github/workflows/dev-deployment.yml'),
     deployGitIgnore: path.join(process.cwd(), 'deploy.gitignore'),
 
-    init: function(themeName, devName) {
-        this.themeName = themeName;
+    init: function(devName) {
+        this.themeName = store.getters.getWpThemeName();
         this.devSlug = devName.replace('.wpengine.com', '');
 
         return {

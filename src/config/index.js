@@ -26,7 +26,8 @@ module.exports = {
         store.actions.setThemeName();
         store.actions.setWpPackageJsonPath();
         store.actions.setPackageJson();
-
+        store.actions.setProjectName();
+        
         // init
         this.program = program;
         this.packageJson = store.getters.getWpPackageJson();

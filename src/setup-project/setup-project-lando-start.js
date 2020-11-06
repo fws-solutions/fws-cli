@@ -4,7 +4,9 @@
  * @description CLI script for creating Lando recipe file.
  */
 const colors = require('ansi-colors');
+const figlet = require('figlet');
 const helpers = require('../helpers');
+const store = require('../store');
 
 module.exports = {
     projectName: '',
@@ -17,27 +19,28 @@ module.exports = {
     protocol: 'https',
     spawnConfig: {},
 
-    init: function(projectName, devServer, devSecretKey) {
-        this.projectName = projectName;
+    init: function(devServer, devSecretKey) {
+        this.projectName = store.getters.getProjectName();
         this.devSecretKey = devSecretKey;
         this.devServer = devServer;
-        this.hostName = helpers.createLandoHostName(projectName);
+        this.hostName = helpers.createLandoHostName(this.projectName);
         this.spawnConfig = {
             stdio: 'inherit',
-            cwd: process.cwd()
+            cwd: store.getters.getProjectRoot()
         };
 
-        this.landoStart();
+        const landoStartCallback = this.wpDbReset.bind(this);
+        this.landoStart(landoStartCallback);
     },
 
-    landoStart: function() {
+    landoStart: function(callback) {
         // run bash script with spawn - 'lando start'
         helpers.spawnScript(
             'lando',
             ['start'],
             this.spawnConfig,
             this.getSpinnerTitle('lando start'),
-            this.wpDbReset.bind(this)
+            callback
         );
     },
 
@@ -105,21 +108,38 @@ module.exports = {
             'wp',
             'migratedb',
             'pull',
-            `${protocol}://${this.devServer}`,
+            `${this.protocol}://${this.devServer}`,
             this.devSecretKey,
             `--find=//${this.devServer}`,
             `--replace=//${this.hostName}`
         ];
+
+        const landoStartCallback = this.setupAllDone.bind(this);
+
         helpers.spawnScript(
             'lando',
             scriptParams,
             this.spawnConfig,
-            this.getSpinnerTitle('wp migrate db pull')
+            this.getSpinnerTitle('wp migrate db pull'),
+            this.landoStart.bind(this, landoStartCallback)
         );
     },
 
     getSpinnerTitle: function(title) {
         const colorTitle = colors.magenta(title);
         return colors.cyan(`%s ...getting ready for '${colorTitle}'...`);
+    },
+
+    setupAllDone: function() {
+        figlet('All Done!', {font: 'Small Slant'}, function(err, data) {
+            if (err) {
+                console.log('Something went wrong...');
+                console.dir(err);
+                return;
+            }
+            console.log(colors['red'](data));
+
+            process.exit();
+        });
     }
 };

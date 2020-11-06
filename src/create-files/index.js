@@ -31,9 +31,9 @@ module.exports = {
             const cf = isVue ? cfVue : cfTempView;
             const opt = isVue ? option.replace('Vue', '') : option;
 
-            cf.init(name, opt, this.starter);
+            cf.init(name, opt);
         } else if (this.starter === helpers.starterVue || this.starter === helpers.starterNuxt) {
-            cfVue.init(name, option, this.starter);
+            cfVue.init(name, option);
         } else {
             helpers.consoleLogWarning('This is an unknown Starter!', 'red');
         }

@@ -7,19 +7,22 @@ const fs = require('fs');
 const path = require('path');
 const colors = require('ansi-colors');
 const helpers = require('../helpers');
+const store = require('../store');
 
 module.exports = {
     wpThemeDir: '',
+    wpThemePath: '',
     themeName: '',
     spawnConfig: {},
     spinner: null,
     timeout: 1500,
     callback: null,
 
-    init: function(themeName, wpThemeDir, callback) {
+    init: function(callback) {
         this.callback = callback;
-        this.themeName = themeName;
-        this.wpThemeDir = path.join(wpThemeDir, themeName);
+        this.themeName = store.getters.getWpThemeName();
+        this.wpThemePath = store.getters.getWpThemePath()
+        this.wpThemeDir = path.join(this.wpThemePath, this.themeName);
         this.spawnConfig = {
             stdio: 'inherit',
             cwd: this.wpThemeDir

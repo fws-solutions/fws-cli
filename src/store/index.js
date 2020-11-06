@@ -4,10 +4,12 @@
 
 const fs = require('fs');
 const path = require('path');
+const parse = require('parse-git-config');
+const helpers = require('../helpers');
 
 const Store = {
     data: {
-        moduleDir: path.dirname(__dirname),
+        modulePath: path.dirname(__dirname),
         projectRoot: '',
         projectName: '',
         starter: '',
@@ -76,7 +78,7 @@ const Store = {
             Store.mutations.setThemeName(themeName);
         },
         setWpPackageJsonPath: function() {
-           const packageJsonDir = path.join(
+            const packageJsonDir = path.join(
                 Store.data.projectRoot,
                 'wp-content',
                 'themes',
@@ -98,7 +100,10 @@ const Store = {
             const gitConfig = parse.sync()['remote "origin"'];
 
             if (!gitConfig) {
-                helpers.consoleLogWarning('WARNING: No Git repository found!');
+                if (!fs.existsSync(path.join(process.cwd(), 'package.json'))) {
+                    helpers.consoleLogWarning('WARNING: No Git repository found!');
+                }
+
                 return null;
             }
 
@@ -110,8 +115,11 @@ const Store = {
     },
 
     getters: {
+        getModulePath: function() {
+            return Store.data.modulePath;
+        },
         getProjectRoot: function() {
-            return Store.data.starter;
+            return Store.data.projectRoot;
         },
         getStarter: function() {
             return Store.data.starter;
@@ -119,13 +127,19 @@ const Store = {
         getWpThemeName: function() {
             return Store.data.wpThemeName;
         },
+        getWpThemePath: function() {
+            return Store.data.wpThemePath;
+        },
         getWpConfigSamplePath: function() {
             return Store.data.wpConfigSamplePath;
         },
         getWpPackageJson: function() {
             return Store.data.wpPackageJson;
+        },
+        getProjectName: function() {
+            return Store.data.projectName;
         }
     }
-}
+};
 
 module.exports = Store;

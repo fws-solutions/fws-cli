@@ -7,7 +7,6 @@ const fs = require('fs');
 const path = require('path');
 const colors = require('ansi-colors');
 const readline = require('readline');
-const parse = require('parse-git-config');
 const yaml = require('yaml');
 const figlet = require('figlet');
 const helpers = require('../helpers');
@@ -28,8 +27,6 @@ module.exports = {
     isLando: true,
     devSecretKey: '',
     wpMigrateDbKey: '',
-    wpThemePrefix: 'fws-',
-    wpThemeDir: path.join(process.cwd(), '/wp-content/themes/'),
     landoConfigDir: path.join(process.cwd(), '/.lando.yml'),
     createdFiles: {
         lando: false,
@@ -40,7 +37,7 @@ module.exports = {
     },
 
     init: function() {
-        this.projectName = this.getRepositoryName();
+        this.projectName = store.getters.getProjectName();
         this.themeName = store.getters.getWpThemeName();
 
         // init inputs
@@ -183,7 +180,7 @@ module.exports = {
 
             // create .lando.yml file
             if (_this.isLando) {
-                _this.hostName = spLandoConfig.init(_this.projectName, _this.themeName, _this.landoConfigDir);
+                _this.hostName = spLandoConfig.init(_this.landoConfigDir);
                 _this.createdFiles.lando = !!_this.hostName;
                 _this.getLocalHostName();
             }
@@ -195,7 +192,7 @@ module.exports = {
             _this.createdFiles.htaccess = spHtaccess.init(_this.hostName, _this.devServer);
 
             // create .github config pipeline
-            const githubFiles = spGithub.init(_this.themeName, _this.devServer);
+            const githubFiles = spGithub.init( _this.devServer);
             _this.createdFiles.github = githubFiles.githubConfig;
             _this.createdFiles.deployIgnore = githubFiles.deployGitIgnore;
 
@@ -203,16 +200,8 @@ module.exports = {
             _this.logReport();
 
             // run 'npm install', build in theme's root directory and start lando
-            spNpm.init(
-                _this.themeName,
-                _this.wpThemeDir,
-                spLandoStart.init.bind(
-                    spLandoStart,
-                    _this.projectName,
-                    _this.devServer,
-                    _this.devSecretKey
-                )
-            );
+            const spNpmCallback = spLandoStart.init.bind(spLandoStart, _this.devServer, _this.devSecretKey);
+            spNpm.init(spNpmCallback);
         });
     },
 
@@ -242,33 +231,6 @@ module.exports = {
             const hostName = fs.readFileSync(this.landoConfigDir, 'utf8');
             this.hostName = yaml.parse(hostName)['proxy']['appserver'][0];
         }
-    },
-
-    getRepositoryName: function() {
-        const gitConfig = parse.sync()['remote "origin"'];
-
-        if (!gitConfig) {
-            helpers.consoleLogWarning('WARNING: No Git repository found!');
-            return null;
-        }
-
-        const repoUrl = gitConfig.url.split('/');
-        const repoName = repoUrl[repoUrl.length - 1];
-
-        return repoName.replace('.git', '');
-    },
-
-    getThemeName: function() {
-        const themes = fs.readdirSync(this.wpThemeDir);
-        let themeName = '';
-
-        themes.forEach(cur => {
-            if (cur.substr(0, 4) === this.wpThemePrefix) {
-                themeName = cur;
-            }
-        });
-
-        return themeName;
     },
 
     logReport: function() {
