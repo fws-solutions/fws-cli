@@ -27,7 +27,7 @@ module.exports = {
     isLando: true,
     devSecretKey: '',
     wpMigrateDbKey: '',
-    landoConfigDir: path.join(process.cwd(), '/.lando.yml'),
+    landoConfigDir: '',
     createdFiles: {
         lando: false,
         wpconfig: false,
@@ -37,6 +37,7 @@ module.exports = {
     },
 
     init: function() {
+        this.landoConfigDir = path.join(store.getters.getProjectRoot(), '/.lando.yml');
         this.projectName = store.getters.getProjectName();
         this.themeName = store.getters.getWpThemeName();
 

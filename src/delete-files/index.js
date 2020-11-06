@@ -7,11 +7,15 @@ const fs = require('fs');
 const path = require('path');
 const colors = require('ansi-colors');
 const helpers = require('../helpers');
+const store = require('../store');
 const glob = require('glob');
 
 module.exports = {
+    wpThemeDir: '',
+
     init: function() {
-        const tempViewPath = path.join(process.cwd(), 'template-views/**/*.php');
+        this.wpThemeDir = path.join(store.getters.getWpThemePath(), store.getters.getWpThemeName());
+        const tempViewPath = path.join(this.wpThemeDir, 'template-views/**/*.php');
         const allTempFiles = glob.sync(tempViewPath);
         this.deleteFeFiles(allTempFiles);
     },
@@ -34,7 +38,7 @@ module.exports = {
 
             filteredFiles.forEach((file) => {
                 fs.unlinkSync(file);
-                console.log(colors.red(`    ${count++}. ${path.relative(process.cwd(), file)}`));
+                console.log(colors.red(`    ${count++}. ${path.relative(this.wpThemeDir, file)}`));
             });
         } else {
             helpers.consoleLogWarning('No FE files to delete');

@@ -16,12 +16,14 @@ module.exports = {
     name: '',
     type: '',
     starter: '',
+    wpThemeDir: '',
 
     init: function(name, type) {
         // set global values
         this.name = name;
         this.type = type;
         this.starter = store.getters.getStarter();
+        this.wpThemeDir = path.join(store.getters.getWpThemePath(), store.getters.getWpThemeName());
 
         // exit if unknown starter
         if (this.starter !== helpers.starterS && this.starter !== helpers.starterTwig) {
@@ -108,13 +110,15 @@ module.exports = {
     },
 
     createStylePath: function(part) {
+        // todo - add support for starter_twig for wpThemeDir
         const src = this.starter === helpers.starterS ? 'src/scss/layout' : 'src/assets/scss/layout';
-        return path.join(process.cwd(), src, `_${part}.scss`);
+        return path.join(this.wpThemeDir, src, `_${part}.scss`);
     },
 
     createDirectoryPath: function(part) {
+        // todo - add support for starter_twig for wpThemeDir
         const src = this.starter === helpers.starterS ? 'template-views' : 'src/components';
-        return path.join(process.cwd(), src, part, this.name);
+        return path.join(this.wpThemeDir, src, part, this.name);
     },
 
     createDirectory: function(directory, callback) {

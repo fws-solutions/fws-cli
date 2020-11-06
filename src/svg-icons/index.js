@@ -20,7 +20,13 @@ module.exports = {
 
     init: function() {
         this.starter = store.getters.getStarter();
-        const svgDirPath = path.join(process.cwd(), `${this.starter !== helpers.starterNuxt ? 'src/' : ''}assets/svg`);
+
+        const projectRoot = store.getters.getProjectRoot();
+        // todo - add support for starter_twig for wpThemeDir
+        const wpThemeDir = path.join(store.getters.getWpThemePath(), store.getters.getWpThemeName());
+        const assetsRoot = this.starter !== helpers.starterNuxt ? wpThemeDir : projectRoot;
+        const assetsDir = `${this.starter !== helpers.starterNuxt ? 'src/' : ''}assets/svg`;
+        const svgDirPath = path.join(assetsRoot, assetsDir);
 
         this.handleSvgFiles(svgDirPath);
         this.generateFiles(svgDirPath);
