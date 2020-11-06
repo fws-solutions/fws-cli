@@ -11,13 +11,13 @@ const Store = {
     data: {
         modulePath: path.dirname(__dirname),
         projectRoot: '',
+        packageJsonPath: '',
+        packageJson: null,
         projectName: '',
         starter: '',
         wpConfigSamplePath: '',
         wpThemePath: '',
-        wpThemeName: '',
-        wpPackageJsonPath: '',
-        wpPackageJson: null
+        wpThemeName: ''
     },
 
     mutations: {
@@ -36,11 +36,11 @@ const Store = {
         setThemeName: function(themeName) {
             Store.data.wpThemeName = themeName;
         },
-        setWpPackageJsonPath: function(packageJsonDir) {
-            Store.data.wpPackageJsonPath = packageJsonDir;
+        setPackageJsonPath: function(packageJsonDir) {
+            Store.data.packageJsonPath = packageJsonDir;
         },
-        setWpPackageJson: function(packageJson) {
-            Store.data.wpPackageJson = packageJson;
+        setPackageJson: function(packageJson) {
+            Store.data.packageJson = packageJson;
         },
         setProjectName: function(projectName) {
             Store.data.projectName = projectName;
@@ -49,10 +49,17 @@ const Store = {
 
     actions: {
         setProjectRoot: function() {
-            // todo - find root for starter_nuxt, starter_vue and starter_twig
             let currentPath = process.cwd();
+            const checkForRoot = function(currentPath) {
+                return (
+                    (!fs.existsSync(path.join(currentPath, 'wp-content')) && currentPath !== '/') &&
+                    !fs.existsSync(path.join(currentPath, 'nuxt.config.js')) &&
+                    !fs.existsSync(path.join(currentPath, 'vue.config.js')) &&
+                    !fs.existsSync(path.join(currentPath, 'src/pages/index.twig'))
+                );
+            }
 
-            while (!fs.existsSync(path.join(currentPath, 'wp-content')) && currentPath !== '/') {
+            while (checkForRoot(currentPath)) {
                 currentPath = path.dirname(currentPath);
             }
 
@@ -78,8 +85,8 @@ const Store = {
 
             Store.mutations.setThemeName(themeName);
         },
-        setWpPackageJsonPath: function() {
-            const packageJsonDir = path.join(
+        setPackageJsonPath: function() {
+            const packageJsonWPDir = path.join(
                 Store.data.projectRoot,
                 'wp-content',
                 'themes',
@@ -87,15 +94,16 @@ const Store = {
                 'package.json'
             );
 
-            Store.mutations.setWpPackageJsonPath(packageJsonDir);
+            const packageJsonDir = fs.existsSync(packageJsonWPDir) ? packageJsonWPDir : path.join(Store.data.projectRoot, 'package.json');
+            Store.mutations.setPackageJsonPath(packageJsonDir);
         },
         setPackageJson: function() {
-            if (!fs.existsSync(Store.data.wpPackageJsonPath)) {
+            if (!fs.existsSync(Store.data.packageJsonPath)) {
                 return null;
             }
 
-            const packageJson = JSON.parse(fs.readFileSync(Store.data.wpPackageJsonPath, 'utf8'));
-            Store.mutations.setWpPackageJson(packageJson);
+            const packageJson = JSON.parse(fs.readFileSync(Store.data.packageJsonPath, 'utf8'));
+            Store.mutations.setPackageJson(packageJson);
         },
         setProjectName: function() {
             const gitConfig = parse.sync()['remote "origin"'];
@@ -135,7 +143,7 @@ const Store = {
             return Store.data.wpConfigSamplePath;
         },
         getWpPackageJson: function() {
-            return Store.data.wpPackageJson;
+            return Store.data.packageJson;
         },
         getProjectName: function() {
             return Store.data.projectName;

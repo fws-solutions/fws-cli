@@ -3,6 +3,8 @@
  *
  * @description Configuration of FWS CLI commands.
  */
+const fs = require('fs');
+const path = require('path');
 const helpers = require('../helpers');
 const store = require('../store');
 const svgIcons = require('../svg-icons');
@@ -21,28 +23,34 @@ module.exports = {
     starter: '',
 
     init: function(program) {
-        // set store
+        // init config
+        this.program = program;
         store.actions.setProjectRoot();
-        store.actions.setWpConfigSamplePath();
-        store.actions.setWpThemePath();
-        store.actions.setThemeName();
-        store.actions.setWpPackageJsonPath();
+
+        // wp config
+        if (fs.existsSync(path.join(store.getters.getProjectRoot(), 'wp-content'))) {
+            store.actions.setWpConfigSamplePath();
+            store.actions.setWpThemePath();
+            store.actions.setThemeName();
+
+            this.wpConfigSamplePath = store.getters.getWpConfigSamplePath();
+            this.themeName = store.getters.getWpThemeName();
+        }
+
+        // basic config
+        store.actions.setPackageJsonPath();
         store.actions.setPackageJson();
         store.actions.setProjectName();
 
-        // init
-        this.program = program;
         this.packageJson = store.getters.getWpPackageJson();
-        this.wpConfigSamplePath = store.getters.getWpConfigSamplePath();
-        this.themeName = store.getters.getWpThemeName();
-
-        // w3 validator available from anywhere
-        this.w3Validator();
 
         // limit commands to wp's root directory
         if (this.wpConfigSamplePath) {
             this.setupProject();
         }
+
+        // w3 validator available from anywhere
+        this.w3Validator();
 
         // limit commands to theme's root directory
         if (this.packageJson) {
