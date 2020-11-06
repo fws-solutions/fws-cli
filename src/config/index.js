@@ -11,11 +11,13 @@ const deleteFiles = require('../delete-files');
 const postInstall = require('../postinstall');
 const setupProject = require('../setup-project');
 const w3Validator = require('../w3-validator');
+const colors = require('ansi-colors');
 
 module.exports = {
     program: null,
     packageJson: null,
     wpConfigSamplePath: null,
+    themeName: '',
     starter: '',
 
     init: function(program) {
@@ -27,11 +29,12 @@ module.exports = {
         store.actions.setWpPackageJsonPath();
         store.actions.setPackageJson();
         store.actions.setProjectName();
-        
+
         // init
         this.program = program;
         this.packageJson = store.getters.getWpPackageJson();
         this.wpConfigSamplePath = store.getters.getWpConfigSamplePath();
+        this.themeName = store.getters.getWpThemeName();
 
         // w3 validator available from anywhere
         this.w3Validator();
@@ -176,6 +179,8 @@ module.exports = {
     },
 
     universalCommands: function() {
+        const _this = this;
+
         this.program
             .command('icons')
             .description('optimizes and generates SVG icons')
@@ -188,6 +193,22 @@ module.exports = {
             .description('runs postinstall script')
             .action(function() {
                 postInstall.init();
+            });
+
+        this.program
+            .command('npm-i')
+            .alias('i')
+            .description('install node modules')
+            .action(function() {
+                helpers.spawnScript(
+                    'npm',
+                    ['i'],
+                    helpers.getSpawnConfig(),
+                    colors.cyan('%s ...getting ready for \'npm install\'...'),
+                    () => {
+                        helpers.consoleLogWarning(`node_modules installed in the root of '${_this.themeName}' theme.`, 'cyan');
+                    }
+                );
             });
     }
 };

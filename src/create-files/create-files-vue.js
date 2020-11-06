@@ -14,6 +14,8 @@ module.exports = {
     name: '',
     type: '',
     starter: '',
+    projectRoot: '',
+    wpThemeDir: '',
     isPart: null,
     directoryFile: '',
     directoryStory: '',
@@ -29,6 +31,8 @@ module.exports = {
         this.name = name;
         this.type = type;
         this.starter = store.getters.getStarter();
+        this.wpThemeDir = path.join(store.getters.getWpThemePath(), store.getters.getWpThemeName());
+        this.projectRoot = store.getters.getProjectRoot();
 
         this.setFileDetails();
         this.checkIfComponentExists();
@@ -48,21 +52,21 @@ module.exports = {
         let vueStoryDir;
         switch (this.starter) {
             case helpers.starterS:
-                vueCompDir = 'src/vue/components';
+                vueCompDir = path.join(this.wpThemeDir, 'src/vue/components');
                 vueStoryDir = '';
                 break;
             case helpers.starterNuxt:
-                vueCompDir = 'components';
-                vueStoryDir = 'stories';
+                vueCompDir = path.join(this.projectRoot, 'components');
+                vueStoryDir = path.join(this.projectRoot, 'stories');
                 break;
             case helpers.starterVue:
-                vueCompDir = 'src/components';
-                vueStoryDir = 'src/stories';
+                vueCompDir = path.join(this.projectRoot, 'src/components');
+                vueStoryDir = path.join(this.projectRoot, 'src/stories');
                 break;
         }
 
-        this.directoryFile = path.join(process.cwd(), vueCompDir, `${this.type}s`, `${this.fileName}.vue`);
-        this.directoryStory = path.join(process.cwd(), vueStoryDir, `${this.isPart ? '2-' : '3-'}${this.fileName}.stories.js`);
+        this.directoryFile = path.join(vueCompDir, `${this.type}s`, `${this.fileName}.vue`);
+        this.directoryStory = path.join(vueStoryDir, `${this.isPart ? '2-' : '3-'}${this.fileName}.stories.js`);
 
         // success message
         this.msgPrefix = this.starter !== helpers.starterS ? 'Vue ' : '';

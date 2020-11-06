@@ -46,7 +46,7 @@ module.exports = {
             this.spawnConfig,
             colors.cyan('%s ...getting ready for \'npm install\'...'),
             () => {
-                helpers.consoleLogWarning(`node_modules installed in the root of '${this.themeName}' theme.`, 'green');
+                helpers.consoleLogWarning(`node_modules installed in the root of '${this.themeName}' theme.`, 'cyan');
                 this.buildFiles();
             }
         );

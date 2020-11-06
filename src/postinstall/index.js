@@ -8,6 +8,7 @@ const path = require('path');
 const helpers = require('../helpers');
 const store = require('../store');
 
+// todo - process.cwd for .env files for various starters
 module.exports = {
     starter: '',
     directoryEnvFile: path.join(process.cwd(), '/.env'),

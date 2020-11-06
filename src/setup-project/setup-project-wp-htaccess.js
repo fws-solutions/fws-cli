@@ -6,15 +6,17 @@
 const fs = require('fs');
 const path = require('path');
 const helpers = require('../helpers');
+const store = require('../store');
 
 module.exports = {
     hostName: '',
     devName: '',
-    htaccessDir: path.join(process.cwd(), '/wp-content/uploads/.htaccess'),
+    htaccessDir: '',
 
     init: function(hostName, devName) {
         this.hostName = hostName;
         this.devName = devName;
+        this.htaccessDir = path.join(store.getters.getProjectRoot(), '/wp-content/uploads/.htaccess');
 
         return this.createHtaccessFile();
     },

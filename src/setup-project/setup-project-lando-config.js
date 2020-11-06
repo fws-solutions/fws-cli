@@ -4,7 +4,6 @@
  * @description CLI script for creating Lando recipe file.
  */
 const fs = require('fs');
-const path = require('path');
 const helpers = require('../helpers');
 const store = require('../store');
 
@@ -12,7 +11,7 @@ module.exports = {
     projectName: '',
     themeName: '',
     hostName: '',
-    landoConfigDir: path.join(process.cwd(), '/.lando.yml'),
+    landoConfigDir: '',
 
     init: function(landoConfigDir) {
         this.landoConfigDir = landoConfigDir;

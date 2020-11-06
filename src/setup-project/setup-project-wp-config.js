@@ -10,14 +10,17 @@ const helpers = require('../helpers');
 const store = require('../store');
 
 module.exports = {
+    projectRoot: '',
     wpMigrateDbKey: '',
     wpConfigSamplePath: null,
-    wpConfigDir: path.join(process.cwd(), '/wp-config.php'),
+    wpConfigDir: '',
     wpConfig: null,
     saltApi: 'https://api.wordpress.org/secret-key/1.1/salt/',
 
     init: function(wpMigrateDbKey) {
+        this.projectRoot = store.getters.getProjectRoot();
         this.wpConfigSamplePath = store.getters.getWpConfigSamplePath();
+        this.wpConfigDir = path.join(this.projectRoot, '/wp-config.php');
         this.wpMigrateDbKey = wpMigrateDbKey;
 
         return this.createWPConfigFile();

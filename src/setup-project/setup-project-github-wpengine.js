@@ -9,13 +9,17 @@ const helpers = require('../helpers');
 const store = require('../store');
 
 module.exports = {
+    projectRoot: '',
     themeName: '',
     devSlug: '',
-    githubDir: path.join(process.cwd(), '/.github/workflows/dev-deployment.yml'),
-    deployGitIgnore: path.join(process.cwd(), 'deploy.gitignore'),
+    githubDir: '',
+    deployGitIgnore: '',
 
     init: function(devName) {
+        this.projectRoot = store.getters.getProjectRoot();
         this.themeName = store.getters.getWpThemeName();
+        this.githubDir = path.join(this.projectRoot, '.github/workflows/dev-deployment.yml');
+        this.deployGitIgnore = path.join(this.projectRoot, 'deploy.gitignore');
         this.devSlug = devName.replace('.wpengine.com', '');
 
         return {

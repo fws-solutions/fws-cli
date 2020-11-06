@@ -7,6 +7,7 @@ const spinner = require('cli-spinner').Spinner;
 const notifier = require('node-notifier');
 const _template = require('lodash.template');
 const moduleDir = path.dirname(__dirname);
+const store = require('./store');
 
 module.exports = {
     starterVue: 'fws_starter_vue',
@@ -95,11 +96,7 @@ module.exports = {
     },
 
     runTask: function(task) {
-        const spawnConfig = {
-            stdio: 'inherit',
-            cwd: process.cwd()
-        };
-
+        const spawnConfig = this.getSpawnConfig();
         const script = spawn('npm', ['run', task], spawnConfig);
 
         script.on('close', (code) => {
@@ -122,8 +119,8 @@ module.exports = {
         return `${projectName}.lndo.site`;
     },
 
-    createNestedDirectories(dirs, root = process.cwd()) {
-        let curPath = root;
+    createNestedDirectories(dirs, root) {
+        let curPath = root ? root : store.getters.getProjectRoot();
 
         if (dirs.length > 0) {
             dirs.forEach(cur => {
@@ -134,6 +131,18 @@ module.exports = {
                 }
             });
         }
+    },
+
+    getSpawnConfig: function() {
+        const _this = this;
+        const projectRoot = store.getters.getProjectRoot();
+        const wpThemeDir = path.join(store.getters.getWpThemePath(), store.getters.getWpThemeName());
+        const starter = store.getters.getStarter();
+
+        return  {
+            stdio: 'inherit',
+            cwd: starter === _this.starterS ? wpThemeDir : projectRoot
+        };
     },
 
     spawnScript: function(scriptName, scriptParams, spawnConfig, spinnerTitle, callback = null) {

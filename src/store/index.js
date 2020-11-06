@@ -13,7 +13,7 @@ const Store = {
         projectRoot: '',
         projectName: '',
         starter: '',
-        wpConfigSamplePath: path.join(process.cwd(), '/wp-config-sample.php'),
+        wpConfigSamplePath: '',
         wpThemePath: '',
         wpThemeName: '',
         wpPackageJsonPath: '',
@@ -49,6 +49,7 @@ const Store = {
 
     actions: {
         setProjectRoot: function() {
+            // todo - find root for starter_nuxt, starter_vue and starter_twig
             let currentPath = process.cwd();
 
             while (!fs.existsSync(path.join(currentPath, 'wp-content')) && currentPath !== '/') {
