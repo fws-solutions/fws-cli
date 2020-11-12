@@ -74,7 +74,7 @@ module.exports = {
                 this.program
                     .command('create-file <name>')
                     .alias('cf')
-                    .description('creates files')
+                    .description('create component files')
                     .option('-b, --block', 'create block component')
                     .option('-p, --part', 'create part component')
                     .action(function(arg, cmd) {
@@ -85,7 +85,7 @@ module.exports = {
                 this.program
                     .command('create-file <name>')
                     .alias('cf')
-                    .description('creates files')
+                    .description('create component files')
                     .option('-b, --block', 'create block component')
                     .option('-p, --part', 'create part component')
                     .option('-pg, --page', 'create page')
@@ -149,13 +149,13 @@ module.exports = {
                 helpers.mapCommand(this.program, null, 'dev', 'runs watch task');
                 helpers.mapCommand(this.program, null, 'build-dev', 'runs development build');
                 helpers.mapCommand(this.program, null, 'build', 'runs production build');
+                helpers.mapCommand(this.program, null, 'vue-prod', 'runs production vue build');
                 helpers.mapCommand(this.program, null, 'vue', 'runs development vue build');
                 helpers.mapCommand(this.program, null, 'css', 'compiles CSS files');
                 helpers.mapCommand(this.program, null, 'js', 'compiles JS files');
                 helpers.mapCommand(this.program, null, 'lint-html', 'lint check of HTML files');
                 helpers.mapCommand(this.program, null, 'lint-css', 'lint check of SCSS files');
                 helpers.mapCommand(this.program, null, 'lint-js', 'lint check of JS files');
-                helpers.mapCommand(this.program, null, 'w3-local', 'validate via w3 api');
                 break;
             default:
                 helpers.consoleLogWarning('This is NOT a FWS Starter!!!', 'red');
