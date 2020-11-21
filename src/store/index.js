@@ -9,6 +9,7 @@ const helpers = require('../helpers');
 
 const Store = {
     data: {
+        isWin: false,
         modulePath: path.dirname(__dirname),
         projectRoot: '',
         packageJsonPath: '',
@@ -21,6 +22,9 @@ const Store = {
     },
 
     mutations: {
+        setIsWin: function(isWin) {
+            Store.data.isWin = isWin;
+        },
         setProjectRoot: function(value) {
             Store.data.projectRoot = value;
         },
@@ -48,6 +52,10 @@ const Store = {
     },
 
     actions: {
+        setIsWin: function() {
+            const isWin = /^win/.test(process.platform);
+            Store.mutations.setIsWin(isWin);
+        },
         setProjectRoot: function() {
             let currentPath = process.cwd();
             const checkForRoot = function(currentPath) {
@@ -57,7 +65,7 @@ const Store = {
                     !fs.existsSync(path.join(currentPath, 'vue.config.js')) &&
                     !fs.existsSync(path.join(currentPath, 'src/pages/index.twig'))
                 );
-            }
+            };
 
             while (checkForRoot(currentPath)) {
                 currentPath = path.dirname(currentPath);

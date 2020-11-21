@@ -97,7 +97,11 @@ module.exports = {
 
     runTask: function(task) {
         const spawnConfig = this.getSpawnConfig();
-        const script = spawn('npm', ['run', task], spawnConfig);
+        const script = spawn(
+            store.data.isWin ? 'npm.cmd' : 'npm',
+            ['run', task],
+            spawnConfig
+        );
 
         script.on('close', (code) => {
             process.exit(code);

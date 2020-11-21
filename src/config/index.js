@@ -25,6 +25,7 @@ module.exports = {
     init: function(program) {
         // init config
         this.program = program;
+        store.actions.setIsWin();
         store.actions.setProjectRoot();
 
         // wp config
@@ -209,7 +210,7 @@ module.exports = {
             .description('install node modules')
             .action(function() {
                 helpers.spawnScript(
-                    'npm',
+                    store.data.isWin ? 'npm.cmd' : 'npm',
                     ['i'],
                     helpers.getSpawnConfig(),
                     colors.cyan('%s ...getting ready for \'npm install\'...'),

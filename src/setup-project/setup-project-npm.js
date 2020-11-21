@@ -21,7 +21,7 @@ module.exports = {
     init: function(callback) {
         this.callback = callback;
         this.themeName = store.getters.getWpThemeName();
-        this.wpThemePath = store.getters.getWpThemePath()
+        this.wpThemePath = store.getters.getWpThemePath();
         this.wpThemeDir = path.join(this.wpThemePath, this.themeName);
         this.spawnConfig = {
             stdio: 'inherit',
@@ -41,7 +41,7 @@ module.exports = {
 
         // run bash script with spawn - 'npm i'
         helpers.spawnScript(
-            'npm',
+            store.data.isWin ? 'npm.cmd' : 'npm',
             ['i'],
             this.spawnConfig,
             colors.cyan('%s ...getting ready for \'npm install\'...'),
@@ -55,7 +55,7 @@ module.exports = {
     buildFiles: function() {
         // run bash script with spawn - 'npm run build-dev'
         helpers.spawnScript(
-            'npm',
+            store.data.isWin ? 'npm.cmd' : 'npm',
             ['run', 'build-dev'],
             this.spawnConfig,
             colors.cyan('%s ...getting ready for \'fws build-dev\'...'),
