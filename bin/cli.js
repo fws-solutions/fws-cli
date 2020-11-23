@@ -6,7 +6,7 @@ const commander = require('commander');
 /*
 * Init FWS CLI. */
 const program = new commander.Command();
-program.version('0.3.1');
+program.version('0.3.2');
 
 /*
 * Error on unknown commands. */

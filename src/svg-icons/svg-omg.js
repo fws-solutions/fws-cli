@@ -40,7 +40,7 @@ module.exports = new svgOmg({
         {convertShapeToPath: true},
         {sortAttrs: true},
         {removeDimensions: true},
-        {removeAttrs: {attrs: '(stroke|fill)'}},
+        {removeAttrs: {attrs: '(stroke|fill|style)'}},
         {
             addAttributesToSVGElement: {
                 attributes: ['fill="currentColor"']
