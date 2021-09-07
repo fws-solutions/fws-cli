@@ -1,11 +1,11 @@
 
 ------------------------------------------------------------------------
 
-    CREATED STATIC PAGE -------------------------------------- <%= str %>
+    This is a copy of temp-page-twig-log.txt that is left here in case
+    this file is still used somewhere.
 
+    If you are seeing this message, it's a bug in CLI.
 
-    - created TWIG file: '<%= str %>.twig' in dir 'src/pages/<%= str %>'
-
-    - created JSON file: '<%= str %>.json' in dir 'src/pages/<%= str %>'
+    Please report it.
 
 ------------------------------------------------------------------------

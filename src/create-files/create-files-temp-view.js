@@ -47,8 +47,10 @@ module.exports = {
             this.createFile('json', directory);
         }
 
-        this.createFile('scss', directory);
-        this.createFile('style', directory);
+        if (this.type !== 'page' && this.starter === helpers.starterTwig) {
+            this.createFile('scss', directory);
+            this.createFile('style', directory);
+        }
 
         this.logCreatedFiles();
     },
@@ -110,14 +112,23 @@ module.exports = {
     },
 
     createStylePath: function(part) {
-        // todo - add support for starter_twig for wpThemeDir
         const src = this.starter === helpers.starterS ? 'src/scss/layout' : 'src/assets/scss/layout';
         return path.join(this.wpThemeDir, src, `_${part}.scss`);
     },
 
     createDirectoryPath: function(part) {
-        // todo - add support for starter_twig for wpThemeDir
-        const src = this.starter === helpers.starterS ? 'template-views' : 'src/components';
+        let src;
+
+        // need to check if it's starter_s or if starter_twig is creating new pages
+        if (this.starter === helpers.starterS) {
+            src = 'template-views';
+        } else if (this.starter === helpers.starterTwig && part === 'pages') {
+            src = 'src';
+            this.wpThemeDir = '';
+        } else {
+            src = 'src/components';
+        }
+
         return path.join(this.wpThemeDir, src, part, this.name);
     },
 
