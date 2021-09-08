@@ -70,6 +70,8 @@ module.exports = {
         if (!cmd) {
             return null;
         } else {
+            console.log(cmd);
+
             return cmd.options.reduce(function(agg, cur) {
                 const key = module.exports.camelize(cur.long.replace(/^--/, ''));
 

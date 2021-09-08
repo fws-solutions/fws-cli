@@ -7,7 +7,7 @@ const parse = require('parse-git-config');
 
 const Store = {
     data: {
-        cliVersion: '0.3.5',
+        cliVersion: '0.4.0',
         isWin: false,
         modulePath: path.dirname(__dirname),
         projectRoot: '',

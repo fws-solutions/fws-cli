@@ -9,10 +9,11 @@ const path = require('path');
 const fancyLog = require('fancy-log');
 const colors = require('ansi-colors');
 const helpers = require('../helpers');
-const SVGO = require('./svg-omg');
+const SVGO = require('svgo');
+const svgPlugins = require('./svg-plugins');
 
 module.exports = {
-    renameSvgFiles: function (file, filePath, allFiles, svgDirPath) {
+    renameSvgFiles: function(file, filePath, allFiles, svgDirPath) {
         return new Promise((resolve) => {
             helpers.rf(filePath, () => {
                 let newFile;
@@ -44,15 +45,18 @@ module.exports = {
         });
     },
 
-    optimizeSvgFiles: function (filePath) {
+    optimizeSvgFiles: function(filePath) {
         return new Promise((resolve) => {
             helpers.rf(filePath, (data) => {
-                resolve(SVGO.optimize(data, {path: filePath}));
+                resolve(SVGO.optimize(data, {
+                    path: filePath,
+                    plugins: svgPlugins
+                }));
             });
         });
     },
 
-    saveSvgFiles: function (filepath, data) {
+    saveSvgFiles: function(filepath, data) {
         return new Promise((resolve) => {
             fs.writeFile(filepath, data, err => {
                 if (err) throw err;
