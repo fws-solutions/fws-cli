@@ -14,9 +14,7 @@ module.exports = {
 
     init: function(name, cmd) {
         this.starter = store.getters.getStarter();
-
-        let option = helpers.cleanCmdArgs(cmd);
-        option = Object.keys(option)[0];
+        const option = Object.keys(cmd)[0];
 
         if (option) {
             module.exports.checkStarter(name, option);

@@ -184,8 +184,7 @@ module.exports = {
             .description('validate via w3 api')
             .option('--force-build', 'run w3 without build fail')
             .action(function(arg, cmd) {
-                let options = helpers.cleanCmdArgs(cmd);
-                options = Object.keys(options);
+                const options = Object.keys(cmd);
 
                 w3Validator.init(arg);
             });

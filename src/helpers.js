@@ -63,30 +63,6 @@ module.exports = {
         return str.replace(/-(\w)/g, (_, c) => c ? c.toUpperCase() : '');
     },
 
-    cleanCmdArgs: function(cmd) {
-        /*
-        * Package commander passes the cmd object itself as options,
-        * extract only passed values into a fresh object. */
-        if (!cmd) {
-            return null;
-        } else {
-            console.log(cmd);
-
-            return cmd.options.reduce(function(agg, cur) {
-                const key = module.exports.camelize(cur.long.replace(/^--/, ''));
-
-                /*
-                * In case an option is not present and a command has a method with the same name,
-                * it should not be copied */
-                if (typeof cmd[key] !== 'function' && typeof cmd[key] !== 'undefined') {
-                    agg[key] = cmd[key];
-                }
-
-                return agg;
-            }, {});
-        }
-    },
-
     mapCommand: function(program, alias, script, desc) {
         program
             .command(script)
