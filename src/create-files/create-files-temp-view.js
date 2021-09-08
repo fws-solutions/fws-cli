@@ -129,7 +129,15 @@ module.exports = {
             src = 'src/components';
         }
 
-        return path.join(this.wpThemeDir, src, part, this.name);
+        const typeDir = path.join(this.wpThemeDir, src, part);
+
+        // create folder type directory (/block, /part, /main, etc)
+        if (!fs.existsSync(typeDir)) {
+            fs.mkdirSync(typeDir);
+        }
+
+        // return full component path
+        return path.join(typeDir, this.name);
     },
 
     createDirectory: function(directory, callback) {
