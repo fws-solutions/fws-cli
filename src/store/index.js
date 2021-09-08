@@ -1,15 +1,13 @@
 /**
  * Store
  */
-
 const fs = require('fs');
 const path = require('path');
 const parse = require('parse-git-config');
-const helpers = require('../helpers');
 
 const Store = {
     data: {
-        cliVersion: '0.3.4',
+        cliVersion: '0.3.5',
         isWin: false,
         modulePath: path.dirname(__dirname),
         projectRoot: '',
@@ -82,7 +80,7 @@ const Store = {
             const themeDir = path.join(Store.data.projectRoot, 'wp-content/themes');
             Store.mutations.setWpThemePath(themeDir);
         },
-        setThemeName: function() {
+        setWpThemeName: function() {
             const themes = fs.readdirSync(Store.data.wpThemePath);
             let themeName = '';
 
@@ -115,6 +113,11 @@ const Store = {
             Store.mutations.setPackageJson(packageJson);
         },
         setProjectName: function() {
+            if (!fs.existsSync(Store.data.packageJsonPath)) {
+                return null;
+            }
+
+            const helpers = require('../helpers');
             const gitConfig = parse.sync()['remote "origin"'];
 
             if (!gitConfig) {

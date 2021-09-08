@@ -33,7 +33,7 @@ module.exports = {
         if (fs.existsSync(path.join(store.getters.getProjectRoot(), 'wp-content'))) {
             store.actions.setWpConfigSamplePath();
             store.actions.setWpThemePath();
-            store.actions.setThemeName();
+            store.actions.setWpThemeName();
 
             this.wpConfigSamplePath = store.getters.getWpConfigSamplePath();
             this.themeName = store.getters.getWpThemeName();
@@ -229,7 +229,7 @@ module.exports = {
         this.program
             .command('latest-version')
             .alias('latest')
-            .description('setup project using lando')
+            .description('check for latest CLI version')
             .action(function() {
                 const cliVersion = helpers.quickSpawnScriptNPM(
                     ['view', '@fws/cli', 'version'],

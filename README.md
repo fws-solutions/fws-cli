@@ -1,4 +1,5 @@
-# FORWARDSLASH
+![](http://fwsinternaladm.wpengine.com/wp-content/uploads/2021/09/fw-logo-small.png)
+
 
 ## Welcome
 
@@ -34,6 +35,9 @@ Default commands available from any directory.
 - Output the version number: 
     - `fws --version` or 
     - `fws -V`.
+- Check for latest version:
+    - `fws latest-version` or
+    - `fws latest`.
 - Display help for commands: 
     - `fws --help` or 
     - `fws -h`.

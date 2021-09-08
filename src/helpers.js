@@ -151,12 +151,7 @@ module.exports = {
 
     spawnScript: function(scriptName, scriptParams, spawnConfig, spinnerTitle, callback = null) {
         // spinner config
-        const scriptSpinner = new spinner();
-        scriptSpinner.setSpinnerString('|/-\\');
-        scriptSpinner.setSpinnerTitle(spinnerTitle);
-
-        // adds space between spinner and following logs
-        console.log('\n');
+        const scriptSpinner = this.setSpinner(spinnerTitle);
 
         // start spinner before timeout delay
         scriptSpinner.start();
@@ -181,8 +176,13 @@ module.exports = {
     },
 
     quickSpawnScriptNPM: function(scriptParams, isPromise = false, callback = null) {
+        const scriptSpinner = this.setSpinner(colors.cyan('%s ...checking latest @fws/cli version...'));
+
         // run script as-is or as a Promise
         if (isPromise) {
+            // start spinner before timeout delay
+            scriptSpinner.start();
+
             return new Promise(resolve => {
                 runScript(resolve);
             });
@@ -214,11 +214,26 @@ module.exports = {
                 }
 
                 if (resolve) {
+                    scriptSpinner.stop();
                     resolve(output);
                 } else {
                     return output;
                 }
             });
         }
+    },
+
+    setSpinner: function(spinnerTitle) {
+        const scriptSpinner = new spinner();
+        scriptSpinner.setSpinnerString('|/-\\');
+
+        if (spinnerTitle) {
+            scriptSpinner.setSpinnerTitle(spinnerTitle);
+        }
+
+        // adds space between spinner and following logs
+        console.log('\n');
+
+        return scriptSpinner;
     }
 };
