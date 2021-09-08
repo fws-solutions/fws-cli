@@ -14,6 +14,7 @@ const postInstall = require('../postinstall');
 const setupProject = require('../setup-project');
 const w3Validator = require('../w3-validator');
 const colors = require('ansi-colors');
+const figlet = require('figlet');
 
 module.exports = {
     program: null,
@@ -52,6 +53,9 @@ module.exports = {
 
         // w3 validator available from anywhere
         this.w3Validator();
+
+        // check FWS CLI version
+        this.checkCliLatestVersion();
 
         // limit commands to theme's root directory
         if (this.packageJson) {
@@ -218,6 +222,43 @@ module.exports = {
                         helpers.consoleLogWarning(`node_modules installed in the root of '${_this.themeName}' theme.`, 'cyan');
                     }
                 );
+            });
+    },
+
+    checkCliLatestVersion: function() {
+        this.program
+            .command('latest-version')
+            .alias('latest')
+            .description('setup project using lando')
+            .action(function() {
+                const cliVersion = helpers.quickSpawnScriptNPM(
+                    ['view', '@fws/cli', 'version'],
+                    true
+                );
+
+                cliVersion.then(data => {
+                    const latestVersion = data.trim();
+                    const localVersion = store.getters.getCliVersion();
+                    const updateNeeded = latestVersion !== localVersion;
+                    const message = `You${updateNeeded ? ' DO NOT' : ''} have the latest version of ${colors['magenta']('@fws/cli')} installed!`;
+                    let report = '';
+
+                    figlet(updateNeeded ? 'Update Needed!' : 'All Good!', {font: 'Small Slant'}, function(err, data) {
+                        if (err) {
+                            console.log('Something went wrong...');
+                            console.dir(err);
+                            return;
+                        }
+
+                        report += '\n' + colors[updateNeeded ? 'red' : 'cyan'](data);
+                        report += '\n\n' + colors[updateNeeded ? 'red' : 'grey'](message);
+                        report += '\n\n' + colors['cyan'](`Latest version: ${latestVersion}`);
+                        report += '\n' + colors[updateNeeded ? 'red' : 'cyan'](`Local version: ${localVersion}`) + '\n';
+
+                        console.log(report);
+                        process.exit();
+                    });
+                });
             });
     }
 };

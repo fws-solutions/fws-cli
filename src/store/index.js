@@ -9,6 +9,7 @@ const helpers = require('../helpers');
 
 const Store = {
     data: {
+        cliVersion: '0.3.4',
         isWin: false,
         modulePath: path.dirname(__dirname),
         projectRoot: '',
@@ -132,6 +133,9 @@ const Store = {
     },
 
     getters: {
+        getCliVersion: function() {
+            return Store.data.cliVersion;
+        },
         getModulePath: function() {
             return Store.data.modulePath;
         },

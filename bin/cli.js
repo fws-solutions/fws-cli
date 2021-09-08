@@ -2,11 +2,12 @@
 const config = require('../src/config');
 const helpers = require('../src/helpers');
 const commander = require('commander');
+const store = require('../src/store');
 
 /*
 * Init FWS CLI. */
 const program = new commander.Command();
-program.version('0.3.3');
+program.version(store.getters.getCliVersion());
 
 /*
 * Error on unknown commands. */

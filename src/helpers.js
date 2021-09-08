@@ -179,4 +179,46 @@ module.exports = {
             });
         }, 1500);
     },
+
+    quickSpawnScriptNPM: function(scriptParams, isPromise = false, callback = null) {
+        // run script as-is or as a Promise
+        if (isPromise) {
+            return new Promise(resolve => {
+                runScript(resolve);
+            });
+        }
+
+        runScript();
+
+        // run spawn script
+        function runScript(resolve = null) {
+            // run bash script with spawn
+            const script = spawn(store.data.isWin ? 'npm.cmd' : 'npm', scriptParams);
+            let output = '';
+
+            // handle output data
+            script.stdin.setEncoding = 'utf-8';
+            script.stdout.on('data', (data) => {
+                output += data.toString();
+            });
+
+            // handle output error
+            script.stderr.on('data', (data) => {
+                console.log('error:' + data);
+            });
+
+            // execute callback once spawn script is done
+            script.on('close', (code) => {
+                if (callback) {
+                    callback();
+                }
+
+                if (resolve) {
+                    resolve(output);
+                } else {
+                    return output;
+                }
+            });
+        }
+    }
 };
