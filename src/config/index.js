@@ -15,6 +15,7 @@ const setupProject = require('../setup-project');
 const w3Validator = require('../w3-validator');
 const colors = require('ansi-colors');
 const figlet = require('figlet');
+const fileStructure = require('../file-structure');
 
 module.exports = {
     program: null,
@@ -187,6 +188,14 @@ module.exports = {
                 const options = Object.keys(cmd);
 
                 w3Validator.init(arg);
+            });
+
+        this.program
+            .command('checkDir')
+            .alias('chd')
+            .description('testing checkFolderAndFileStructure')
+            .action(function() {
+                fileStructure.init();
             });
     },
 
