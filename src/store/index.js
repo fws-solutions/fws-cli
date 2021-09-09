@@ -58,11 +58,17 @@ const Store = {
         setProjectRoot: function() {
             let currentPath = process.cwd();
             const checkForRoot = function(currentPath) {
+                const isWpContentPath = fs.existsSync(path.join(currentPath, 'wp-content'));
+                const isWpAcfJsonPath = fs.existsSync(path.join(currentPath, 'acf-json'));
+                const isNuxtConfigPath = fs.existsSync(path.join(currentPath, 'nuxt.config.js'));
+                const isVueConfigPath = fs.existsSync(path.join(currentPath, 'vue.config.js'));
+                const isTwigPagePath = fs.existsSync(path.join(currentPath, 'src/pages/index.twig'));
+
                 return (
-                    (!fs.existsSync(path.join(currentPath, 'wp-content')) && currentPath !== '/') &&
-                    !fs.existsSync(path.join(currentPath, 'nuxt.config.js')) &&
-                    !fs.existsSync(path.join(currentPath, 'vue.config.js')) &&
-                    !fs.existsSync(path.join(currentPath, 'src/pages/index.twig'))
+                    (!isWpContentPath && currentPath !== '/') &&
+                    !isNuxtConfigPath &&
+                    !(isVueConfigPath && !isWpAcfJsonPath) &&
+                    !isTwigPagePath
                 );
             };
 
@@ -85,7 +91,7 @@ const Store = {
             let themeName = '';
 
             themes.forEach(cur => {
-                if (cur.substr(0, 4) === 'fws-') {
+                if (cur.substr(0, 4) === 'fws-' || cur === 'starter_s') {
                     themeName = cur;
                 }
             });

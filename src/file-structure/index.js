@@ -8,6 +8,7 @@ const path = require('path');
 const colors = require('ansi-colors');
 const helpers = require('../helpers');
 const store = require('../store');
+const yaml = require('yaml');
 
 const FileStructure = {
     importedDefinedStructure: {
@@ -25,12 +26,26 @@ const FileStructure = {
     definedStructure: [],
     projectStructure: [],
     componentsRootPath: '',
+    structureOK: true,
 
     init: function() {
-        this.definedStructure = this.importedDefinedStructure.componentsRootStructure;
-        this.componentsRootPath = path.join(store.getters.getProjectRoot(), this.importedDefinedStructure.componentsRootDirectory);
+        // this.definedStructure = this.importedDefinedStructure.componentsRootStructure;
+        // this.componentsRootPath = path.join(store.getters.getProjectRoot(), this.importedDefinedStructure.componentsRootDirectory);
+        //
+        // this.checkStructure();
+        //
+        // if (this.structureOK) {
+        //     console.log(colors.cyan('Components file structure matches. :)'));
+        // }
 
-        this.checkStructure();
+        console.log(store.data);
+    },
+
+    getStructureConfig: function() {
+        if (!this.hostName) {
+            const hostName = fs.readFileSync(this.landoConfigDir, 'utf8');
+            this.hostName = yaml.parse(hostName)['proxy']['appserver'][0];
+        }
     },
 
     checkStructure: function() {
@@ -39,12 +54,8 @@ const FileStructure = {
             return !this.importedDefinedStructure.ignoreFiles.includes(value);
         });
 
-        const isWrongStructureSize = this.checkStructureSizes();
-        const isWrongStructureNames = this.checkStructureNames();
-
-        if (!isWrongStructureSize && !isWrongStructureNames) {
-            console.log(colors.cyan('Components file structure matches. :)'));
-        }
+        this.checkStructureSizes();
+        this.checkStructureNames();
     },
 
     checkStructureSizes: function() {
@@ -53,6 +64,8 @@ const FileStructure = {
             return null;
         }
 
+        this.structureNotOk();
+
         // log lists of directories
         const projectStructureSize = this.projectStructure.length > this.definedStructure.length ? 'bigger' : 'smaller';
         let report = colors.yellow(`Project structure is ${colors.red(projectStructureSize)} than defined structure.\n`);
@@ -60,8 +73,6 @@ const FileStructure = {
         report += this.logReportFolderStructure('Project structure:', this.projectStructure);
 
         helpers.consoleLogReport('NUMBER OF DIRs DON\'T MATCH', report);
-
-        return true;
     },
 
     checkStructureNames: function() {
@@ -73,6 +84,8 @@ const FileStructure = {
         if (mismatched.length === 0) {
             return null;
         }
+
+        this.structureNotOk();
 
         // log mismatched directories
         let report = colors.yellow(`These directories are ${colors.red('not')} from defined structure:\n`);
@@ -90,6 +103,10 @@ const FileStructure = {
         report += '\n';
 
         return report;
+    },
+
+    structureNotOk: function() {
+        this.structureOK = false;
     }
 };
 
