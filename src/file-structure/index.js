@@ -1,7 +1,7 @@
 /**
  * File Structure
  *
- * @description CLI script for checking if the file importedDefinedStructure in specific project is according to a defined standard.
+ * @description CLI script for checking if the file structure in specific project is according to a defined standard.
  */
 const fs = require('fs');
 const path = require('path');
@@ -11,47 +11,49 @@ const store = require('../store');
 const yaml = require('yaml');
 
 const FileStructure = {
-    importedDefinedStructure: {
-        componentsRootDirectory: 'template-views',
-        componentsRootStructure: [
-            'blocks',
-            'listings',
-            'parts',
-            'shared'
-        ],
-        ignoreFiles: [
-            '.DS_Store'
-        ]
-    },
+    pkgJsonRoot: '',
+    fwsStructure: null,
     definedStructure: [],
     projectStructure: [],
     componentsRootPath: '',
     structureOK: true,
 
     init: function() {
-        // this.definedStructure = this.importedDefinedStructure.componentsRootStructure;
-        // this.componentsRootPath = path.join(store.getters.getProjectRoot(), this.importedDefinedStructure.componentsRootDirectory);
-        //
-        // this.checkStructure();
-        //
-        // if (this.structureOK) {
-        //     console.log(colors.cyan('Components file structure matches. :)'));
-        // }
+        this.pkgJsonRoot = path.dirname(store.getters.getPackageJsonPath());
+        this.fwsStructure = this.getStructureConfig();
 
-        console.log(store.data);
+        // exit if there is no .fwsstructure.yml file
+        if (!this.fwsStructure) {
+            console.log(colors.yellow('No .fwsstructure.yml file.'));
+            return null;
+        }
+
+        // set up values and run checking
+        this.definedStructure = this.fwsStructure.componentsRootStructure;
+        this.componentsRootPath = path.join(this.pkgJsonRoot, this.fwsStructure.componentsRootDirectory);
+
+        this.checkStructure();
+
+        if (this.structureOK) {
+            console.log(colors.cyan('Components file structure matches. :)'));
+        }
     },
 
     getStructureConfig: function() {
-        if (!this.hostName) {
-            const hostName = fs.readFileSync(this.landoConfigDir, 'utf8');
-            this.hostName = yaml.parse(hostName)['proxy']['appserver'][0];
+        const fileStructureFile = path.join(this.pkgJsonRoot, '.fwsstructure.yml');
+
+        if (!fs.existsSync(fileStructureFile)) {
+            return null;
         }
+
+        const fileStructure = fs.readFileSync(fileStructureFile, 'utf8');
+        return yaml.parse(fileStructure);
     },
 
     checkStructure: function() {
         const compRootDir = fs.readdirSync(this.componentsRootPath);
         this.projectStructure = compRootDir.filter(value => {
-            return !this.importedDefinedStructure.ignoreFiles.includes(value);
+            return !this.fwsStructure.ignoreFiles.includes(value);
         });
 
         this.checkStructureSizes();

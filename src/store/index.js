@@ -163,7 +163,10 @@ const Store = {
         getWpConfigSamplePath: function() {
             return Store.data.wpConfigSamplePath;
         },
-        getWpPackageJson: function() {
+        getPackageJsonPath: function() {
+            return Store.data.packageJsonPath;
+        },
+        getPackageJson: function() {
             return Store.data.packageJson;
         },
         getProjectName: function() {

@@ -45,7 +45,7 @@ module.exports = {
         store.actions.setPackageJson();
         store.actions.setProjectName();
 
-        this.packageJson = store.getters.getWpPackageJson();
+        this.packageJson = store.getters.getPackageJson();
 
         // limit commands to wp's root directory
         if (this.wpConfigSamplePath) {
@@ -191,8 +191,7 @@ module.exports = {
             });
 
         this.program
-            .command('checkDir')
-            .alias('chd')
+            .command('test')
             .description('testing checkFolderAndFileStructure')
             .action(function() {
                 fileStructure.init();
