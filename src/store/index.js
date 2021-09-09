@@ -58,6 +58,7 @@ const Store = {
         setProjectRoot: function() {
             let currentPath = process.cwd();
             const checkForRoot = function(currentPath) {
+                // check for various files and folders to detect different starters and their root directory
                 const isWpContentPath = fs.existsSync(path.join(currentPath, 'wp-content'));
                 const isWpAcfJsonPath = fs.existsSync(path.join(currentPath, 'acf-json'));
                 const isNuxtConfigPath = fs.existsSync(path.join(currentPath, 'nuxt.config.js'));
@@ -72,6 +73,7 @@ const Store = {
                 );
             };
 
+            // move one directory path up if no folders and files are matched above
             while (checkForRoot(currentPath)) {
                 currentPath = path.dirname(currentPath);
             }

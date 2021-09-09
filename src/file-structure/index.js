@@ -34,6 +34,7 @@ const FileStructure = {
 
         this.checkStructure();
 
+        // log message if everything is matched
         if (this.structureOK) {
             console.log(colors.cyan('Components file structure matches. :)'));
         }
