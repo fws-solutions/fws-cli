@@ -20,7 +20,7 @@
     ],
     "dependencies": {
         "ansi-colors": "^4.1.1",
-        "axios": "^0.19.2",
+        "axios": "^0.21.2",
         "cli-progress": "^3.8.2",
         "cli-spinner": "^0.2.10",
         "commander": "^5.1.0",
