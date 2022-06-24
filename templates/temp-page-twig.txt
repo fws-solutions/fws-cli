@@ -1,4 +1,0 @@
-{% extends "../main/base.twig" %}
-
-{% block content %}
-{% endblock %}

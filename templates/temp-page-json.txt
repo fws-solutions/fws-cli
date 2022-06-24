@@ -1,9 +1,0 @@
-{
-  "header": {
-    ">>": "main/header/header.json"
-  },
-  "footer": {
-    ">>": "main/footer/footer.json"
-  }
-}
-
