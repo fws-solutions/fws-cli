@@ -1,1 +1,1 @@
-Make Love Not JS
+// Make Love Not JS
