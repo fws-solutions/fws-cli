@@ -1,13 +1,16 @@
-class Svg {
+import CommandDefinition from "../base/domain/Command/CommandDefinition.js";
+import BaseCommand from "../base/domain/Command/BaseCommand.js";
+
+export default class Svg extends BaseCommand {
     constructor() {
-        this.init()
+        super(
+            new CommandDefinition('svg', 'SVG Description')
+                .setMandatoryParameters('mandatory1', 'mandatory2')
+                .setOptionalParameters('optional1')
+        );
     }
 
-    init = () => {
-        console.log('SVG init')
+    run(mandatory1, mandatory2, optional1) {
+        console.log(mandatory1, mandatory2, optional1);
     }
-
-
 }
-
-module.exports = Svg;
