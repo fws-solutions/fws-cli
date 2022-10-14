@@ -2,9 +2,9 @@
 import {resolve, dirname} from 'path';
 import {fileURLToPath} from 'url';
 import {readdir} from 'fs';
-const commands = resolve(dirname(fileURLToPath(import.meta.url)), "../", 'commands');
+const commands = resolve(dirname(fileURLToPath(import.meta.url)), 'commands');
 import { Command } from 'commander';
-import BaseCommand from "../base/domain/Command/BaseCommand.js";
+import BaseCommand from "./base/domain/Command/BaseCommand.js";
 
 const program = new Command();
 program.version('2.0.0');
@@ -14,7 +14,7 @@ readdir(commands, async function (err, files) {
     for (let file of files) {
         let module;
         try {
-            file = './../commands/' + file;
+            file = './commands/' + file;
             module = await import(file);
             module = new module.default();
         } catch (exception) {
