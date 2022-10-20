@@ -67,6 +67,14 @@ General commands, available for all starters.
 
 
 
-Additional docs to include
+DEVELOPER INSTRUCTIONS
 
+Aplikacija moze da se pokrene pre eksportovanja u paket na sledeci nacin:
+node ../../fws-cli/cli.js -h
+Ovo ce skenirati i izlistati sve dostupne komande sa njihovim specifikacijama.
+
+Aplikacija moze da se pokrene sa bilo koje lokacije s tim da se kuca relativna putanja sa lokacije do cli.js. Ovo omogucava da se iz nekog specificnog projekta pokrene aplikacija a da se ona tokom razvoja ne nalazi u tom projektu.
+node ../../fws-cli/cli.js svg man1 man2 opt1
+
+Literatura
 https://docs.npmjs.com/cli/v8/configuring-npm/package-json#bin
