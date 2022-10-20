@@ -1,0 +1,57 @@
+jobs:
+    build-and-deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Set additional env variables
+                run: |
+                    echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+                    echo "workspace=$GITHUB_WORKSPACE" >> $GITHUB_ENV
+                    echo "fullThemeDir=$GITHUB_WORKSPACE/wp-content/themes/${{ env.themeDir }}" >> $GITHUB_ENV
+                    echo "nodeModulesDir=$GITHUB_WORKSPACE/wp-content/themes/${{ env.themeDir }}/node_modules" >> $GITHUB_ENV
+                    echo "packageLockJson=$GITHUB_WORKSPACE/wp-content/themes/${{ env.themeDir }}/package-lock.json" >> $GITHUB_ENV
+            -   name: Git checkout
+                uses: actions/checkout@v2
+                with:
+                    fetch-depth: 0
+
+            -   name: Prepare for Deployment
+                working-directory: ${{ env.workspace }}
+                run: rm .gitignore && mv deploy.gitignore .gitignore
+
+            -   name: Install Composer Dependencies
+                uses: php-actions/composer@v3
+                env:
+                    FULL_THEME_DIR: ${{ env.fullThemeDir }}
+                with:
+                    args: --working-dir $FULL_THEME_DIR
+                    dev: no
+
+            -   name: Setup Node.js environment
+                uses: actions/setup-node@v2.1.2
+                with:
+                    node-version: ${{ env.nodeVersion }}
+
+            -   name: Cache node_modules
+                id: cache-node-modules
+                uses: actions/cache@v2
+                with:
+                    path: ${{ env.nodeModulesDir }}
+                    key: node-modules-${{ hashFiles( env.packageLockJson) }}
+
+            -   name: Install NPM
+                working-directory: ${{ env.fullThemeDir }}
+                if: steps.cache-node-modules.outputs.cache-hit != 'true'
+                run: npm install
+
+            -   name: Build FE assets
+                working-directory: ${{ env.fullThemeDir }}
+                run: npm run build
+
+            -   name: WP Engine deployment
+                uses: fws-solutions/wpengine-deploy-action@1.1.1
+                env:
+                    WPENGINE_ENVIRONMENT_NAME: ${{ env.wpengineEnvironment }}
+                    LOCAL_BRANCH: ${{ env.branch }}
+                    WPENGINE_SSH_KEY_PRIVATE: ${{ secrets.WPENGINE_SSH_KEY_PRIVATE }}
+                    WPENGINE_SSH_KEY_PUBLIC: ${{ secrets.WPENGINE_SSH_KEY_PUBLIC }}

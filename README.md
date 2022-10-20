@@ -64,3 +64,9 @@ General commands, available for all starters.
     - `fws w3 <url> [options]`.
     
 **Specific commands for each Starter can be found in each Starter's README.md file.**
+
+
+
+Additional docs to include
+
+https://docs.npmjs.com/cli/v8/configuring-npm/package-json#bin

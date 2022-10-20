@@ -1,0 +1,15 @@
+
+------------------------------------------------------------------------
+
+    CREATED PART -------------------------------------- <%= str %>
+
+
+    - created TWIG file:  '<%= str %>.twig' in dir '<%= src %>/<%= str %>'
+
+    - created JSON file:  '<%= str %>.json' in dir '<%= src %>/<%= str %>'
+
+    - created SCSS file: '_<%= str %>.scss' in dir '<%= src %>/<%= str %>'
+
+    - updated SCSS file: '_parts.scss' in dir 'src/assets/scss/layout'
+
+------------------------------------------------------------------------
