@@ -21,6 +21,10 @@ export default class CommandDefinition {
         return this._mandatoryParameters;
     }
 
+    hasMandatoryParameters() {
+        return this._mandatoryParameters.length > 0;
+    }
+
     setMandatoryParameters(...value) {
         this._mandatoryParameters = value;
         return this;
@@ -28,6 +32,10 @@ export default class CommandDefinition {
 
     get optionalParameters() {
         return this._optionalParameters;
+    }
+
+    hasOptionalParameters() {
+        return this._optionalParameters.length > 0;
     }
 
     setOptionalParameters(...value) {

@@ -27,8 +27,12 @@ readdir(commands, async function (err, files) {
         if (!(module instanceof BaseCommand)) throw new Error(`This file is not a proper command: ${file}`);
 
         const commandName = module.getDefinition().name;
-        const mandatoryParameters = module.getDefinition().mandatoryParameters.map((parameter) => `<${parameter}>`).reduce((accumulator, parameter) => `${accumulator} ${parameter}`);
-        const optionalParameters = module.getDefinition().optionalParameters.map((parameter) => `[${parameter}]`).reduce((accumulator, parameter) => `${accumulator} ${parameter}`);
+        const mandatoryParameters = module.getDefinition().hasMandatoryParameters()
+            ? module.getDefinition().mandatoryParameters.map((parameter) => `<${parameter}>`).reduce((accumulator, parameter) => `${accumulator} ${parameter}`)
+            : '';
+        const optionalParameters = module.getDefinition().hasOptionalParameters()
+            ? module.getDefinition().optionalParameters.map((parameter) => `[${parameter}]`).reduce((accumulator, parameter) => `${accumulator} ${parameter}`)
+            : '';
 
         program
             .command(`${commandName} ${mandatoryParameters} ${optionalParameters}`)
