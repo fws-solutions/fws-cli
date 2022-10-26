@@ -1,8 +1,12 @@
 import {resolve} from 'path';
-import {readdirSync, existsSync, readFileSync} from 'fs';
+import {existsSync, readFileSync} from 'fs';
 export default class NuxtPackage {
     is() {
-        return this.getPackageJson().forwardslash === 'fws_starter_nuxt';
+        try {
+            return this.getPackageJson().forwardslash === 'fws_starter_nuxt';
+        } catch (exception) {
+            return false;
+        }
     }
 
     getAssetsDirectory() {
@@ -10,11 +14,11 @@ export default class NuxtPackage {
     }
 
     getPackageJson() {
-        const packageJsonDir = existsSync(this.getProjectRoot(), 'package.json')
+        const packageJsonFile = existsSync(this.getProjectRoot(), 'package.json')
             ? resolve(this.getProjectRoot(), 'package.json')
             : resolve(process.cwd(), 'package.json');
 
-        return JSON.parse(readFileSync(packageJsonDir, 'utf8'));
+        return JSON.parse(readFileSync(packageJsonFile, 'utf8'));
     }
 
     getProjectRoot() {
