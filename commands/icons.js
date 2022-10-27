@@ -10,8 +10,6 @@ export default class Icons extends BaseCommand {
     constructor() {
         super(
             new CommandDefinition('icons', 'SVG Description')
-                .setMandatoryParameters('mandatory1', 'mandatory2')
-                .setOptionalParameters('optional1')
         );
     }
 
@@ -30,18 +28,17 @@ export default class Icons extends BaseCommand {
                 try {
                     if (lstatSync(filePath).isDirectory())
                         rmdir(filePath, (error) => {
-                            if (error) this.consoleLogError(error);
-                            this.consoleLogWarning(`deleted '${relative(svgDirPath, filePath)}' as it is not an SVG file`, 'red');
+                            if (error) this.inlineLogError(error);
+                            this.consoleLogWarning(`Deleted '${relative(svgDirPath, filePath)}' as it is not an SVG file!`);
                         });
                     else {
                         unlinkSync(filePath);
-                        this.consoleLogWarning(`deleted '${relative(svgDirPath, filePath)}' as it is not an SVG file`, 'red');
+                        this.consoleLogWarning(`Deleted '${relative(svgDirPath, filePath)}' as it is not an SVG file!`);
                     }
                 } catch (error) {
-                    this.consoleLogError(error);
+                    this.inlineLogError(error);
                 }
             } else {
-                console.log(`We should optimize ${file}`);
                 // Optimize file
                 const result = optimize(readFileSync(filePath, {encoding:'utf8', flag:'r'}));
 
@@ -59,9 +56,9 @@ export default class Icons extends BaseCommand {
                         // delete file if already exists
                         try {
                             unlinkSync(newFilePath);
-                            this.consoleLogWarning(`deleted '${newFilePath}' as file with same name already exists`, 'red');
+                            this.consoleLogWarning(`Deleted '${newFilePath}' as file with same name already exists!`);
                         } catch (error) {
-                            this.consoleLogError(error);
+                            this.inlineLogError(error);
                         }
                     }
                     unlinkSync(filePath);
@@ -69,6 +66,7 @@ export default class Icons extends BaseCommand {
 
                 // Save file
                 writeFileSync(newFilePath, result.data, {encoding:'utf8', flag:'w'});
+                this.inlineLogSuccess(`Optimized ${file}`);
             }
         });
     }
@@ -126,8 +124,13 @@ export default class Icons extends BaseCommand {
             components: componentsStrings
         });
 
-        // generate new Vue file
-        writeFileSync(writeFile, dataSvgIconGen, 'utf8');
+        try {
+            // generate new Vue file
+            writeFileSync(writeFile, dataSvgIconGen, 'utf8');
+            this.inlineLogSuccess('SvgIconGen.vue file is generated!');
+        } catch (exception) {
+            this.inlineLogError(exception);
+        }
     }
 
     _generateIconsScssFile(svgDirPath) {
@@ -150,7 +153,8 @@ export default class Icons extends BaseCommand {
         // compile parts of lodash template
         readdirSync(svgDirPath).forEach(file => {
             const name = basename(file, '.svg');
-            const filePath = relative('src/scss', join(svgDirPath, file)).replace(/\\/g, '/');
+            let filePath = relative('src/scss', join(svgDirPath, file)).replace(/\\/g, '/');
+            filePath = '../' + filePath.split('/src/')[1];
 
             scssImports += `\t@if $icon == ${name} {\n`;
             scssImports += `\t\t$path: '${filePath}'\n`;
@@ -162,7 +166,12 @@ export default class Icons extends BaseCommand {
             imports: scssImports
         });
 
-        // generate new scss file
-        writeFileSync(writeFile, dataIconsScss, 'utf8');
+        try {
+            // generate new scss file
+            writeFileSync(writeFile, dataIconsScss, 'utf8');
+            this.inlineLogSuccess('_icons.scss is generated!');
+        } catch (exception) {
+            this.inlineLogError(exception);
+        }
     }
 }

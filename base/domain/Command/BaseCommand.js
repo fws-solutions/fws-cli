@@ -38,20 +38,34 @@ export default class BaseCommand {
 
     // Logging and error handling
 
-    consoleLogWarning(message, color = 'yellow', error = false) {
-        /* Log warning messages using a template.  */
-        const warningTemplate = readFileSync(resolve(this.getApplicationTemplateDirectory(), 'temp-warning-log.txt'), 'utf8');
-        const compiled = _template(warningTemplate);
-        fancyLog(colors[color](compiled({message: message})));
+    inlineLogSuccess(message) {
+        fancyLog(colors.cyan(message));
+    }
 
-        if (error) {
-            this.notifyError(message);
-            process.exit(1);
-        }
+    inlineLogWarning(message) {
+        fancyLog(colors.yellow(message));
+    }
+
+    inlineLogError(message) {
+        fancyLog(colors.red(message));
+    }
+
+    consoleLogSuccess(message) {
+        this._consoleLogMessage(message, 'cyan');
+    }
+
+    consoleLogWarning(message) {
+        this._consoleLogMessage(message, 'yellow');
     }
 
     consoleLogError(message) {
-        fancyLog(colors.red(message));
+        this._consoleLogMessage(message, 'red');
+    }
+
+    _consoleLogMessage(message, color) {
+        const template = readFileSync(resolve(this.getApplicationTemplateDirectory(), 'temp-cli-log.txt'), 'utf8');
+        const compiled = _template(template);
+        fancyLog(colors[color](compiled({message: message})));
     }
 
     notifyError(message) {
