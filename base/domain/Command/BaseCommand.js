@@ -9,15 +9,22 @@ import {fileURLToPath} from 'url';
 import WordPressPackage from "../Package/WordPress/WordPressPackage.js";
 import VuePackage from "../Package/WordPress/VuePackage.js";
 import NuxtPackage from "../Package/WordPress/NuxtPackage.js";
+import Spinner from 'cli-spinner';
+import CliProgress from 'cli-progress';
+
 
 export default class BaseCommand {
     _definition;
     _package;
+    _spinner;
+    _progressBar;
 
     constructor(definition) {
         if (!(definition instanceof CommandDefinition)) throw new Error('Missing command definition!')
         this._definition = definition;
         this._setPackage();
+        this._setSpinner();
+        this._setProgressBar();
     }
 
     getDefinition() {
@@ -102,5 +109,46 @@ export default class BaseCommand {
 
     isVuePackage() {
         return this._package instanceof VuePackage;
+    }
+
+    showStartMessage(message){
+        this.inlineLogSuccess(message === undefined
+            ? `Starting ${this.getDefinition().name}`
+            : message);
+    }
+
+    showEndMessage(message){
+        this.inlineLogSuccess(message === undefined
+            ? `Finished ${this.getDefinition().name}`
+            : message);
+    }
+
+    _setSpinner() {
+        this._spinner = new Spinner.Spinner(colors.yellow('Loading WP REST API... %s'));
+        this._spinner.setSpinnerString('|/-\\');
+    }
+
+    startSpinner(){
+        this._spinner.start();
+    }
+
+    stopSpinner(){
+        this._spinner.stop();
+    }
+
+    _setProgressBar() {
+        this._progressBar = new CliProgress.SingleBar({}, CliProgress.Presets.shades_classic);
+    }
+
+    startProgressBar() {
+        this._progressBar.start();
+    }
+
+    stopProgressBar() {
+        this._progressBar.stop();
+    }
+
+    updateProgressBar(barCount) {
+        this._progressBar.update(barCount);
     }
 }
