@@ -67,6 +67,7 @@ export default class BaseCommand {
 
     consoleLogError(message) {
         this._consoleLogMessage(message, 'red');
+        process.exit(1);
     }
 
     _consoleLogMessage(message, color) {
@@ -113,7 +114,7 @@ export default class BaseCommand {
 
     showStartMessage(message){
         this.inlineLogSuccess(message === undefined
-            ? `Starting ${this.getDefinition().name}`
+            ? `Starting ${this.getDefinition().name}...`
             : message);
     }
 
@@ -140,8 +141,8 @@ export default class BaseCommand {
         this._progressBar = new CliProgress.SingleBar({}, CliProgress.Presets.shades_classic);
     }
 
-    startProgressBar() {
-        this._progressBar.start();
+    startProgressBar(totalValue, startValue) {
+        this._progressBar.start(totalValue, startValue);
     }
 
     stopProgressBar() {
