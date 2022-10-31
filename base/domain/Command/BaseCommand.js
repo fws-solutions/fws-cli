@@ -11,6 +11,7 @@ import VuePackage from "../Package/WordPress/VuePackage.js";
 import NuxtPackage from "../Package/WordPress/NuxtPackage.js";
 import Spinner from 'cli-spinner';
 import CliProgress from 'cli-progress';
+import NextPackage from "../Package/WordPress/NextPackage.js";
 
 
 export default class BaseCommand {
@@ -110,6 +111,10 @@ export default class BaseCommand {
 
     isVuePackage() {
         return this._package instanceof VuePackage;
+    }
+
+    isNextPackage() {
+        return this._package instanceof NextPackage;
     }
 
     showStartMessage(message){
