@@ -123,10 +123,11 @@ export default class BaseCommand {
             : message);
     }
 
-    showEndMessage(message){
+    showEndMessage(message, endScript = true){
         this.inlineLogSuccess(message === undefined
             ? `Finished ${this.getDefinition().name}`
             : message);
+        if (endScript) process.exit(1);
     }
 
     _setSpinner() {
@@ -147,6 +148,7 @@ export default class BaseCommand {
     }
 
     startProgressBar(totalValue, startValue) {
+        this.stopSpinner();
         this._progressBar.start(totalValue, startValue);
     }
 
