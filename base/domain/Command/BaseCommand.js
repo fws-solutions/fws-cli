@@ -68,7 +68,6 @@ export default class BaseCommand {
 
     consoleLogError(message) {
         this._consoleLogMessage(message, 'red');
-        process.exit(1);
     }
 
     _consoleLogMessage(message, color) {

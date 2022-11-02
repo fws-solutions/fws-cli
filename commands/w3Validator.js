@@ -14,7 +14,7 @@ export default class W3Validator extends BaseCommand {
 
     constructor() {
         super(
-            new CommandDefinition('w3Validator', 'w3Validator description')
+            new CommandDefinition('w3Validator', 'validate via w3 api')
                 .setMandatoryParameters('url')
         );
     }

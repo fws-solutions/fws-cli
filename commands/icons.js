@@ -9,7 +9,7 @@ import _startCase from 'lodash.startcase';
 export default class Icons extends BaseCommand {
     constructor() {
         super(
-            new CommandDefinition('icons', 'SVG Description')
+            new CommandDefinition('icons', 'optimizes and generates SVG icons')
         );
     }
 
