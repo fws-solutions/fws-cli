@@ -158,4 +158,11 @@ export default class BaseCommand {
     updateProgressBar(barCount) {
         this._progressBar.update(barCount);
     }
+
+    compileTemplate(templateFile, data) {
+        const template = readFileSync(resolve(this.getApplicationTemplateDirectory(), templateFile), 'utf8');
+        const templateCompiler = _template(template);
+
+        return templateCompiler(data);
+    }
 }
