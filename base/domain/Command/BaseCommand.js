@@ -44,6 +44,10 @@ export default class BaseCommand {
         return resolve(this.getApplicationRoot(), 'base/templates');
     }
 
+    getApplicationEnvDirectory() {
+        return resolve(this.getApplicationRoot(), 'base/env');
+    }
+
     // Logging and error handling
 
     inlineLogSuccess(message) {
