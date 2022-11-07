@@ -1,8 +1,8 @@
 import CommandDefinition from "../base/domain/Command/CommandDefinition.js";
 import BaseCommand from "../base/domain/Command/BaseCommand.js";
 import {resolve} from "path";
-import _startCase from "lodash.startcase";
 import fs from "fs";
+import _startCase from "lodash.startcase";
 
 export default class CreateFiles extends BaseCommand {
     _fileName;
@@ -32,14 +32,19 @@ export default class CreateFiles extends BaseCommand {
 
     _checkType() {
         if (this._type === 'block' || this._type === 'listing' || this._type === 'part') {
-
+            const directoryPath = this._getDirectoryPath();
+            this._createDirectory(directoryPath);
+            this._createFile('php', '', 'php', directoryPath);
+            this._createFile('php-fe', '_fe-', 'php', directoryPath);
+            this._createFile('scss', '', 'scss', directoryPath);
+            this._updateScssFile();
         } else if (this._type === 'block-vue' || this._type === 'part-vue') {
             this._type = (this._type).replace('-vue', '');
             this._checkVueComponentExists();
             this._generateVueFile();
             this._generateVueStory();
-            this.showEndMessage();
         }
+        this.showEndMessage();
     }
 
     _checkVueComponentExists() {
@@ -116,5 +121,96 @@ export default class CreateFiles extends BaseCommand {
             this.inlineLogError(exception);
             this.showEndMessage();
         }
+    }
+
+    _createFile(tempName, prefix, extension, directoryPath) {
+        let template;
+        let directory;
+
+        if (this.isWPPackage()) {
+            template = `temp-${this._type}-${tempName}.txt`;
+            directory = 'template-views';
+        } else {
+            this.consoleLogError('Unknown package type!');
+            this.showEndMessage();
+        }
+        const fileName = this._getFileName();
+        const generateFile = `${prefix + fileName}.${extension}`;
+        const writeDir = resolve(directoryPath, generateFile);
+
+        const data = {
+            str: fileName,
+        }
+        const output = this.compileTemplate(template, data);
+
+        try {
+            fs.writeFileSync(writeDir, output, 'utf8');
+            this.inlineLogSuccess(`Created ${extension.toUpperCase()} file: '${generateFile}' in dir '${directory}/${this._type}s/${fileName}'`)
+        } catch (exception) {
+            this.inlineLogError(exception);
+            this.showEndMessage();
+        }
+    }
+
+    _updateScssFile() {
+        let directoryPath;
+        let directory;
+        let output = '';
+
+        if (this.isWPPackage()) {
+            directoryPath = 'src/scss/layout';
+            directory = 'template-views';
+        } else {
+            this.consoleLogError('Unknown package type!');
+            this.showEndMessage();
+        }
+        const generateFile = `_${this._type}s.scss`;
+        const fileName = this._getFileName();
+        const file = resolve(this.package.getProjectRoot(), directoryPath, generateFile);
+
+        if (fs.existsSync(file)) output = fs.readFileSync(file, 'utf8') + '\n';
+        output += `@import '../../../${directory}/${this._type}s/${fileName}/${fileName}';`;
+
+        try {
+            fs.writeFileSync(file, output, 'utf8');
+            this.inlineLogSuccess(`Updated SCSS file: '${generateFile}' in dir '${directoryPath}'`)
+        } catch (exception) {
+            this.inlineLogError(exception);
+            this.showEndMessage();
+        }
+    }
+
+    _getDirectoryPath() {
+        let directory;
+
+        if (this.isWPPackage()) directory = 'template-views';
+        else {
+            this.consoleLogError('Unknown package type!');
+            this.showEndMessage();
+        }
+        const directoryPath = this._createDirectoryPath(directory);
+
+        if (fs.existsSync(directoryPath)) {
+            this.consoleLogWarning(`ERROR: ${this._type} '${_startCase(this._name).replace(/[\s]+/g, '-').toLowerCase()}' already exists!`);
+            this.showEndMessage();
+        }
+        return directoryPath;
+    }
+
+    _createDirectoryPath(directory) {
+        return resolve(this.package.getProjectRoot(), directory + '/' + this._type + 's/' + this._getFileName());
+    }
+
+    _createDirectory(directory) {
+        try {
+            fs.mkdirSync(directory);
+        } catch (exception) {
+            this.inlineLogError(exception);
+            this.showEndMessage();
+        }
+    }
+
+    _getFileName() {
+        return _startCase(this._name).replace(/[\s]+/g, '-').toLowerCase();
     }
 }
