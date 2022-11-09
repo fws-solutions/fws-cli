@@ -24,7 +24,6 @@ export default class BaseCommand {
         if (!(definition instanceof CommandDefinition)) throw new Error('Missing command definition!')
         this._definition = definition;
         this._setPackage();
-        this._setSpinner();
         this._setProgressBar();
     }
 
@@ -45,7 +44,7 @@ export default class BaseCommand {
     }
 
     getApplicationEnvDirectory() {
-        return resolve(this.getApplicationRoot(), 'base/env');
+        return resolve(this.getApplicationRoot(), 'base/source/env');
     }
 
     // Logging and error handling
@@ -133,8 +132,8 @@ export default class BaseCommand {
         if (endScript) process.exit(1);
     }
 
-    _setSpinner() {
-        this._spinner = new Spinner.Spinner(colors.yellow('Loading WP REST API... %s'));
+    setSpinner(title) {
+        this._spinner = new Spinner.Spinner(colors.yellow(title));
         this._spinner.setSpinnerString('|/-\\');
     }
 
@@ -165,8 +164,6 @@ export default class BaseCommand {
 
     compileTemplate(templateFile, data) {
         const template = readFileSync(resolve(this.getApplicationTemplateDirectory(), templateFile), 'utf8');
-        const templateCompiler = _template(template);
-
-        return templateCompiler(data);
+        return _template(template)(data);
     }
 }
