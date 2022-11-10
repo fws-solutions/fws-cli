@@ -27,6 +27,56 @@ export default class BaseCommand {
         this._setProgressBar();
     }
 
+    hasParameter(name) {
+        let hasParameter = false;
+        this._definition.mandatoryParameters.forEach((parameter) => {
+            if (parameter.name === name) hasParameter = true;
+        });
+        return hasParameter;
+    }
+
+    getParameter(name) {
+        let value = undefined;
+        this._definition.mandatoryParameters.forEach((parameter) => {
+            if (parameter.name === name) value = parameter.value;
+        });
+        return value;
+    }
+
+    validateInputParameters() {
+        this
+            ._validateMandatoryParameters()
+            ._validateOptionalParameters();
+    }
+
+    _validateMandatoryParameters() {
+        this._definition.mandatoryParameters.forEach((parameter) => {
+            if (parameter.hasAvailableValues() && parameter.availableValues.indexOf(parameter.value) < 0) {
+                this.consoleLogError(`Value out of bounds for parameter ${parameter.name}!`);
+                this.showEndMessage();
+            }
+        });
+        return this;
+    }
+
+    _validateOptionalParameters() {
+        this._definition.optionalParameters.forEach((parameter) => {
+            if (parameter.hasAvailableValues() && parameter.hasValue() && parameter.availableValues.indexOf(parameter.value) < 0) {
+                this.consoleLogError(`Value out of bounds for parameter ${parameter.name}!`);
+                this.showEndMessage();
+            }
+        });
+        return this;
+    }
+
+    validateCorrectPackage(condition) {
+        if (!condition) {
+            this.consoleLogError('Wrong package type!')
+            this.showEndMessage();
+        }
+        return this;
+    }
+
     getDefinition() {
         return this._definition;
     }
@@ -119,17 +169,13 @@ export default class BaseCommand {
         return this._package instanceof NextPackage;
     }
 
-    showStartMessage(message){
-        this.inlineLogSuccess(message === undefined
-            ? `Starting ${this.getDefinition().name}...`
-            : message);
+    showStartMessage(){
+        this.inlineLogSuccess(`Starting ${this.getDefinition().name}...`);
     }
 
-    showEndMessage(message, endScript = true){
-        this.inlineLogSuccess(message === undefined
-            ? `Finished ${this.getDefinition().name}`
-            : message);
-        if (endScript) process.exit(1);
+    showEndMessage(){
+        this.inlineLogSuccess(`Finished ${this.getDefinition().name}`);
+        process.exit(1);
     }
 
     setSpinner(title) {

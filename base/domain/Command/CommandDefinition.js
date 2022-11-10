@@ -1,8 +1,11 @@
+import ParameterDefinition from "../Parameter/ParameterDefinition.js";
+
 export default class CommandDefinition {
     _mandatoryParameters = [];
     _optionalParameters = [];
     _name;
     _description;
+    _alias;
 
     constructor(name, description) {
         this._name = name;
@@ -17,6 +20,19 @@ export default class CommandDefinition {
         return this._description;
     }
 
+    get alias() {
+        return this._alias;
+    }
+
+    hasAlias() {
+        return this._alias !== undefined;
+    }
+
+    setAlias(value) {
+        this._alias = value;
+        return this;
+    }
+
     get mandatoryParameters() {
         return this._mandatoryParameters;
     }
@@ -25,8 +41,11 @@ export default class CommandDefinition {
         return this._mandatoryParameters.length > 0;
     }
 
-    setMandatoryParameters(...value) {
-        this._mandatoryParameters = value;
+    setMandatoryParameters(...parameters) {
+        parameters.forEach((parameter) => {
+            if (!(parameter instanceof ParameterDefinition)) throw new Error(`Trying to inject something else instead of ParameterDefinition for mandatory command parameter!`);
+        });
+        this._mandatoryParameters = parameters;
         return this;
     }
 
@@ -38,8 +57,11 @@ export default class CommandDefinition {
         return this._optionalParameters.length > 0;
     }
 
-    setOptionalParameters(...value) {
-        this._optionalParameters = value;
+    setOptionalParameters(...parameters) {
+        parameters.forEach((parameter) => {
+            if (!(parameter instanceof ParameterDefinition)) throw new Error(`Trying to inject something else instead of ParameterDefinition for optional command parameter!`);
+        });
+        this._optionalParameters = parameters;
         return this;
     }
 }

@@ -28,18 +28,33 @@ readdir(commands, async function (err, files) {
 
         const commandName = module.getDefinition().name;
         const mandatoryParameters = module.getDefinition().hasMandatoryParameters()
-            ? module.getDefinition().mandatoryParameters.map((parameter) => `<${parameter}>`).reduce((accumulator, parameter) => `${accumulator} ${parameter}`)
+            ? module.getDefinition().mandatoryParameters.map((parameter) => `<${parameter.name}>`).reduce((accumulator, parameterName) => `${accumulator} ${parameterName}`)
             : '';
         const optionalParameters = module.getDefinition().hasOptionalParameters()
-            ? module.getDefinition().optionalParameters.map((parameter) => `[${parameter}]`).reduce((accumulator, parameter) => `${accumulator} ${parameter}`)
+            ? module.getDefinition().optionalParameters.map((parameter) => `[${parameter.name}]`).reduce((accumulator, parameterName) => `${accumulator} ${parameterName}`)
+            : '';
+        const alias = module.getDefinition().hasAlias()
+            ? module.getDefinition().alias
             : '';
 
         program
             .command(`${commandName} ${mandatoryParameters} ${optionalParameters}`)
             .description(module.getDefinition().description)
             .action(async (...parameters) => {
-                module.run(...parameters);
-            });
+                const mandatoryValues = parameters.slice(0, module.getDefinition().mandatoryParameters.length);
+                const optionalValues = parameters.slice(module.getDefinition().mandatoryParameters.length, module.getDefinition().mandatoryParameters.length + module.getDefinition().optionalParameters.length);
+                for (let i = 0; i < mandatoryValues.length; i++) {
+                    module.getDefinition().mandatoryParameters[i].setValue(mandatoryValues[i]);
+                }
+                for (let i = 0; i < optionalValues.length; i++) {
+                    module.getDefinition().optionalParameters[i].setValue(optionalValues[i]);
+                }
+                module.showStartMessage();
+                module.validateInputParameters();
+                await module.run();
+                module.showEndMessage();
+            })
+            .alias(alias);
     }
 
     program.parse(process.argv);
