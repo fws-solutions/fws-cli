@@ -1,11 +1,14 @@
 import BaseCommand from "../base/domain/Command/BaseCommand.js";
 import CommandDefinition from "../base/domain/Command/CommandDefinition.js";
+import ParameterDefinition from "../base/domain/Parameter/ParameterDefinition.js";
 
 export default class StarterNext extends BaseCommand {
     constructor() {
         super(
             new CommandDefinition('starter-next', 'Initializes a NextJS project from scratch.')
-                .setMandatoryParameters('project-name')
+                .setMandatoryParameters(
+                    new ParameterDefinition('project-name'),
+                )
         );
     }
 

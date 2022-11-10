@@ -11,9 +11,7 @@ export default class Postinstall extends BaseCommand {
     }
 
     run() {
-        this.showStartMessage();
         this._createEnv();
-        this.showEndMessage();
     }
 
     _createEnv() {
@@ -36,23 +34,23 @@ export default class Postinstall extends BaseCommand {
         if (!fs.existsSync(exampleEnv)) {
             try {
                 fs.copyFileSync(template, exampleEnv);
-                this.inlineLogSuccess(`Generated .env.example file in the root of the ${message}.`);
+                this.consoleLogSuccess(`Generated '.env.example' file in the root of the ${message}.`);
             } catch (exception) {
                 this.inlineLogError(exception);
             }
         } else {
-            this.inlineLogWarning(`WARNING: .env.example already exists!`);
+            this.consoleLogWarning(`WARNING: '.env.example' already exists!`);
         }
 
         if (!fs.existsSync(env)) {
             try {
                 fs.copyFileSync(template, env);
-                this.inlineLogSuccess(`Generated .env file in the root of the ${message}. Please configure your local environment.`);
+                this.consoleLogSuccess(`Generated '.env file' in the root of the ${message}. Please configure your local environment.`);
             } catch (exception) {
                 this.inlineLogError(exception);
             }
         } else {
-            this.inlineLogWarning(`WARNING: .env already exists!`);
+            this.consoleLogWarning(`WARNING: '.env' already exists!`);
         }
     }
 }

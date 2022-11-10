@@ -5,33 +5,32 @@ import { spawn } from 'child_process';
 export default class Npm extends BaseCommand {
     constructor() {
         super(
-            new CommandDefinition('npm-i', 'install node modules')
+            new CommandDefinition( 'npm-i', 'install node modules')
+                .setAlias('i')
         );
     }
 
     run() {
-        this.showStartMessage();
-        this._npmInstall();
+         this._npmInstall();
     }
 
-    _npmInstall() {
-        const path = this.package.getProjectRoot();
+     _npmInstall() {
         this.setSpinner('%s ...getting ready for \'npm install\'...');
         this.startSpinner();
 
-        setTimeout(() => {
+        setTimeout(async () => {
             this.stopSpinner();
 
             const config = {
                 stdio: 'inherit',
-                cwd: path
+                cwd: this.package.getProjectRoot()
             };
-            const command = /^win/.test(process.platform)? 'npm.cmd' : 'npm';
-            const script = spawn(command, ['i'], config);
+
+            const command = /^win/.test(process.platform) ? 'npm.cmd' : 'npm';
+            const script = await spawn(command, ['i'], config);
 
             script.on('close', () => {
-                this.consoleLogSuccess(`node_modules installed in the root '${path}'.`);
-                this.showEndMessage();
+                this.consoleLogSuccess(`node_modules installed in the root '${this.package.getProjectRoot()}'.`);
             });
         }, 1500);
     }
