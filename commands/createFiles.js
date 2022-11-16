@@ -35,6 +35,7 @@ export default class CreateFiles extends BaseCommand {
                     ._createFile('php-fe', '_fe-', 'php', directoryPath)
                     ._createFile('scss', '', 'scss', directoryPath)
                     ._updateScssFile();
+                    // when adding any new method below, modify rollBack for updateScssFile method
             } else if (this.getParameter('type') === 'block-vue' || this.getParameter('type') === 'part-vue') {
                 this.validateCorrectPackage(this.isWPPackage() || this.isVuePackage() || this.isNuxtPackage())
                     ._checkVueComponentExists()
