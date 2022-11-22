@@ -6,12 +6,12 @@ import {readFileSync} from 'fs';
 import _template from 'lodash.template';
 import {resolve, dirname} from 'path';
 import {fileURLToPath} from 'url';
-import WordPressPackage from "../Package/WordPress/WordPressPackage.js";
-import VuePackage from "../Package/WordPress/VuePackage.js";
-import NuxtPackage from "../Package/WordPress/NuxtPackage.js";
+import WordPressPackage from "../Package/WordPressPackage.js";
+import VuePackage from "../Package/VuePackage.js";
+import NuxtPackage from "../Package/NuxtPackage.js";
 import Spinner from 'cli-spinner';
 import CliProgress from 'cli-progress';
-import NextPackage from "../Package/WordPress/NextPackage.js";
+import NextPackage from "../Package/NextPackage.js";
 
 
 export default class BaseCommand {
