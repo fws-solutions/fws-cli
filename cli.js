@@ -7,6 +7,10 @@ import { Command } from 'commander';
 import BaseCommand from "./base/domain/Command/BaseCommand.js";
 import fancyLog from'fancy-log';
 import colors from 'ansi-colors';
+import WordPressPackage from "./base/domain/Package/WordPressPackage.js";
+import VuePackage from "./base/domain/Package/VuePackage.js";
+import NuxtPackage from "./base/domain/Package/NuxtPackage.js";
+import { spawn } from 'child_process';
 
 const program = new Command();
 program.version('1.0.0');
@@ -55,6 +59,33 @@ readdir(commands, async function (err, files) {
                 module.showEndMessage();
             })
             .alias(alias);
+    }
+    let currentPackage;
+
+    if (new WordPressPackage().is()) currentPackage = new WordPressPackage();
+    else if (new VuePackage().is()) currentPackage = new VuePackage();
+    else if (new NuxtPackage().is()) currentPackage = new NuxtPackage();
+
+    const packageJson = currentPackage.getPackageJson();
+    for (const command in packageJson.scripts) {
+        if (command === 'postinstall') continue;
+        program
+            .command(`${command}`)
+            .description(`${packageJson.scripts[command]}`)
+            .action(async () => {
+                const script = spawn(
+                    /^win/.test(process.platform) ? 'npm.cmd' : 'npm',
+                    ['run', command],
+                    {
+                        stdio: 'inherit',
+                        cwd: currentPackage.getProjectRoot()
+                    }
+                );
+                script.on('close', (code) => {
+                    process.exit(code);
+                });
+            })
+            .alias();
     }
 
     program.parse(process.argv);
