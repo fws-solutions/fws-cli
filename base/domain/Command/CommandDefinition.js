@@ -6,6 +6,7 @@ export default class CommandDefinition {
     _name;
     _description;
     _alias;
+    _isStandAlone = false;
 
     constructor(name, description) {
         this._name = name;
@@ -62,6 +63,15 @@ export default class CommandDefinition {
             if (!(parameter instanceof ParameterDefinition)) throw new Error(`Trying to inject something else instead of ParameterDefinition for optional command parameter!`);
         });
         this._optionalParameters = parameters;
+        return this;
+    }
+
+    get isStandAlone() {
+        return this._isStandAlone;
+    }
+
+    setIsStandAlone(value) {
+        this._isStandAlone = value;
         return this;
     }
 }

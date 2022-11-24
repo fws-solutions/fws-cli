@@ -53,10 +53,10 @@ readdir(commands, async function (err, files) {
                 for (let i = 0; i < optionalValues.length; i++) {
                     module.getDefinition().optionalParameters[i].setValue(optionalValues[i]);
                 }
-                module.showStartMessage();
+                if (!module.getDefinition().isStandAlone) module.showStartMessage();
                 module.validateInputParameters();
                 await module.run();
-                module.showEndMessage();
+                if (!module.getDefinition().isStandAlone) module.showEndMessage();
             })
             .alias(alias);
     }
@@ -72,7 +72,7 @@ readdir(commands, async function (err, files) {
         program
             .command(`${command}`)
             .description(`${packageJson.scripts[command]}`)
-            .action(async () => {
+            .action(() => {
                 const script = spawn(
                     /^win/.test(process.platform) ? 'npm.cmd' : 'npm',
                     ['run', command],
@@ -84,8 +84,7 @@ readdir(commands, async function (err, files) {
                 script.on('close', (code) => {
                     process.exit(code);
                 });
-            })
-            .alias();
+            });
     }
 
     program.parse(process.argv);
