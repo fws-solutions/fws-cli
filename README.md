@@ -76,5 +76,15 @@ Ovo ce skenirati i izlistati sve dostupne komande sa njihovim specifikacijama.
 Aplikacija moze da se pokrene sa bilo koje lokacije s tim da se kuca relativna putanja sa lokacije do cli.js. Ovo omogucava da se iz nekog specificnog projekta pokrene aplikacija a da se ona tokom razvoja ne nalazi u tom projektu.
 node ../../fws-cli/cli.js svg man1 man2 opt1
 
+Najlaksi nacin za testiranje paketa je njegovo linkovanje. Linkovanje paketa se izvodi na sledeci nacin. 
+Za pocetak je potrebno klonirati repozitorijum. 
+Nakon toga se u 'package.json' izmeni "name", na primer (@fws/cli-test) da ne bi doslo do konflikta sa vec instaliranim paketom.
+Isto to je potrebno uraditi i unutar "bin" objekta za "fws" atribut, na primer (fws-test).
+Kada je package.json izmenjen, potrebno je otvoriti terminal na putanji kloniranog repozitorijuma i za pocetak instalirati node_modules.
+Nakon sto je to odradjeno, na istoj putanji je potrebno pokrenuti komandu 'npm link'. 
+I na taj nacin bi trebalo da je paket linkovan sa komandom koja je definisana unutar package.json u objektu "bin".
+Sa komandom 'npm list --global --depth=0' mogu da se provere svi paketi i samim tim da se proveri da li je paket dobro linkovan.
+Paket se unlinkuje sa komandom 'npm unlink' na putanji na kojoj je i linkovan.
+
 Literatura
 https://docs.npmjs.com/cli/v8/configuring-npm/package-json#bin
