@@ -181,14 +181,17 @@ export default class BaseCommand {
     setSpinner(title) {
         this._spinner = new Spinner.Spinner(colors.yellow(title));
         this._spinner.setSpinnerString('|/-\\');
+        return this;
     }
 
     startSpinner(){
         this._spinner.start();
+        return this;
     }
 
     stopSpinner(){
         this._spinner.stop();
+        return this;
     }
 
     _setProgressBar() {
