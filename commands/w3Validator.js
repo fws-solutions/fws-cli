@@ -12,6 +12,7 @@ export default class W3Validator extends BaseCommand {
     _errorCount = 0;
     _errorReport = '';
     _barCount = 0;
+    _urlAddress;
 
     constructor() {
         super(
@@ -24,9 +25,10 @@ export default class W3Validator extends BaseCommand {
     }
 
     async run() {
-        this._validateUrlAddress();
-        this.setSpinner('Loading WP REST API... %s');
-        this.startSpinner();
+        this._setUrlAddress()
+            ._validateUrlAddress()
+            .setSpinner('Loading WP REST API... %s')
+            .startSpinner();
         await this._validatePages(
             await this._getPages(
                 await this._getPostTypes()
@@ -35,17 +37,25 @@ export default class W3Validator extends BaseCommand {
         this._endProcess();
     }
 
+    _setUrlAddress() {
+        this._urlAddress = this.getParameter('url') === 'local'
+            ? process.env.VIRTUAL_HOST_URL
+            : this.getParameter('url');
+        return this;
+    }
+
     _validateUrlAddress() {
-        if (!isUrl(this.getParameter('url'))) {
-            this.inlineLogError(`The passed argument '${this.getParameter('url')}' is not an URL.`);
+        if (!isUrl(this._urlAddress)) {
+            this.inlineLogError(`The passed argument '${this._urlAddress}' is not an URL.`);
             this.showEndMessage();
         }
+        return this;
     }
 
     async _getPostTypes() {
         try {
-           const types = await axios.get(`${this.getParameter('url')}/wp-json/wp/v2/types`);
-           let filteredTypes = [`${this.getParameter('url')}/wp-json/wp/v2/pages?per_page=100`];
+           const types = await axios.get(`${this._urlAddress}/wp-json/wp/v2/types`);
+           let filteredTypes = [`${this._urlAddress}/wp-json/wp/v2/pages?per_page=100`];
            forOwn(types.data, function(value) {
                // exclude unneeded types
                if (value.slug !== 'attachment' && value.slug !== 'wp_block' && value.slug !== 'page'
@@ -57,11 +67,11 @@ export default class W3Validator extends BaseCommand {
 
        } catch (exception) {
            this.stopSpinner();
-           if (exception.code === 'ENOTFOUND') this.inlineLogError(`The URL '${this.getParameter('url')}' that you are trying to reach is unavailable or wrong.`);
+           if (exception.code === 'ENOTFOUND') this.inlineLogError(`The URL '${this._urlAddress}' that you are trying to reach is unavailable or wrong.`);
            else {
                if (exception.response && exception.response.status && exception.response.statusText)
                    this.inlineLogError(`Error ${exception.response.status}: ${exception.response.statusText}!
-                                   W3 Validator couldn't scan URL '${this.getParameter('url')}'.
+                                   W3 Validator couldn't scan URL '${this._urlAddress}'.
                                    Please check if this URL is a WP site and if 'wp-json' routes are available.`);
                else this.inlineLogError(exception);
            }

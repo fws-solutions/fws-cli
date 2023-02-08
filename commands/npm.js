@@ -7,6 +7,7 @@ export default class Npm extends BaseCommand {
         super(
             new CommandDefinition( 'npm-i', 'install node modules')
                 .setAlias('i')
+                .setIsStandAlone(true)
         );
     }
 
@@ -15,23 +16,27 @@ export default class Npm extends BaseCommand {
     }
 
      _npmInstall() {
-        this.setSpinner('%s ...getting ready for \'npm install\'...');
-        this.startSpinner();
+        const config = {
+            stdio: 'inherit',
+            cwd: this.package.getProjectRoot()
+        };
 
-        setTimeout(async () => {
-            this.stopSpinner();
+        const command = /^win/.test(process.platform) ? 'npm.cmd' : 'npm';
+        const script =  spawn(command, ['i'], config);
 
-            const config = {
-                stdio: 'inherit',
-                cwd: this.package.getProjectRoot()
-            };
-
-            const command = /^win/.test(process.platform) ? 'npm.cmd' : 'npm';
-            const script = await spawn(command, ['i'], config);
-
-            script.on('close', () => {
-                this.consoleLogSuccess(`node_modules installed in the root '${this.package.getProjectRoot()}'.`);
-            });
-        }, 1500);
+        script.on('close', (code) => {
+            switch (code){
+                case 1:
+                    this.consoleLogError(`Install failed!`);
+                    break;
+                case 0:
+                    this.consoleLogSuccess(`node_modules installed in the root '${this.package.getProjectRoot()}'.`);
+                    break;
+                default :
+                    this.consoleLogWarning(`Unknown install state! Response code: ${code}`);
+                    break;
+            }
+            process.exit(code);
+        });
     }
 }
