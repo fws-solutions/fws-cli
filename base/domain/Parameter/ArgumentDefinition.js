@@ -1,10 +1,15 @@
-export default class ParameterDefinition {
+// List of reserved names which cannot be used to define 'commander' options
+export const ARGUMENT_RESERVED_NAMES = [
+    // Unknown reserved names at the moment. Extend the list if necessary.
+];
+export default class ArgumentDefinition {
     _name;
-    _shortName;
+    _description = '';
     _availableValues;
     _value;
 
     constructor(name) {
+        if (ARGUMENT_RESERVED_NAMES.includes(name)) throw new Error(`Trying to use a reserved name for the argument parameter: ${name}`);
         this._name = name;
     }
 
@@ -12,16 +17,12 @@ export default class ParameterDefinition {
         return this._name;
     }
 
-    get shortName() {
-        return this._shortName;
+    get description() {
+        return this._description;
     }
 
-    hasShortName() {
-        return this._shortName !== undefined;
-    }
-
-    setShortName(value) {
-        this._shortName = value;
+    setDescription(value) {
+        this._description = value;
         return this;
     }
 
@@ -39,6 +40,7 @@ export default class ParameterDefinition {
     }
 
     get value() {
+        if (this._isFlag && this._value === undefined) return false;
         return this._value;
     }
 

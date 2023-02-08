@@ -1,8 +1,11 @@
-import ParameterDefinition from "../Parameter/ParameterDefinition.js";
+import OptionDefinition from "../Parameter/OptionDefinition.js";
+import ArgumentDefinition from "../Parameter/ArgumentDefinition.js";
 
 export default class CommandDefinition {
-    _mandatoryParameters = [];
-    _optionalParameters = [];
+    _mandatoryOptions = [];
+    _optionalOptions = [];
+    _mandatoryArguments = [];
+    _optionalArguments = [];
     _name;
     _description;
     _alias;
@@ -33,35 +36,53 @@ export default class CommandDefinition {
         return this;
     }
 
-    get mandatoryParameters() {
-        return this._mandatoryParameters;
+    get mandatoryArguments() {
+        return this._mandatoryArguments;
     }
 
-    hasMandatoryParameters() {
-        return this._mandatoryParameters.length > 0;
+    hasMandatoryArguments() {
+        return this._mandatoryArguments.length > 0;
+    }
+
+    get mandatoryOptions() {
+        return this._mandatoryOptions;
+    }
+
+    hasMandatoryOptions() {
+        return this._mandatoryOptions.length > 0;
     }
 
     setMandatoryParameters(...parameters) {
         parameters.forEach((parameter) => {
-            if (!(parameter instanceof ParameterDefinition)) throw new Error(`Trying to inject something else instead of ParameterDefinition for mandatory command parameter!`);
+            if (parameter instanceof OptionDefinition) this._mandatoryOptions.push(parameter);
+            else if (parameter instanceof ArgumentDefinition) this._mandatoryArguments.push(parameter);
+            else throw new Error(`Trying to inject something else instead of OptionDefinition or ArgumentDefinition for mandatory command parameter!`);
         });
-        this._mandatoryParameters = parameters;
         return this;
     }
 
-    get optionalParameters() {
-        return this._optionalParameters;
+    get optionalArguments() {
+        return this._optionalArguments;
     }
 
-    hasOptionalParameters() {
-        return this._optionalParameters.length > 0;
+    hasOptionalArguments() {
+        return this._optionalArguments.length > 0;
+    }
+
+    get optionalOptions() {
+        return this._optionalOptions;
+    }
+
+    hasOptionalOptions() {
+        return this._optionalOptions.length > 0;
     }
 
     setOptionalParameters(...parameters) {
         parameters.forEach((parameter) => {
-            if (!(parameter instanceof ParameterDefinition)) throw new Error(`Trying to inject something else instead of ParameterDefinition for optional command parameter!`);
+            if (parameter instanceof OptionDefinition) this._optionalOptions.push(parameter);
+            else if (parameter instanceof ArgumentDefinition) this._optionalArguments.push(parameter);
+            else throw new Error(`Trying to inject something else instead of OptionDefinition or ArgumentDefinition for optional command parameter!`);
         });
-        this._optionalParameters = parameters;
         return this;
     }
 }

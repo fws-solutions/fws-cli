@@ -3,7 +3,8 @@ import BaseCommand from "../base/domain/Command/BaseCommand.js";
 import {resolve} from "path";
 import fs from "fs";
 import _startCase from "lodash.startcase";
-import ParameterDefinition from "../base/domain/Parameter/ParameterDefinition.js";
+import OptionDefinition from "../base/domain/Parameter/OptionDefinition.js";
+import ArgumentDefinition from "../base/domain/Parameter/ArgumentDefinition.js";
 
 export default class CreateFiles extends BaseCommand {
     _fileName;
@@ -20,10 +21,34 @@ export default class CreateFiles extends BaseCommand {
                     new ParameterDefinition('type').setAvailableValues(['block', 'listing', 'part', 'block-vue', 'part-vue'])
                 )
                 .setAlias('cf')
+                // .setMandatoryParameters(
+                //     new ArgumentDefinition('name').setDescription('neki diskripshn').setAvailableValues(['nejmuan', 'something']),
+                //     new OptionDefinition('n', 'some-name').setDescription('deskripcion'),
+                // )
+                // .setOptionalParameters(
+                //     new ArgumentDefinition('opshnl-parametr').setDescription('neki adr diskripshn').setAvailableValues(['block', 'listing', 'part', 'block-vue', 'part-vue']),
+                //     new ArgumentDefinition('opshnl2-parametr').setDescription('neki adr diskripshn').setAvailableValues(['block', 'listing', 'part', 'block-vue', 'part-vue']),
+                //     new OptionDefinition('b', 'block').isFlag(),
+                //     new OptionDefinition('l', 'listing').isFlag(),
+                //     new OptionDefinition('p', 'part').isFlag(),
+                //     new OptionDefinition('bv', 'block-vue').isFlag(),
+                //     new OptionDefinition('pv', 'part-vue').isFlag()
+                // )
+                // .setAlias('cf')
         );
     }
 
     run() {
+        // console.log(this.getParameter('name'));
+        // console.log(this.getParameter('opshnl-parametr'));
+        // console.log(this.getParameter('opshnl2-parametr'));
+        // console.log(this.getParameter('block'));
+        // console.log(this.getParameter('listing'));
+        // console.log(this.getParameter('part'));
+        // console.log(this.getParameter('block-vue'));
+        // console.log(this.getParameter('part-vue'));
+        // return;
+
         try {
             if (this.getParameter('type') === 'block' || this.getParameter('type') === 'listing' || this.getParameter('type') === 'part') {
                 this.validateCorrectPackage(this.isWPPackage());
@@ -48,14 +73,14 @@ export default class CreateFiles extends BaseCommand {
     }
 
     _getDirectoryNameByType() {
-        switch (this.getParameter('type')) {
-            case 'block' :
-            case 'listing' :
-            case 'part' :
-                return this.getParameter('type');
-            case 'block-vue':
+        switch (true) {
+            case this.getParameter('block') :
+            case this.getParameter('block-vue'):
                 return 'block';
-            case 'part-vue':
+            case this.getParameter('listing') :
+                return 'listing';
+            case this.getParameter('part') :
+            case this.getParameter('part-vue'):
                 return 'part';
         }
     }
@@ -67,7 +92,7 @@ export default class CreateFiles extends BaseCommand {
         else if (this.isNuxtPackage()) vueComponentDir = resolve(this.package.getProjectRoot(), 'components');
         else if (this.isVuePackage()) vueComponentDir = resolve(this.package.getProjectRoot(), 'src/components');
 
-        this._fileName = (_startCase(this._getDirectoryNameByType()) + _startCase(this.getParameter('name'))).replace(/[\s]+/g, '');
+        this._fileName = (_startCase(this._getDirectoryNameByType()) + _startCase(this.getParameter('file-name'))).replace(/[\s]+/g, '');
         this._filePath = resolve(this.package.getProjectRoot(), vueComponentDir + `/${this._getDirectoryNameByType()}s`, `${this._fileName}.vue`);
 
         if (fs.existsSync(this._filePath)) {
@@ -86,7 +111,7 @@ export default class CreateFiles extends BaseCommand {
 
         const data = {
             componentName: this._fileName,
-            componentClass: this.getParameter('name')
+            componentClass: this.getParameter('file-name')
         };
 
         const compiledTemplate =this.compileTemplate(templateFile, data);
@@ -119,7 +144,7 @@ export default class CreateFiles extends BaseCommand {
         const data = {
             componentSrc: `../components/${this.getParameter('type')}s/${this._fileName}`,
             componentName: this._fileName,
-            componentPrettyName: _startCase(this.getParameter('name')),
+            componentPrettyName: _startCase(this.getParameter('file-name')),
             componentPrettyNamePrefix: _startCase(this.getParameter('type')) + ': ',
             componentWrapFluid: true
         };
@@ -189,7 +214,7 @@ export default class CreateFiles extends BaseCommand {
 
     _validateDirectory(directoryPath) {
         if (fs.existsSync(directoryPath)) {
-            this.consoleLogWarning(`ERROR: ${this.getParameter('type')} '${_startCase(this.getParameter('name')).replace(/[\s]+/g, '-').toLowerCase()}' already exists!`);
+            this.consoleLogWarning(`ERROR: ${this.getParameter('type')} '${_startCase(this.getParameter('file-name')).replace(/[\s]+/g, '-').toLowerCase()}' already exists!`);
             this.showEndMessage();
         }
         return this;
@@ -206,7 +231,7 @@ export default class CreateFiles extends BaseCommand {
     }
 
     _getDirectoryName() {
-        return _startCase(this.getParameter('name')).replace(/[\s]+/g, '-').toLowerCase();
+        return _startCase(this.getParameter('file-name')).replace(/[\s]+/g, '-').toLowerCase();
     }
 
     _rollBack() {

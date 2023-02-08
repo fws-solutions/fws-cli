@@ -29,7 +29,16 @@ export default class BaseCommand {
 
     hasParameter(name) {
         let hasParameter = false;
-        this._definition.mandatoryParameters.forEach((parameter) => {
+        this._definition.mandatoryArguments.forEach((parameter) => {
+            if (parameter.name === name) hasParameter = true;
+        });
+        this._definition.optionalArguments.forEach((parameter) => {
+            if (parameter.name === name) hasParameter = true;
+        });
+        this._definition.mandatoryOptions.forEach((parameter) => {
+            if (parameter.name === name) hasParameter = true;
+        });
+        this._definition.optionalOptions.forEach((parameter) => {
             if (parameter.name === name) hasParameter = true;
         });
         return hasParameter;
@@ -37,7 +46,16 @@ export default class BaseCommand {
 
     getParameter(name) {
         let value = undefined;
-        this._definition.mandatoryParameters.forEach((parameter) => {
+        this._definition.mandatoryArguments.forEach((parameter) => {
+            if (parameter.name === name) value = parameter.value;
+        });
+        this._definition.optionalArguments.forEach((parameter) => {
+            if (parameter.name === name) value = parameter.value;
+        });
+        this._definition.mandatoryOptions.forEach((parameter) => {
+            if (parameter.name === name) value = parameter.value;
+        });
+        this._definition.optionalOptions.forEach((parameter) => {
             if (parameter.name === name) value = parameter.value;
         });
         return value;
@@ -45,28 +63,37 @@ export default class BaseCommand {
 
     validateInputParameters() {
         this
-            ._validateMandatoryParameters()
-            ._validateOptionalParameters();
+            ._validateMandatoryArguments()
+            ._validateOptionalArguments()
+            ._validateMandatoryOptions()
+            ._validateOptionalOptions();
     }
 
-    _validateMandatoryParameters() {
-        this._definition.mandatoryParameters.forEach((parameter) => {
-            if (parameter.hasAvailableValues() && parameter.availableValues.indexOf(parameter.value) < 0) {
-                this.consoleLogError(`Value out of bounds for parameter ${parameter.name}!`);
-                this.showEndMessage();
-            }
-        });
+    _validateMandatoryArguments() {
+        this._definition.mandatoryArguments.forEach((parameter) => this._validateParameter(parameter));
         return this;
     }
 
-    _validateOptionalParameters() {
-        this._definition.optionalParameters.forEach((parameter) => {
-            if (parameter.hasAvailableValues() && parameter.hasValue() && parameter.availableValues.indexOf(parameter.value) < 0) {
-                this.consoleLogError(`Value out of bounds for parameter ${parameter.name}!`);
-                this.showEndMessage();
-            }
-        });
+    _validateOptionalArguments() {
+        this._definition.optionalArguments.forEach((parameter) => this._validateParameter(parameter));
         return this;
+    }
+
+    _validateMandatoryOptions() {
+        this._definition.mandatoryOptions.forEach((parameter) => this._validateParameter(parameter));
+        return this;
+    }
+
+    _validateOptionalOptions() {
+        this._definition.optionalOptions.forEach((parameter) => this._validateParameter(parameter));
+        return this;
+    }
+
+    _validateParameter(parameter) {
+        if (parameter.hasAvailableValues() && parameter.hasValue() && parameter.availableValues.indexOf(parameter.value) < 0) {
+            this.consoleLogError(`Value out of bounds for parameter ${parameter.name}!`);
+            this.showEndMessage();
+        }
     }
 
     validateCorrectPackage(condition) {
