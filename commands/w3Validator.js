@@ -5,7 +5,7 @@ import validator from 'html-validator';
 import forOwn from 'lodash.forown'
 import axios from 'axios'
 import colors from "ansi-colors";
-import ParameterDefinition from "../base/domain/Parameter/ParameterDefinition.js";
+import ArgumentDefinition from "../base/domain/Parameter/ArgumentDefinition.js";
 
 export default class W3Validator extends BaseCommand {
     _pageCount = 0;
@@ -18,7 +18,7 @@ export default class W3Validator extends BaseCommand {
         super(
             new CommandDefinition('w3Validator', 'validate via w3 api')
                 .setMandatoryParameters(
-                    new ParameterDefinition('url'),
+                    new ArgumentDefinition('url'),
                 )
                 .setAlias('w3')
         );

@@ -89,9 +89,12 @@ readdir(commands, async function (err, files) {
                     }
                     args.splice(0, module.getDefinition().mandatoryArguments.length)
                 }
-                const inboundOptionalArguments = args || [];
-                for (let index = 0; index < inboundOptionalArguments.length; index++) {
-                    module.getDefinition().optionalArguments[index].setValue(inboundOptionalArguments[index]);
+
+                if (module.getDefinition().hasOptionalArguments()){
+                    const inboundOptionalArguments = args || [];
+                    for (let index = 0; index < inboundOptionalArguments.length; index++) {
+                        module.getDefinition().optionalArguments[index].setValue(inboundOptionalArguments[index]);
+                    }
                 }
 
                 module.getDefinition().mandatoryOptions.forEach((parameter) => {

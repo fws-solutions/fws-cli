@@ -17,40 +17,28 @@ export default class CreateFiles extends BaseCommand {
         super(
             new CommandDefinition('create-file', 'create component files')
                 .setMandatoryParameters(
-                    new ParameterDefinition('name'),
-                    new ParameterDefinition('type').setAvailableValues(['block', 'listing', 'part', 'block-vue', 'part-vue'])
+                    new ArgumentDefinition('file-name'),
+                )
+                .setOptionalParameters(
+                    new OptionDefinition('b', 'block').isFlag(),
+                    new OptionDefinition('l', 'listing').isFlag(),
+                    new OptionDefinition('p', 'part').isFlag(),
+                    new OptionDefinition('B', 'block-vue').isFlag(),
+                    new OptionDefinition('P', 'part-vue').isFlag()
                 )
                 .setAlias('cf')
-                // .setMandatoryParameters(
-                //     new ArgumentDefinition('name').setDescription('neki diskripshn').setAvailableValues(['nejmuan', 'something']),
-                //     new OptionDefinition('n', 'some-name').setDescription('deskripcion'),
-                // )
-                // .setOptionalParameters(
-                //     new ArgumentDefinition('opshnl-parametr').setDescription('neki adr diskripshn').setAvailableValues(['block', 'listing', 'part', 'block-vue', 'part-vue']),
-                //     new ArgumentDefinition('opshnl2-parametr').setDescription('neki adr diskripshn').setAvailableValues(['block', 'listing', 'part', 'block-vue', 'part-vue']),
-                //     new OptionDefinition('b', 'block').isFlag(),
-                //     new OptionDefinition('l', 'listing').isFlag(),
-                //     new OptionDefinition('p', 'part').isFlag(),
-                //     new OptionDefinition('bv', 'block-vue').isFlag(),
-                //     new OptionDefinition('pv', 'part-vue').isFlag()
-                // )
-                // .setAlias('cf')
         );
     }
 
     run() {
-        // console.log(this.getParameter('name'));
-        // console.log(this.getParameter('opshnl-parametr'));
-        // console.log(this.getParameter('opshnl2-parametr'));
-        // console.log(this.getParameter('block'));
-        // console.log(this.getParameter('listing'));
-        // console.log(this.getParameter('part'));
-        // console.log(this.getParameter('block-vue'));
-        // console.log(this.getParameter('part-vue'));
-        // return;
+        if (!this.getParameter('block') && !this.getParameter('listing')   &&
+            !this.getParameter('part')  && !this.getParameter('block-vue') && !this.getParameter('part-vue')) {
+            this.consoleLogWarning(`WARNING: 'no parameters were passed`);
+            return;
+        }
 
         try {
-            if (this.getParameter('type') === 'block' || this.getParameter('type') === 'listing' || this.getParameter('type') === 'part') {
+            if (this.getParameter('block') || this.getParameter('listing') || this.getParameter('part')) {
                 this.validateCorrectPackage(this.isWPPackage());
                 const directoryPath = this._getDirectoryPath();
                 this
@@ -58,10 +46,10 @@ export default class CreateFiles extends BaseCommand {
                     ._createDirectory(directoryPath)
                     ._createFile('php', '', 'php', directoryPath)
                     ._createFile('php-fe', '_fe-', 'php', directoryPath)
-                    ._createFile('scss', '', 'scss', directoryPath)
+                    ._createFile('scss', '_', 'scss', directoryPath)
                     ._updateScssFile();
                     // when adding any new method below, modify rollBack for updateScssFile method
-            } else if (this.getParameter('type') === 'block-vue' || this.getParameter('type') === 'part-vue') {
+            } else if (this.getParameter('block-vue') || this.getParameter('part-vue')) {
                 this.validateCorrectPackage(this.isWPPackage() || this.isVuePackage() || this.isNuxtPackage())
                     ._checkVueComponentExists()
                     ._generateVueFile()
@@ -142,10 +130,10 @@ export default class CreateFiles extends BaseCommand {
         const filePath = resolve(this.package.getProjectRoot(), writeFile + `/${prefix + this._fileName}.stories.js`);
 
         const data = {
-            componentSrc: `../components/${this.getParameter('type')}s/${this._fileName}`,
+            componentSrc: `../components/${this._getDirectoryNameByType()}s/${this._fileName}`,
             componentName: this._fileName,
             componentPrettyName: _startCase(this.getParameter('file-name')),
-            componentPrettyNamePrefix: _startCase(this.getParameter('type')) + ': ',
+            componentPrettyNamePrefix: _startCase(this._getDirectoryNameByType()) + ': ',
             componentWrapFluid: true
         };
 
@@ -156,12 +144,12 @@ export default class CreateFiles extends BaseCommand {
         } catch (exception) {
             throw exception;
         }
-        this.inlineLogSuccess(`New story ${this.getParameter('type')} "${prefix}${this._fileName}.stories.js" is created!`);
+        this.inlineLogSuccess(`New story ${this._getDirectoryNameByType()} "${prefix}${this._fileName}.stories.js" is created!`);
         return this;
     }
 
     _createFile(tempName, prefix, extension, directoryPath) {
-        const template = `temp-${this.getParameter('type')}-${tempName}.txt`;
+        const template = `temp-${this._getDirectoryNameByType()}-${tempName}.txt`;
         const directory = 'template-views';
 
         const directoryName = this._getDirectoryName();
@@ -179,7 +167,7 @@ export default class CreateFiles extends BaseCommand {
         } catch (exception) {
             throw exception;
         }
-        this.inlineLogSuccess(`Created ${extension.toUpperCase()} file: '${fileName}' in dir '${directory}/${this.getParameter('type')}s/${directoryName}'`);
+        this.inlineLogSuccess(`Created ${extension.toUpperCase()} file: '${fileName}' in dir '${directory}/${this._getDirectoryNameByType()}s/${directoryName}'`);
         return this;
     }
 
@@ -189,14 +177,14 @@ export default class CreateFiles extends BaseCommand {
         const directoryPath = 'src/scss/layout';
         const directory = 'template-views';
 
-        const generateFile = `_${this.getParameter('type')}s.scss`;
+        const generateFile = `_${this._getDirectoryNameByType()}s.scss`;
         const fileName = this._getDirectoryName();
         const file = resolve(this.package.getProjectRoot(), directoryPath, generateFile);
 
         if (fs.existsSync(file)) output = fs.readFileSync(file, 'utf8');
 
         output = output.replace(/^(?=\n)$|^\s*|\s*$|\n\n+/gm, "");
-        output += `\n@import '../../../${directory}/${this.getParameter('type')}s/${fileName}/${fileName}';`;
+        output += `\n@import '../../../${directory}/${this._getDirectoryNameByType()}s/${fileName}/${fileName}';`;
 
         try {
             fs.writeFileSync(file, output, 'utf8');
@@ -209,12 +197,12 @@ export default class CreateFiles extends BaseCommand {
 
     _getDirectoryPath() {
         const directory = 'template-views';
-        return resolve(this.package.getProjectRoot(), directory + '/' + this.getParameter('type') + 's/' + this._getDirectoryName());
+        return resolve(this.package.getProjectRoot(), directory + '/' + this._getDirectoryNameByType() + 's/' + this._getDirectoryName());
     }
 
     _validateDirectory(directoryPath) {
         if (fs.existsSync(directoryPath)) {
-            this.consoleLogWarning(`ERROR: ${this.getParameter('type')} '${_startCase(this.getParameter('file-name')).replace(/[\s]+/g, '-').toLowerCase()}' already exists!`);
+            this.consoleLogWarning(`ERROR: ${this._getDirectoryNameByType()} '${_startCase(this.getParameter('file-name')).replace(/[\s]+/g, '-').toLowerCase()}' already exists!`);
             this.showEndMessage();
         }
         return this;
