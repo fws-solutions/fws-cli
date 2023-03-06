@@ -1,5 +1,5 @@
-import {resolve} from 'path';
-import {existsSync, readFileSync} from 'fs';
+import { resolve } from 'path';
+import { existsSync, readFileSync } from 'fs';
 export default class NextPackage {
     is() {
         try {
@@ -14,7 +14,10 @@ export default class NextPackage {
     }
 
     getPackageJson() {
-        const packageJsonFile = existsSync(this.getProjectRoot(), 'package.json')
+        const packageJsonFile = existsSync(
+            this.getProjectRoot(),
+            'package.json'
+        )
             ? resolve(this.getProjectRoot(), 'package.json')
             : resolve(process.cwd(), 'package.json');
 

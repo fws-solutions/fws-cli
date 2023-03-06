@@ -1,18 +1,17 @@
-import CommandDefinition from "./CommandDefinition.js";
+import CommandDefinition from './CommandDefinition.js';
 import fancyLog from 'fancy-log';
 import colors from 'ansi-colors';
 import notifier from 'node-notifier';
-import {readFileSync} from 'fs';
+import { readFileSync } from 'fs';
 import _template from 'lodash.template';
-import {resolve, dirname} from 'path';
-import {fileURLToPath} from 'url';
-import WordPressPackage from "../Package/WordPressPackage.js";
-import VuePackage from "../Package/VuePackage.js";
-import NuxtPackage from "../Package/NuxtPackage.js";
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+import WordPressPackage from '../Package/WordPressPackage.js';
+import VuePackage from '../Package/VuePackage.js';
+import NuxtPackage from '../Package/NuxtPackage.js';
 import Spinner from 'cli-spinner';
 import CliProgress from 'cli-progress';
-import NextPackage from "../Package/NextPackage.js";
-
+import NextPackage from '../Package/NextPackage.js';
 
 export default class BaseCommand {
     _definition;
@@ -21,7 +20,8 @@ export default class BaseCommand {
     _progressBar;
 
     constructor(definition) {
-        if (!(definition instanceof CommandDefinition)) throw new Error('Missing command definition!')
+        if (!(definition instanceof CommandDefinition))
+            throw new Error('Missing command definition!');
         this._definition = definition;
         this._setPackage();
         this._setProgressBar();
@@ -62,43 +62,56 @@ export default class BaseCommand {
     }
 
     validateInputParameters() {
-        this
-            ._validateMandatoryArguments()
+        this._validateMandatoryArguments()
             ._validateOptionalArguments()
             ._validateMandatoryOptions()
             ._validateOptionalOptions();
     }
 
     _validateMandatoryArguments() {
-        this._definition.mandatoryArguments.forEach((parameter) => this._validateParameter(parameter));
+        this._definition.mandatoryArguments.forEach((parameter) =>
+            this._validateParameter(parameter)
+        );
         return this;
     }
 
     _validateOptionalArguments() {
-        this._definition.optionalArguments.forEach((parameter) => this._validateParameter(parameter));
+        this._definition.optionalArguments.forEach((parameter) =>
+            this._validateParameter(parameter)
+        );
         return this;
     }
 
     _validateMandatoryOptions() {
-        this._definition.mandatoryOptions.forEach((parameter) => this._validateParameter(parameter));
+        this._definition.mandatoryOptions.forEach((parameter) =>
+            this._validateParameter(parameter)
+        );
         return this;
     }
 
     _validateOptionalOptions() {
-        this._definition.optionalOptions.forEach((parameter) => this._validateParameter(parameter));
+        this._definition.optionalOptions.forEach((parameter) =>
+            this._validateParameter(parameter)
+        );
         return this;
     }
 
     _validateParameter(parameter) {
-        if (parameter.hasAvailableValues() && parameter.hasValue() && parameter.availableValues.indexOf(parameter.value) < 0) {
-            this.consoleLogError(`Value out of bounds for parameter ${parameter.name}!`);
+        if (
+            parameter.hasAvailableValues() &&
+            parameter.hasValue() &&
+            parameter.availableValues.indexOf(parameter.value) < 0
+        ) {
+            this.consoleLogError(
+                `Value out of bounds for parameter ${parameter.name}!`
+            );
             this.showEndMessage();
         }
     }
 
     validateCorrectPackage(condition) {
         if (!condition) {
-            this.consoleLogError('Wrong package type!')
+            this.consoleLogError('Wrong package type!');
             this.showEndMessage();
         }
         return this;
@@ -151,9 +164,12 @@ export default class BaseCommand {
     }
 
     _consoleLogMessage(message, color) {
-        const template = readFileSync(resolve(this.getApplicationTemplateDirectory(), 'temp-cli-log.txt'), 'utf8');
+        const template = readFileSync(
+            resolve(this.getApplicationTemplateDirectory(), 'temp-cli-log.txt'),
+            'utf8'
+        );
         const compiled = _template(template);
-        fancyLog(colors[color](compiled({message: message})));
+        fancyLog(colors[color](compiled({ message: message })));
     }
 
     notifyError(message) {
@@ -162,7 +178,7 @@ export default class BaseCommand {
             icon: resolve(this.getApplicationRoot(), '/assets/error-icon.png'),
             message: message,
             time: 1000,
-            type: 'error'
+            type: 'error',
         });
     }
 
@@ -171,8 +187,8 @@ export default class BaseCommand {
         else if (new VuePackage().is()) this._package = new VuePackage();
         else if (new NuxtPackage().is()) this._package = new NuxtPackage();
         else {
-            this.consoleLogError('Unknown package type!');
-            process.exit(1);
+            // this.consoleLogError('Unknown package type!');
+            // process.exit(1);
         }
     }
 
@@ -196,11 +212,11 @@ export default class BaseCommand {
         return this._package instanceof NextPackage;
     }
 
-    showStartMessage(){
+    showStartMessage() {
         this.inlineLogSuccess(`Starting ${this.getDefinition().name}...`);
     }
 
-    showEndMessage(){
+    showEndMessage() {
         this.inlineLogSuccess(`Finished ${this.getDefinition().name}`);
         process.exit(1);
     }
@@ -211,18 +227,21 @@ export default class BaseCommand {
         return this;
     }
 
-    startSpinner(){
+    startSpinner() {
         this._spinner.start();
         return this;
     }
 
-    stopSpinner(){
+    stopSpinner() {
         this._spinner.stop();
         return this;
     }
 
     _setProgressBar() {
-        this._progressBar = new CliProgress.SingleBar({}, CliProgress.Presets.shades_classic);
+        this._progressBar = new CliProgress.SingleBar(
+            {},
+            CliProgress.Presets.shades_classic
+        );
     }
 
     startProgressBar(totalValue, startValue) {
@@ -239,7 +258,10 @@ export default class BaseCommand {
     }
 
     compileTemplate(templateFile, data) {
-        const template = readFileSync(resolve(this.getApplicationTemplateDirectory(), templateFile), 'utf8');
+        const template = readFileSync(
+            resolve(this.getApplicationTemplateDirectory(), templateFile),
+            'utf8'
+        );
         return _template(template)(data);
     }
 }

@@ -1,5 +1,5 @@
 export default class StringHelpers {
     static dashCaseToCamelCase(string) {
-        return string.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); });
+        return string.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
     }
 }
