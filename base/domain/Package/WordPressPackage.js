@@ -30,14 +30,8 @@ export default class WordPressPackage {
         const themes = readdirSync(
             resolve(process.cwd(), 'wp-content', 'themes')
         );
-
-        let themeName = '';
-
-        themes.forEach((cur) => {
-            if (cur.slice(0, 4) === 'fws-') {
-                themeName = cur;
-            }
-        });
+        const themeName =
+            themes.find((cur) => cur.slice(0, 4) === 'fws-') || '';
 
         return resolve(process.cwd(), 'wp-content', 'themes', themeName);
     }
