@@ -46,14 +46,28 @@ export default class CreateFiles extends BaseCommand {
                 this.getParameter('listing') ||
                 this.getParameter('part')
             ) {
+                const isGutenberg = this.package.getIsGutenberg() | false;
                 this.validateCorrectPackage(this.isWPPackage());
                 const directoryPath = this._getDirectoryPath();
-                this._validateDirectory(directoryPath)
-                    ._createDirectory(directoryPath)
-                    ._createFile('php', '', 'php', directoryPath)
-                    ._createFile('php-fe', '_fe-', 'php', directoryPath)
-                    ._createFile('scss', '_', 'scss', directoryPath)
-                    ._updateScssFile();
+                isGutenberg
+                    ? this._validateDirectory(directoryPath)
+                          ._createDirectory(directoryPath)
+                          ._createFile('php', '', 'php', directoryPath)
+                          ._createFile('php-fe', '_fe-', 'php', directoryPath)
+                          ._createFile('scss', '', 'scss', directoryPath)
+                          ._createFile(
+                              'json',
+                              'guttenberg-',
+                              'json',
+                              directoryPath
+                          )
+                          ._updateGutenbergJson('guttenberg-', 'json')
+                    : this._validateDirectory(directoryPath)
+                          ._createDirectory(directoryPath)
+                          ._createFile('php', '', 'php', directoryPath)
+                          ._createFile('php-fe', '_fe-', 'php', directoryPath)
+                          ._createFile('scss', '_', 'scss', directoryPath)
+                          ._updateScssFile();
                 // when adding any new method below, modify rollBack for updateScssFile method
             } else if (
                 this.getParameter('block-vue') ||
@@ -233,9 +247,11 @@ export default class CreateFiles extends BaseCommand {
             generateFile
         );
 
-        if (fs.existsSync(file)) output = fs.readFileSync(file, 'utf8');
+        if (fs.existsSync(file))
+            output = fs
+                .readFileSync(file, 'utf8')
+                .replace(/^(?=\n)$|^\s*|\s*$|\n\n+/gm, '');
 
-        output = output.replace(/^(?=\n)$|^\s*|\s*$|\n\n+/gm, '');
         output += `\n@import '../../../${directory}/${this._getDirectoryNameByType()}s/${fileName}/${fileName}';`;
 
         try {
@@ -248,6 +264,28 @@ export default class CreateFiles extends BaseCommand {
         );
         return this;
     }
+
+    _updateGutenbergJson = (prefix, extension) => {
+        const directoryName = this._getDirectoryName();
+        const fileName = `${prefix + directoryName}.${extension}`;
+        const file = `${this._getDirectoryPath()}/${fileName}`;
+        const directoryPath = `template-views/${this._getDirectoryNameByType()}s/${directoryName}`;
+
+        const output = JSON.stringify({
+            test: 'test',
+            version: '1.2.3',
+        });
+
+        try {
+            fs.writeFileSync(file, output, 'utf8');
+        } catch (exception) {
+            throw exception;
+        }
+        this.inlineLogSuccess(
+            `Updated JSON file: '${fileName}' in dir 'template-views/${this._getDirectoryNameByType()}s/${directoryName}'`
+        );
+        return this;
+    };
 
     _getDirectoryPath() {
         const directory = 'template-views';
