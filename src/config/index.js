@@ -106,8 +106,6 @@ module.exports = {
                     .option('-b, --block', 'create template-view block')
                     .option('-p, --part', 'create template-view part')
                     .option('-l, --listing', 'create template-view listing')
-                    .option('-B, --block-vue', 'create vue block')
-                    .option('-P, --part-vue', 'create vue part')
                     .action(function(arg, cmd) {
                         createFiles.init(arg, cmd);
                     });
@@ -154,8 +152,6 @@ module.exports = {
                 helpers.mapCommand(this.program, null, 'dev', 'runs watch task');
                 helpers.mapCommand(this.program, null, 'build-dev', 'runs development build');
                 helpers.mapCommand(this.program, null, 'build', 'runs production build');
-                helpers.mapCommand(this.program, null, 'vue-prod', 'runs production vue build');
-                helpers.mapCommand(this.program, null, 'vue', 'runs development vue build');
                 helpers.mapCommand(this.program, null, 'css', 'compiles CSS files');
                 helpers.mapCommand(this.program, null, 'js', 'compiles JS files');
                 helpers.mapCommand(this.program, null, 'lint-html', 'lint check of HTML files');

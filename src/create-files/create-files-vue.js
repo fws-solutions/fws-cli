@@ -51,10 +51,6 @@ module.exports = {
         let vueCompDir;
         let vueStoryDir;
         switch (this.starter) {
-            case helpers.starterS:
-                vueCompDir = path.join(this.wpThemeDir, 'src/vue/components');
-                vueStoryDir = '';
-                break;
             case helpers.starterNuxt:
                 vueCompDir = path.join(this.projectRoot, 'components');
                 vueStoryDir = path.join(this.projectRoot, 'stories');
@@ -69,7 +65,7 @@ module.exports = {
         this.directoryStory = path.join(vueStoryDir, `${this.isPart ? '2-' : '3-'}${this.fileName}.stories.js`);
 
         // success message
-        this.msgPrefix = this.starter !== helpers.starterS ? 'Vue ' : '';
+        this.msgPrefix = '';
         this.msg = `New ${this.msgPrefix}component ${this.type} "${this.fileName}.vue" is created!`;
     },
 
@@ -78,10 +74,9 @@ module.exports = {
         if (!fs.existsSync(this.directoryFile)) {
             this.generateVueFile();
 
-            if (this.starter !== helpers.starterS) {
-                this.generateVueStory();
-                this.msg += `\n    New story     ${this.type} "${this.isPart ? '2-' : '3-'}${this.fileName}.stories.js" is created!`;
-            }
+            this.generateVueStory();
+            this.msg += `\n    New story     ${this.type} "${this.isPart ? '2-' : '3-'}${this.fileName}.stories.js" is created!`;
+
 
             helpers.consoleLogWarning(this.msg, 'cyan');
         } else {

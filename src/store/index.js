@@ -7,7 +7,7 @@ const parse = require('parse-git-config');
 
 const Store = {
     data: {
-        cliVersion: '0.3.5',
+        cliVersion: '0.3.6',
         isWin: false,
         modulePath: path.dirname(__dirname),
         projectRoot: '',
@@ -85,7 +85,7 @@ const Store = {
             let themeName = '';
 
             themes.forEach(cur => {
-                if (cur.substr(0, 4) === 'fws-') {
+                if (cur.substr(0, 4) === 'fws-' || cur === 'starter_s') {
                     themeName = cur;
                 }
             });
