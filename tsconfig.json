@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
+        "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
+        "strict": true /* Enable all strict type-checking options. */,
+        "noImplicitAny": true /* Enable error reporting for expressions and declarations with an implied 'any' type. */ /* Skip type checking .d.ts files that are included with TypeScript. */,
+        "skipLibCheck": true,
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
+        "target": "ES2015",
+        "resolveJsonModule": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noFallthroughCasesInSwitch": true,
+        "outDir": "./dist",
+        "types": ["node", "jest"],
+        "baseUrl": "./",
+    },
+    "include": ["src/**/*.ts"],
+    "exclude": ["node_modules", "**/*.test.ts"],
+}

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1707149803625" clover="3.2.0">
+  <project timestamp="1707149803625" name="All files">
+    <metrics statements="93" coveredstatements="93" conditionals="75" coveredconditionals="67" methods="21" coveredmethods="21" elements="189" coveredelements="181" complexity="0" loc="93" ncloc="93" packages="3" files="16" classes="16"/>
+    <package name="consts">
+      <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <file name="packageTypes.ts" path="/home/drinkalot/repos/fws-cli-refactor/src/consts/packageTypes.ts">
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="10" count="3" type="stmt"/>
+      </file>
+    </package>
+    <package name="package">
+      <metrics statements="11" coveredstatements="11" conditionals="15" coveredconditionals="13" methods="1" coveredmethods="1"/>
+      <file name="index.ts" path="/home/drinkalot/repos/fws-cli-refactor/src/package/index.ts">
+        <metrics statements="11" coveredstatements="11" conditionals="15" coveredconditionals="13" methods="1" coveredmethods="1"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="8" count="3" type="stmt"/>
+        <line num="9" count="3" type="stmt"/>
+        <line num="10" count="3" type="stmt"/>
+        <line num="11" count="3" type="cond" truecount="7" falsecount="0"/>
+        <line num="12" count="2" type="stmt"/>
+        <line num="21" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="util">
+      <metrics statements="81" coveredstatements="81" conditionals="60" coveredconditionals="54" methods="20" coveredmethods="20"/>
+      <file name="checkIfOneOptionIsPresent.ts" path="/home/drinkalot/repos/fws-cli-refactor/src/util/checkIfOneOptionIsPresent.ts">
+        <metrics statements="8" coveredstatements="8" conditionals="6" coveredconditionals="6" methods="2" coveredmethods="2"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="7" count="4" type="cond" truecount="5" falsecount="0"/>
+        <line num="8" count="1" type="stmt"/>
+        <line num="9" count="3" type="stmt"/>
+        <line num="10" count="3" type="stmt"/>
+        <line num="11" count="3" type="cond" truecount="1" falsecount="0"/>
+        <line num="12" count="6" type="stmt"/>
+        <line num="15" count="3" type="stmt"/>
+      </file>
+      <file name="getAdditionalOptions.ts" path="/home/drinkalot/repos/fws-cli-refactor/src/util/getAdditionalOptions.ts">
+        <metrics statements="6" coveredstatements="6" conditionals="9" coveredconditionals="7" methods="2" coveredmethods="2"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="cond" truecount="7" falsecount="2"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="10" count="1" type="stmt"/>
+      </file>
+      <file name="getAllowedCommands.ts" path="/home/drinkalot/repos/fws-cli-refactor/src/util/getAllowedCommands.ts">
+        <metrics statements="4" coveredstatements="4" conditionals="7" coveredconditionals="6" methods="1" coveredmethods="1"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="5" type="cond" truecount="6" falsecount="1"/>
+        <line num="5" count="4" type="stmt"/>
+      </file>
+      <file name="getAssetsDir.ts" path="/home/drinkalot/repos/fws-cli-refactor/src/util/getAssetsDir.ts">
+        <metrics statements="3" coveredstatements="3" conditionals="4" coveredconditionals="4" methods="1" coveredmethods="1"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="3" count="2" type="stmt"/>
+        <line num="4" count="5" type="cond" truecount="2" falsecount="0"/>
+      </file>
+      <file name="getCommands.ts" path="/home/drinkalot/repos/fws-cli-refactor/src/util/getCommands.ts">
+        <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="8" count="2" type="stmt"/>
+        <line num="9" count="4" type="stmt"/>
+      </file>
+      <file name="getEnvTemplate.ts" path="/home/drinkalot/repos/fws-cli-refactor/src/util/getEnvTemplate.ts">
+        <metrics statements="3" coveredstatements="3" conditionals="4" coveredconditionals="4" methods="1" coveredmethods="1"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="3" type="stmt"/>
+        <line num="3" count="3" type="cond" truecount="2" falsecount="0"/>
+      </file>
+      <file name="getFiles.ts" path="/home/drinkalot/repos/fws-cli-refactor/src/util/getFiles.ts">
+        <metrics statements="15" coveredstatements="15" conditionals="6" coveredconditionals="6" methods="2" coveredmethods="2"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="6" count="2" type="stmt"/>
+        <line num="8" count="2" type="stmt"/>
+        <line num="9" count="5" type="stmt"/>
+        <line num="10" count="5" type="stmt"/>
+        <line num="11" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="12" count="1" type="stmt"/>
+        <line num="13" count="4" type="cond" truecount="4" falsecount="0"/>
+        <line num="14" count="2" type="stmt"/>
+        <line num="18" count="1" type="stmt"/>
+        <line num="19" count="1" type="stmt"/>
+      </file>
+      <file name="getMessageBasedOnCode.ts" path="/home/drinkalot/repos/fws-cli-refactor/src/util/getMessageBasedOnCode.ts">
+        <metrics statements="2" coveredstatements="2" conditionals="4" coveredconditionals="4" methods="1" coveredmethods="1"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="3" type="cond" truecount="2" falsecount="0"/>
+      </file>
+      <file name="getPackageJson.ts" path="/home/drinkalot/repos/fws-cli-refactor/src/util/getPackageJson.ts">
+        <metrics statements="6" coveredstatements="6" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="1" count="3" type="stmt"/>
+        <line num="2" count="3" type="stmt"/>
+        <line num="3" count="2" type="stmt"/>
+        <line num="4" count="2" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+      </file>
+      <file name="getPackageJsonAndRootPath.ts" path="/home/drinkalot/repos/fws-cli-refactor/src/util/getPackageJsonAndRootPath.ts">
+        <metrics statements="13" coveredstatements="13" conditionals="3" coveredconditionals="3" methods="2" coveredmethods="2"/>
+        <line num="1" count="3" type="stmt"/>
+        <line num="2" count="3" type="stmt"/>
+        <line num="9" count="3" type="stmt"/>
+        <line num="10" count="3" type="stmt"/>
+        <line num="11" count="3" type="cond" truecount="1" falsecount="0"/>
+        <line num="12" count="1" type="stmt"/>
+        <line num="13" count="1" type="cond" truecount="1" falsecount="0"/>
+        <line num="14" count="1" type="stmt"/>
+        <line num="15" count="1" type="cond" truecount="1" falsecount="0"/>
+        <line num="16" count="1" type="stmt"/>
+        <line num="23" count="1" type="stmt"/>
+        <line num="25" count="1" type="stmt"/>
+        <line num="26" count="1" type="stmt"/>
+      </file>
+      <file name="getPackageType.ts" path="/home/drinkalot/repos/fws-cli-refactor/src/util/getPackageType.ts">
+        <metrics statements="4" coveredstatements="4" conditionals="7" coveredconditionals="6" methods="1" coveredmethods="1"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="3" count="2" type="stmt"/>
+        <line num="4" count="5" type="cond" truecount="6" falsecount="1"/>
+        <line num="5" count="4" type="stmt"/>
+      </file>
+      <file name="getRequiredOptions.ts" path="/home/drinkalot/repos/fws-cli-refactor/src/util/getRequiredOptions.ts">
+        <metrics statements="6" coveredstatements="6" conditionals="9" coveredconditionals="7" methods="2" coveredmethods="2"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="cond" truecount="7" falsecount="2"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="10" count="1" type="stmt"/>
+      </file>
+      <file name="isWin.ts" path="/home/drinkalot/repos/fws-cli-refactor/src/util/isWin.ts">
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="1" count="2" type="stmt"/>
+      </file>
+      <file name="resolvePackageJson.ts" path="/home/drinkalot/repos/fws-cli-refactor/src/util/resolvePackageJson.ts">
+        <metrics statements="7" coveredstatements="7" conditionals="1" coveredconditionals="1" methods="1" coveredmethods="1"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="2" count="2" type="stmt"/>
+        <line num="4" count="2" type="stmt"/>
+        <line num="5" count="3" type="stmt"/>
+        <line num="6" count="3" type="cond" truecount="1" falsecount="0"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="8" count="1" type="stmt"/>
+      </file>
+    </package>
+  </project>
+</coverage>

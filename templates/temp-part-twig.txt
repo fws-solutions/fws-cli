@@ -1,3 +1,0 @@
-<div class="<%= str %>">
-	<span>{{title}}</span>
-</div><!-- .<%= str %> -->

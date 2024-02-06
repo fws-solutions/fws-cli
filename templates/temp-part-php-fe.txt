@@ -1,3 +1,0 @@
-<div class="<%= str %>">
-	<span><%= str %> title</span>
-</div><!-- .<%= str %> -->
