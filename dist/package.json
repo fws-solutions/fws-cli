@@ -28,12 +28,16 @@
         "commander": "^11.1.0",
         "dotenv": "^16.4.1",
         "fancy-log": "^2.0.0",
-        "lodash.template": "^4.5.0"
+        "figlet": "^1.7.0",
+        "lodash.template": "^4.5.0",
+        "semver": "^7.6.0"
     },
     "devDependencies": {
         "@types/fancy-log": "^2.0.2",
+        "@types/figlet": "^1.5.8",
         "@types/jest": "^29.5.11",
         "@types/lodash.template": "^4.5.3",
+        "@types/semver": "^7.5.6",
         "cpy-cli": "^5.0.0",
         "eslint": "^8.56.0",
         "install": "^0.13.0",
