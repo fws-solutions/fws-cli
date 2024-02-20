@@ -14,4 +14,15 @@ describe('util/getRequiredOptions - testing required options', () => {
         const result = getRequiredOptions(mockCommand);
         expect(result).toEqual([{ command: '-r, --required', description: 'required option' }]);
     });
+    it('should return empty array if no mandatory options', () => {
+        const mockCommand: ICommand = {
+            name: 'test',
+            description: 'test description',
+            alias: 't',
+            additionalOptions: [{ command: '-a, --additional', description: 'additional option' }],
+            run: () => {},
+        };
+        const result = getRequiredOptions(mockCommand);
+        expect(result).toEqual([]);
+    });
 });

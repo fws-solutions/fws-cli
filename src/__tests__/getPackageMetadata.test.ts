@@ -11,6 +11,9 @@ jest.mock('../util/getPackageType');
 jest.mock('../util/getAssetsDir');
 
 describe('package/getPackageMetadata - testing package metadata', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
     it('should return result.isValid as false if json is incorrect', () => {
         (getPackageJsonAndRootPath as jest.Mock).mockReturnValueOnce({ jsonPath: '', rootPath: '' });
         (resolvePackageJson as jest.Mock).mockReturnValueOnce(null);
@@ -24,7 +27,12 @@ describe('package/getPackageMetadata - testing package metadata', () => {
             isValid: false,
         };
         const result = getPackageMetadata();
-        expect(result.isValid).toEqual(expectedResult.isValid);
+        expect(result).toEqual(expectedResult);
+        expect(result.projectRoot).toBe('');
+        expect(result.packageJsonDir).toBe('');
+        expect(getPackageJsonAndRootPath).toHaveBeenCalledTimes(1);
+        expect(resolvePackageJson).toHaveBeenCalledTimes(1);
+        expect(getPackageType).toHaveBeenCalledTimes(1);
     });
 
     it('should return null if package type is unknown', () => {
@@ -44,6 +52,11 @@ describe('package/getPackageMetadata - testing package metadata', () => {
         };
         const result = getPackageMetadata();
         expect(result).toStrictEqual(expectedResult);
+        expect(result.projectRoot).toBe('');
+        expect(result.packageJsonDir).toBe('');
+        expect(getPackageJsonAndRootPath).toHaveBeenCalledTimes(1);
+        expect(resolvePackageJson).toHaveBeenCalledTimes(1);
+        expect(getPackageType).toHaveBeenCalledTimes(1);
     });
 
     it('should return package metadata if all data is available', () => {
@@ -64,6 +77,13 @@ describe('package/getPackageMetadata - testing package metadata', () => {
             isValid: true,
         };
         const result = getPackageMetadata();
-        expect(result).toEqual(expectedResult);
+        console.log(result);
+        expect(result).toStrictEqual(expectedResult);
+        expect(result.projectRoot).toBe(expectedResult.projectRoot);
+        expect(result.packageJsonDir).toBe(expectedResult.packageJsonDir);
+        expect(getPackageJsonAndRootPath).toHaveBeenCalledTimes(1);
+        expect(resolvePackageJson).toHaveBeenCalledTimes(1);
+        expect(getPackageType).toHaveBeenCalledTimes(1);
+        expect(getAssetsDir).toHaveBeenCalledTimes(1);
     });
 });

@@ -2,7 +2,11 @@ import { getAllowedCommands } from '../util/getAllowedCommands';
 
 describe('util/getAllowedCommands - testing allowed commands', () => {
     it('should return empty array if package json is invalid', () => {
-        const packageJson = {};
+        const allowedCommands = getAllowedCommands(null);
+        expect(allowedCommands).toStrictEqual([]);
+    });
+    it("should return empty array if package json doesn't contain forwardslash key", () => {
+        const packageJson = { name: 'test-package' };
         const allowedCommands = getAllowedCommands(packageJson);
         expect(allowedCommands).toStrictEqual([]);
     });

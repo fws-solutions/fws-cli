@@ -19,8 +19,8 @@ export const getPackageMetadata = (): IPackageMetadata => {
         };
 
     return {
-        projectRoot: paths?.rootPath,
-        packageJsonDir: paths?.jsonPath,
+        projectRoot: paths.rootPath,
+        packageJsonDir: paths.jsonPath,
         assetsDir: getAssetsDir(packageType, paths.rootPath),
         packageType: packageType,
         packageJson: packageJson,
