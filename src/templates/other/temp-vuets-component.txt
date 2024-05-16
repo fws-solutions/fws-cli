@@ -1,0 +1,30 @@
+<template>
+    <div class="<%= componentClass %>">
+        <h2>{{title}}</h2>
+    </div>
+</template>
+
+<script lang="ts">
+    import Vue from 'vue';
+
+    interface Data {
+        title: string
+    }
+
+    export default Vue.extend({
+        props: {
+        },
+
+        data(): Data {
+            return {
+                title: 'This is title of "<%= componentName %>"!'
+            };
+        }
+    });
+</script>
+
+<style lang="scss" scoped>
+    .<%= componentClass %> {
+
+    }
+</style>

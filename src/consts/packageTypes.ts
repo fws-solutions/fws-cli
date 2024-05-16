@@ -33,4 +33,8 @@ export const PACKAGE_TYPES: IPackage = {
         type: 'next',
         allowedCommands: ['create-file', 'latest-version', 'npmci', 'npmi', 'w3Validator'],
     },
+    fws_global: {
+        type: 'global',
+        allowedCommands: ['latest-version'],
+    },
 };

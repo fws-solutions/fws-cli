@@ -1,6 +1,19 @@
 import { checkIfOneOptionIsPresent } from '../util/checkIfOneOptionIsPresent';
+import { createFile } from '../util/createFile';
+import { updateScssFile } from '../util/updateScssFile';
 import { ICommand, ICreateFilesOptions } from '../interfaces/interfaces';
 import { getPackageMetadata } from '../package';
+import { getDirType } from '../util/getDirType';
+import { resolve } from 'path';
+import _startCase from 'lodash.startcase';
+import { validateDirectory } from '../util/validateDirectory';
+import { createDirectory } from '../util/createDirectory';
+import { rollBack } from '../util/rollBack';
+import { isVueComponentExist } from '../util/isVueComponentExists';
+import { getVueComponentDirectory } from '../util/getVueComponentDirectory';
+import { generateVueFile } from '../util/generateVueFile';
+import { generateVueStory } from '../util/generateVueStory';
+import { getLogMessage } from '../util/getLogMessage';
 
 const createFiles: ICommand = {
     name: 'create-file',
@@ -30,9 +43,39 @@ const createFiles: ICommand = {
         message && console.error(message);
         shouldExit && process.exit(1);
         const packageMetadata = getPackageMetadata();
-        console.log(packageMetadata);
+        if (!packageMetadata?.isValid) process.exit(1);
 
-        // TODO: finish create files command
+        const type = Object.entries(options)[1][0];
+        const dirName = _startCase(fileName).replace(/[\s]+/g, '-').toLowerCase();
+        const dirType = getDirType(type);
+        const dirPath = resolve(packageMetadata.projectRoot, `template-views/${dirType}s/${dirName}`);
+
+        try {
+            if (['block', 'listing', 'part'].includes(type) && packageMetadata.packageType === 'wp') {
+                validateDirectory(dirPath, `ERROR: ${dirType} '${dirName}' already exists!`);
+                createDirectory(dirPath);
+                createFile(dirName, dirType, 'php', '', 'php', dirPath);
+                createFile(dirName, dirType, 'php-fe', '_fe-', 'php', dirPath);
+                createFile(dirName, dirType, 'scss', '_', 'scss', dirPath);
+                updateScssFile(packageMetadata.projectRoot, dirType, dirName);
+            } else if (['blockVue', 'partVue'].includes(type) && packageMetadata.packageType !== 'wp') {
+                const vueComponentDir = getVueComponentDirectory(packageMetadata);
+                const componentName = (_startCase(dirType) + _startCase(dirName)).replace(/[\s]+/g, '');
+                const filePath = resolve(
+                    packageMetadata.projectRoot,
+                    vueComponentDir + `/${dirType}s`,
+                    `${fileName}.vue`
+                );
+
+                isVueComponentExist(filePath, componentName);
+                generateVueFile(packageMetadata.packageType, componentName, fileName, filePath);
+                generateVueStory(packageMetadata, componentName, dirType, fileName);
+            } else {
+                getLogMessage('Wrong package...', 'yellow');
+            }
+        } catch (exception) {
+            rollBack();
+        }
     },
 };
 

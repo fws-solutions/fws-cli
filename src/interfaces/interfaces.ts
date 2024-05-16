@@ -37,3 +37,29 @@ export interface IPackageMetadata {
     packageJson: Record<string, string> | null;
     isValid: boolean;
 }
+
+export interface ITemplateData {
+    str?: string;
+    componentName?: string;
+    componentClass?: string;
+    componentSrc?: string;
+    componentPrettyName?: string;
+    componentPrettyNamePrefix?: string;
+    componentWrapFluid?: boolean;
+}
+
+export interface IVueStoryTempAndDir {
+    temp: string;
+    dir: string;
+}
+
+export interface ISvgIconData {
+    svgIconFile: string;
+    compiledImportSrc: string;
+    templateFile: string;
+}
+
+export interface ISvgCompile {
+    impStrings: string;
+    compStrings: string;
+}

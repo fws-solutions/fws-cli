@@ -1,14 +1,14 @@
 import { getAllowedCommands } from '../util/getAllowedCommands';
 
 describe('util/getAllowedCommands - testing allowed commands', () => {
-    it('should return empty array if package json is invalid', () => {
+    it('should return latest command only if package json is invalid', () => {
         const allowedCommands = getAllowedCommands(null);
-        expect(allowedCommands).toStrictEqual([]);
+        expect(allowedCommands).toStrictEqual(['latest-version']);
     });
-    it("should return empty array if package json doesn't contain forwardslash key", () => {
+    it("should return latest command only if package json doesn't contain forwardslash key", () => {
         const packageJson = { name: 'test-package' };
         const allowedCommands = getAllowedCommands(packageJson);
-        expect(allowedCommands).toStrictEqual([]);
+        expect(allowedCommands).toStrictEqual(['latest-version']);
     });
     it('should return wp allowed commands if wp package is found', () => {
         const packageJson = { forwardslash: 'fws_starter_s' };
