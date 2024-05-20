@@ -65,8 +65,8 @@ describe('util/handleSvgFile', () => {
 
         handleSvgFile(svgDirPath, icoFile);
 
-        expect(deleteDuplicateIcon).toHaveBeenCalledWith(icoFilePath);
-        expect(unlinkSync).toHaveBeenCalledWith(icoFilePath);
+        expect(deleteDuplicateIcon).not.toHaveBeenCalled();
+        expect(unlinkSync).not.toHaveBeenCalledWith(icoFilePath);
     });
 
     it('should log a message if the file still exists after optimization', () => {

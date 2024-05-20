@@ -22,7 +22,7 @@ export const handleSvgFile = (svgDirPath: string, file: string): void => {
             const result = optimize(readFileSync(filePath, { encoding: 'utf8', flag: 'r' }));
             const newFilePath = renameSvgFiles(svgDirPath, filePath, file);
 
-            if (file.startsWith('ico-')) {
+            if (!file.startsWith('ico-')) {
                 deleteDuplicateIcon(newFilePath);
                 unlinkSync(filePath);
             }

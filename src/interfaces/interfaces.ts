@@ -54,6 +54,7 @@ export interface IVueStoryTempAndDir {
 }
 
 export interface ISvgIconData {
+    dir: string;
     svgIconFile: string;
     compiledImportSrc: string;
     templateFile: string;
