@@ -1,6 +1,6 @@
 {
     "name": "fws-cli",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "description": "CLI meant to work together with other Forwardslash boilerplates.",
     "main": "dist/app.js",
     "engines": {
