@@ -1,6 +1,8 @@
-const fs = require('node:fs/promises');
-const hookPath = './hooks/pre-commit';
-const gitHookPath = './.git/hooks/pre-commit';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+
+const hookPath = path.resolve('./hooks/pre-commit');
+const gitHookPath = path.resolve('./.git/hooks/pre-commit');
 
 (async () => {
     try {

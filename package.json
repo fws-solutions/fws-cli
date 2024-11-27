@@ -3,6 +3,7 @@
     "version": "0.4.6",
     "description": "CLI meant to work together with other Forwardslash boilerplates.",
     "main": "dist/app.js",
+    "type": "module",
     "engines": {
         "node": ">=20.2.0 <22.0.0"
     },
@@ -12,11 +13,11 @@
     "scripts": {
         "test": "jest --silent",
         "test:verbose": "jest --collect-coverage",
-        "build": "rimraf ./dist && tsc -p tsconfig.build.json && cpy ./src/templates/* ./dist/",
+        "build": "rimraf ./dist && tsc -p tsconfig.build.json && node build.js",
         "lint": "eslint src --ext ts --report-unused-disable-directives --max-warnings 0",
         "format": "prettier --check --ignore-path .gitignore '**/*.{js,ts,json,md}'",
         "format:fix": "prettier --write --ignore-path .gitignore '**/*.{js,ts,json,md}'",
-        "postinstall": "node copy.js"
+        "postinstall": "node postinstall.js"
     },
     "keywords": [
         "cli",
