@@ -1,10 +1,13 @@
 {
     "name": "@forwardslashns/fws-cli",
-    "version": "0.4.5",
+    "version": "0.4.6",
     "description": "CLI meant to work together with other Forwardslash boilerplates.",
     "main": "dist/app.js",
     "engines": {
         "node": ">=20.2.0 <22.0.0"
+    },
+    "bin": {
+        "fws": "./dist/app.js"
     },
     "scripts": {
         "test": "jest --silent",
