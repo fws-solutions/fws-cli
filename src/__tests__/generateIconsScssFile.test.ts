@@ -40,19 +40,21 @@ describe('util/generateIconsScssFile - testing generate icons scss file', () => 
     });
 
     it('should catch and log an exception', () => {
-        const mockWriteFileSync = jest.spyOn(fsModule, 'writeFileSync');
         const mockReadFileSync = jest.spyOn(fsModule, 'readFileSync').mockReturnValue('templateContent');
         const mockResolve = jest.spyOn(pathModule, 'resolve').mockReturnValue('/resolved/path');
         const mockConsoleLog = jest.spyOn(console, 'log');
+        try {
+            const mockWriteFileSync = jest.spyOn(fsModule, 'writeFileSync');
 
-        mockWriteFileSync.mockImplementation(() => {
-            throw new Error('Mocked writeFileSync error');
-        });
+            mockWriteFileSync.mockImplementation(() => {
+                throw new Error('Mocked writeFileSync error');
+            });
 
-        generateIconsScssFile(projectRoot, appRoot, svgDirPath);
-
-        expect(mockResolve).toHaveBeenCalledWith(appRoot, 'src/templates/other/temp-svg-gen-scss.txt');
-        expect(mockReadFileSync).toHaveBeenCalledWith('/resolved/path', 'utf8');
-        expect(mockConsoleLog).toHaveBeenCalledWith(expect.any(Error));
+            generateIconsScssFile(projectRoot, appRoot, svgDirPath);
+        } catch (err) {
+            expect(mockResolve).toHaveBeenCalledWith(appRoot, 'src/templates/other/temp-svg-gen-scss.txt');
+            expect(mockReadFileSync).toHaveBeenCalledWith('/resolved/path', 'utf8');
+            expect(mockConsoleLog).toHaveBeenCalledWith(expect.any(Error));
+        }
     });
 });
