@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { getCommander } from './commander/commander';
 import { getLogMessageInline } from './util/getLogMessageInline';
 
