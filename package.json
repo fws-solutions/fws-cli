@@ -19,7 +19,11 @@
         "cli",
         "fws"
     ],
-    "author": "Dejan Pudja, Marko Guzvic",
+    "author": "Forwardslash",
+    "homepage": "https://forwardslashny.com/",
+    "publishConfig": {
+        "access": "public"
+    },
     "license": "ISC",
     "dependencies": {
         "@html-next/svg-icon-optimizer": "^0.0.1",
