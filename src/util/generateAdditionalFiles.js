@@ -1,5 +1,5 @@
 import { getSvgIconData } from './getSvgIconData.js';
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
 import _template from 'lodash.template';
 import { compileSvgIcons } from './compileSvgIcons.js';
@@ -18,8 +18,10 @@ export const generateAdditionalFiles = (appRoot, projectRoot, svgDirPath, packag
     });
 
     try {
-        writeFileSync(svgIconData.svgIconFile, dataSvgIconGen, 'utf8');
-        getLogMessageInline('SvgIconGen.vue file is generated!', 'cyan');
+        if (existsSync(svgIconData.dir)) {
+            writeFileSync(svgIconData.svgIconFile, dataSvgIconGen, 'utf8');
+            getLogMessageInline('SvgIconGen.vue file is generated!', 'cyan');
+        }
     } catch (err) {
         if (err instanceof Error) {
             getLogMessageInline(err.message, 'red');
