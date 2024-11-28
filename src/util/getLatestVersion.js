@@ -4,7 +4,7 @@ import { isWin } from './isWin.js';
 export const getLatestVersion = () => {
     return new Promise((resolve, reject) => {
         let output = '';
-        const command = isWin() ? 'npm.cmd' : 'npm';
+        const command = 'npm';
         const script = spawn(command, ['view', '@forwardslashns/fws-cli', 'version']);
 
         script.stdout.setEncoding('utf-8');
