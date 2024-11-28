@@ -1,11 +1,9 @@
-import { spawn } from 'child_process';
-import { isWin } from './isWin.js';
+import { spawn, exec } from 'child_process';
 
 export const getLatestVersion = () => {
     return new Promise((resolve, reject) => {
         let output = '';
-        const command = 'npm';
-        const script = spawn(command, ['view', '@forwardslashns/fws-cli', 'version']);
+        const script = exec(`npm view @forwardslashns/fws-cli version`, { shell: true });
 
         script.stdout.setEncoding('utf-8');
         script.stdout.on('data', (data) => {

@@ -11,7 +11,7 @@ const latestVersion = {
     description: 'check for latest CLI version',
     alias: 'latest',
     async run() {
-        const spinner = setSpinner('%s ...checking latest @forwardslashny/fws-cli version...', '⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏');
+        const spinner = setSpinner('%s ...checking latest @forwardslashns/fws-cli version...', '⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏');
         spinner.start();
 
         const currentVersion = getCurrentVersion();
