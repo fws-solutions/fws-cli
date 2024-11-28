@@ -1,4 +1,4 @@
-import { spawn, exec } from 'child_process';
+import { exec } from 'child_process';
 
 export const getLatestVersion = () => {
     return new Promise((resolve, reject) => {
