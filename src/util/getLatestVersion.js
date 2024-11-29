@@ -1,9 +1,11 @@
 import { exec } from 'child_process';
+import { isWin } from './isWin';
 
 export const getLatestVersion = () => {
     return new Promise((resolve, reject) => {
         let output = '';
-        const script = exec(`npm view @forwardslashns/fws-cli version`, { shell: true });
+        const command = isWin() ? 'npm.cmd' : 'npm';
+        const script = exec(`${command} view @forwardslashns/fws-cli version`, { shell: true });
 
         script.stdout.setEncoding('utf-8');
         script.stdout.on('data', (data) => {

@@ -15,7 +15,7 @@ const npmi = {
             cwd: packageMetadata.projectRoot,
         };
         const command = isWin() ? 'npm.cmd' : 'npm';
-        const childProcess = exec(`npm i`, config);
+        const childProcess = exec(command, config);
 
         childProcess.on('close', (code) => {
             console.log(getMessageBasedOnCode(code, 'npm install'));

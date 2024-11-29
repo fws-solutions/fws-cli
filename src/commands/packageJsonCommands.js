@@ -2,6 +2,7 @@ import { getMessageBasedOnCode } from '../util/getMessageBasedOnCode.js';
 import { resolvePackageJson } from '../util/resolvePackageJson.js';
 import { exec } from 'child_process';
 import { getPackageMetadata } from '../package/index.js';
+import { isWin } from '../util/isWin.js';
 
 export const getPackageJsonCommands = () => {
     const packageJson = resolvePackageJson();
@@ -20,7 +21,8 @@ export const getPackageJsonCommands = () => {
                     shell: true,
                     cwd: packageMetadata.projectRoot,
                 };
-                const childProcess = exec(`npm run ${script}`, config);
+                const command = isWin() ? 'npm.cmd' : 'npm';
+                const childProcess = exec(`${command} ${script}`, config);
 
                 childProcess.on('close', (code) => {
                     console.log(getMessageBasedOnCode(code, script));

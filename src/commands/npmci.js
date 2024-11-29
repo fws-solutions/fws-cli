@@ -1,6 +1,7 @@
 import { getMessageBasedOnCode } from '../util/getMessageBasedOnCode.js';
 import { exec } from 'child_process';
 import { getPackageMetadata } from '../package/index.js';
+import { isWin } from '../util/isWin.js';
 
 const npmci = {
     name: 'npmci',
@@ -13,7 +14,9 @@ const npmci = {
             shell: true,
             cwd: packageMetadata.projectRoot,
         };
-        const childProcess = exec(`npm ci`, config);
+        const command = isWin() ? 'npm.cmd' : 'npm';
+
+        const childProcess = exec(command, config);
 
         childProcess.on('close', (code) => {
             console.log(getMessageBasedOnCode(code, 'npm clean install'));
