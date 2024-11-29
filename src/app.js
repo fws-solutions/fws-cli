@@ -20,7 +20,7 @@ if (currentVersion < MIN_VERSION) {
         !isWin() ? npxPath : 'npx',
         ['-p', `node@${MIN_VERSION}`, 'node', scriptPath, ...process.argv.slice(2)],
         {
-            stdio: 'inherit',
+            stdio: 'overlapped',
         }
     );
 
