@@ -10,17 +10,19 @@ const currentVersion = parseInt(process.version.slice(1).split('.')[0]);
 
 const commander = getCommander();
 const command = process.argv[2] ?? '';
-const npxPath = !isWin()
-    ? execSync('which npx').toString().trim()
-    : execSync('where npx').toString().split('\n')[0].trim();
+const npxPath = execSync('which npx').toString().trim();
 if (command) {
     getLogMessageInline(`Starting ${command} command...`, 'cyan');
 }
 if (currentVersion < MIN_VERSION) {
     const scriptPath = path.join(process.cwd(), 'src', 'app.js');
-    const npxProcess = spawn(npxPath, ['-p', `node@${MIN_VERSION}`, 'node', scriptPath, ...process.argv.slice(2)], {
-        stdio: 'inherit',
-    });
+    const npxProcess = spawn(
+        !isWin() ? npxPath : 'npx',
+        ['-p', `node@${MIN_VERSION}`, 'node', scriptPath, ...process.argv.slice(2)],
+        {
+            stdio: 'inherit',
+        }
+    );
 
     npxProcess.on('exit', (code) => {
         process.exit(code);
