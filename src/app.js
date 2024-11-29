@@ -10,7 +10,9 @@ const currentVersion = parseInt(process.version.slice(1).split('.')[0]);
 
 const commander = getCommander();
 const command = process.argv[2] ?? '';
-const npxPath = isWin() ? execSync('where npx').toString().trim() : execSync('which npx').toString().trim();
+const npxPath = isWin()
+    ? execSync('where npx').toString().split('\r\n')[0].trim()
+    : execSync('which npx').toString().trim();
 if (command) {
     getLogMessageInline(`Starting ${command} command...`, 'cyan');
 }
