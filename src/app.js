@@ -3,13 +3,16 @@ import { getCommander } from './commander/commander.js';
 import { getLogMessageInline } from './util/getLogMessageInline.js';
 import { spawn, execSync } from 'node:child_process';
 import path from 'node:path';
+import { isWin } from './util/isWin.js';
 
 const MIN_VERSION = 22;
 const currentVersion = parseInt(process.version.slice(1).split('.')[0]);
 
 const commander = getCommander();
 const command = process.argv[2] ?? '';
-const npxPath = execSync('which npx').toString().trim();
+const npxPath = !isWin()
+    ? execSync('which npx').toString().trim()
+    : execSync('where npx').toString().split('\n')[0].trim();
 if (command) {
     getLogMessageInline(`Starting ${command} command...`, 'cyan');
 }
