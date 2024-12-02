@@ -1,5 +1,5 @@
 import { exec } from 'child_process';
-import { isWin } from './isWin';
+import { isWin } from './isWin.js';
 
 export const getLatestVersion = () => {
     return new Promise((resolve, reject) => {
