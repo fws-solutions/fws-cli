@@ -1,6 +1,5 @@
-import { getMessageBasedOnCode } from '../util/getMessageBasedOnCode.js';
 import { resolvePackageJson } from '../util/resolvePackageJson.js';
-import { exec } from 'child_process';
+import { spawn } from 'child_process';
 import { getPackageMetadata } from '../package/index.js';
 import { isWin } from '../util/isWin.js';
 
@@ -17,16 +16,17 @@ export const getPackageJsonCommands = () => {
             run: () => {
                 const packageMetadata = getPackageMetadata();
                 if (!packageMetadata?.isValid) throw new Error(`Script ${script} failed with code 1`);
-                const config = {
-                    shell: true,
+
+                const npmCommand = isWin() ? 'npm.cmd' : 'npm';
+
+                const childProcess = spawn(npmCommand, ['run', script], {
                     cwd: packageMetadata.projectRoot,
-                };
-                const command = isWin() ? 'npm.cmd' : 'npm';
-                const childProcess = exec(`${command} ${script}`, config);
+                    stdio: 'inherit',
+                    shell: true,
+                });
 
                 childProcess.on('close', (code) => {
-                    console.log(getMessageBasedOnCode(code, script));
-                    throw new Error(`Script ${script} failed with code ${code}`);
+                    process.exit(code);
                 });
             },
         };
