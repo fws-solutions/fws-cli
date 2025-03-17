@@ -18,7 +18,7 @@ const createFiles = {
     name: 'create-file',
     description: 'create component files',
     alias: 'cf',
-    mandatoryOptions: [{ command: '-fn, --file-name <filename>', description: 'file name, mandatory' }],
+    mandatoryOptions: [{ command: '-f, --file-name <filename>', description: 'file name, mandatory' }],
     additionalOptions: [
         { command: '-b, --block', description: 'create WP block, 1 type of component mandatory' },
         { command: '-l, --listing', description: 'create WP listing, 1 type of component mandatory' },
