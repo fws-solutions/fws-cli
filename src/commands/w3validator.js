@@ -8,7 +8,7 @@ const w3validator = {
     name: 'w3Validator',
     description: 'validate via w3 api',
     alias: 'w3',
-    mandatoryOptions: [{ command: '-url, --url <url>', description: 'url, mandatory' }],
+    mandatoryOptions: [{ command: '-u, --url <url>', description: 'url, mandatory' }],
     async run(options) {
         const { url } = options;
         const packageMetadata = getPackageMetadata();
