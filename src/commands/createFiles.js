@@ -44,6 +44,9 @@ const createFiles = {
         const packageMetadata = getPackageMetadata();
         if (!packageMetadata?.isValid) throw new Error('Script: create-file failed with code: 1');
 
+        const themeVersion = packageMetadata.packageJson?.version;
+        const isNewWPStarter = themeVersion && parseInt(themeVersion.split('.')[0], 10) >= 4;
+
         const type = Object.entries(options)[1][0];
         const dirName = _startCase(fileName).replace(/[\s]+/g, '-').toLowerCase();
         const dirType = getDirType(type);
@@ -55,8 +58,11 @@ const createFiles = {
                 createDirectory(dirPath);
                 createFile(dirName, dirType, 'php', '', 'php', dirPath);
                 createFile(dirName, dirType, 'php-fe', '_fe-', 'php', dirPath);
-                createFile(dirName, dirType, 'scss', '_', 'scss', dirPath);
-                updateScssFile(packageMetadata.projectRoot, dirType, dirName);
+                createFile(dirName, dirType, 'scss', isNewWPStarter ? '' : '_', 'scss', dirPath);
+
+                if (!isNewWPStarter) {
+                    updateScssFile(packageMetadata.projectRoot, dirType, dirName);
+                }
             } else if (['blockVue', 'partVue'].includes(type) && packageMetadata.packageType !== 'wp') {
                 const vueComponentDir = getVueComponentDirectory(packageMetadata);
                 const componentName = (_startCase(dirType) + _startCase(dirName)).replace(/[\s]+/g, '');
