@@ -6,10 +6,9 @@ export const prepareIconsScssFile = (svgDirPath) => {
     readdirSync(svgDirPath).forEach((file) => {
         const iconName = basename(file, '.svg');
         const filePath = relative('src/scss', join(svgDirPath, file)).replace(/\\/g, '/');
-        const relativePath = '../' + filePath.split('/src/')[1];
 
         scssImports += `@if $icon == ${iconName} {\n`;
-        scssImports += `\t$path: '${relativePath}'\n`;
+        scssImports += `\t$path: '${filePath}'\n`;
         scssImports += '}\n';
     });
 
