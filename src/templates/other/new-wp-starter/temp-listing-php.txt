@@ -1,0 +1,22 @@
+<?php
+/**
+ * Template View for displaying Parts
+ *
+ * @package fws_starter_s
+ */
+
+declare(strict_types=1);
+
+// get template vars
+$vars = $vars ?? [];
+
+// set template view values
+$title = $vars['title'] ?? '';
+
+fws()->render()->includeCss();
+//fws()->render()->includeJs();
+?>
+
+<div class="<%= str %>">
+	<h2><?php echo $title; ?></h2>
+</div><!-- .<%= str %> -->

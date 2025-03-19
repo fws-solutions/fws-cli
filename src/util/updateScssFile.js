@@ -11,12 +11,13 @@ export const updateScssFile = (projectRoot, dirType, fileName) => {
 
     if (existsSync(file)) {
         output = readFileSync(file, 'utf8');
+        output = output.replace(/^(?=\n)$|^\s*|\s*$|\n\n+/gm, '');
+        output += `\n@import '../../../${directory}/${dirType}s/${fileName}/${fileName}';`;
+
+        writeFileSync(file, output, 'utf8');
+
+        getLogMessageInline(`Updated SCSS file: '${generateFile}' in dir '${directoryPath}'`, 'cyan');
+    } else {
+        getLogMessageInline(`'${generateFile}' file doesn't exist`, 'red');
     }
-
-    output = output.replace(/^(?=\n)$|^\s*|\s*$|\n\n+/gm, '');
-    output += `\n@import '../../../${directory}/${dirType}s/${fileName}/${fileName}';`;
-
-    writeFileSync(file, output, 'utf8');
-
-    getLogMessageInline(`Updated SCSS file: '${generateFile}' in dir '${directoryPath}'`, 'cyan');
 };

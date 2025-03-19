@@ -56,9 +56,9 @@ const createFiles = {
             if (['block', 'listing', 'part'].includes(type) && packageMetadata.packageType === 'wp') {
                 validateDirectory(dirPath, `ERROR: ${dirType} '${dirName}' already exists!`);
                 createDirectory(dirPath);
-                createFile(dirName, dirType, 'php', '', 'php', dirPath);
-                createFile(dirName, dirType, 'php-fe', '_fe-', 'php', dirPath);
-                createFile(dirName, dirType, 'scss', isNewWPStarter ? '' : '_', 'scss', dirPath);
+                createFile(dirName, dirType, 'php', '', 'php', dirPath, packageMetadata);
+                createFile(dirName, dirType, 'php-fe', '_fe-', 'php', dirPath, packageMetadata);
+                createFile(dirName, dirType, 'scss', isNewWPStarter ? '' : '_', 'scss', dirPath, packageMetadata);
 
                 if (!isNewWPStarter) {
                     updateScssFile(packageMetadata.projectRoot, dirType, dirName);

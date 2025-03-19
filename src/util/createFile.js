@@ -4,7 +4,7 @@ import { compileTemplate } from './compileTemplate.js';
 import { resolve } from 'path';
 import { ROLL_BACK } from '../consts/rollBack.js';
 
-export const createFile = (dirName, dirType, tempName, prefix, extension, dirPath) => {
+export const createFile = (dirName, dirType, tempName, prefix, extension, dirPath, packageMetadata) => {
     const template = `temp-${dirType}-${tempName}.txt`;
     const fileName = `${prefix + dirName}.${extension}`;
     const writeDir = resolve(dirPath, fileName);
@@ -12,7 +12,7 @@ export const createFile = (dirName, dirType, tempName, prefix, extension, dirPat
     const data = {
         str: dirName,
     };
-    const output = compileTemplate(template, data);
+    const output = compileTemplate(template, data, packageMetadata);
 
     writeFile(writeDir, output, 'utf8').catch((exception) => {
         ROLL_BACK.files.push(writeDir);
