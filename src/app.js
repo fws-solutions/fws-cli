@@ -5,7 +5,7 @@ import { spawn, execSync } from 'node:child_process';
 import path from 'node:path';
 import { isWin } from './util/isWin.js';
 
-const MIN_VERSION = 22;
+const MIN_VERSION = 14;
 const currentVersion = parseInt(process.version.slice(1).split('.')[0]);
 
 const commander = getCommander();

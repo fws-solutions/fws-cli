@@ -1,6 +1,6 @@
 <?php
 /**
- * Template View for displaying Parts
+ * Template View for displaying Listings
  *
  * @package fws_starter_s
  */
