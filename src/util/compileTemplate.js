@@ -1,9 +1,10 @@
 import { readFileSync } from 'fs';
-import { resolve } from 'path';
+import { dirname, resolve } from 'path';
 import _ from 'lodash';
+import { fileURLToPath } from 'url';
 
 export const compileTemplate = (templateFile, data, packageMetadata) => {
-    const appRoot = import.meta.dirname.split('src')[0];
+    const appRoot = dirname(fileURLToPath(import.meta.url)).split('src')[0] ?? '';
     const themeVersion = packageMetadata.packageJson?.version;
     const isNewWPStarter =
         themeVersion && packageMetadata.packageType === 'wp' && parseInt(themeVersion.split('.')[0], 10) >= 4;

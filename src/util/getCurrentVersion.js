@@ -1,7 +1,9 @@
 import { readFileSync } from 'fs';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 export const getCurrentVersion = () => {
-    const appRoot = import.meta.dirname.split('src')[0];
+    const appRoot = dirname(fileURLToPath(import.meta.url)).split('src')[0] ?? '';
     const packageJsonPath = `${appRoot}package.json`;
 
     try {
