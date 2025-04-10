@@ -3,6 +3,7 @@ export const PACKAGE_TYPES = {
         type: 'wp',
         allowedCommands: [
             'create-file',
+            'create-lando-file',
             'remove-fe',
             'icons',
             'latest-version',

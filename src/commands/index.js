@@ -6,5 +6,16 @@ import { icons } from './icons.js';
 import { latestVersion } from './latestVersion.js';
 import { postInstall } from './postinstall.js';
 import { w3validator } from './w3validator.js';
+import { createLandoFile } from './createLandoFile.js';
 
-export const commands = [npmi, npmci, createFiles, deleteFEFiles, icons, latestVersion, postInstall, w3validator];
+export const commands = [
+    npmi,
+    npmci,
+    createFiles,
+    createLandoFile,
+    deleteFEFiles,
+    icons,
+    latestVersion,
+    postInstall,
+    w3validator,
+];
