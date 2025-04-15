@@ -1,5 +1,5 @@
-@use '../../../src/scss/config/variables';
-@use '../../../src/scss/helpers/mixins';
+@use '../../../src/scss/config/variables' as *;
+@use '../../../src/scss/helpers/mixins' as *;
 
 /*--------------------------------------------------------------
 ## <%= str %>
