@@ -1,7 +1,7 @@
 import { getMessageBasedOnCode } from '../util/getMessageBasedOnCode.js';
-import { exec } from 'child_process';
 import { getPackageMetadata } from '../package/index.js';
 import { isWin } from '../util/isWin.js';
+import { spawn } from 'node:child_process';
 
 const npmci = {
     name: 'npmci',
@@ -10,17 +10,22 @@ const npmci = {
     run() {
         const packageMetadata = getPackageMetadata();
         if (!packageMetadata?.isValid) throw new Error('Npm clean install failed.', 1);
+
+        const command = isWin() ? 'npm.cmd' : 'npm';
+        const args = ['ci'];
         const config = {
             shell: true,
             cwd: packageMetadata.projectRoot,
+            stdio: 'inherit',
         };
-        const command = isWin() ? 'npm.cmd' : 'npm';
 
-        const childProcess = exec(command, config);
+        const childProcess = spawn(command, args, config);
 
         childProcess.on('close', (code) => {
             console.log(getMessageBasedOnCode(code, 'npm clean install'));
-            throw new Error('Npm clean install failed.', code);
+            if (code !== 0) {
+                throw new Error(`Npm clean install failed with code: ${code}`);
+            }
         });
     },
 };

@@ -49,7 +49,7 @@ const createFiles = {
 
         const type = Object.entries(options)[1][0];
         const dirName = _startCase(fileName).replace(/[\s]+/g, '-').toLowerCase();
-        const dirType = getDirType(type);
+        const dirType = getDirType(type, isNewWPStarter);
         const dirPath = resolve(packageMetadata.projectRoot, `template-views/${dirType}s/${dirName}`);
 
         try {
