@@ -18,5 +18,5 @@ fws()->render()->includeCss();
 ?>
 
 <div class="<%= str %>">
-	<span><?php echo $title; ?></span>
+	<span><?php echo esc_html($title); ?></span>
 </div><!-- .<%= str %> -->
